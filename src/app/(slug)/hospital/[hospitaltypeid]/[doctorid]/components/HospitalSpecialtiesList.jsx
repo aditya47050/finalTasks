@@ -5,13 +5,66 @@ import Icons from "@/lib/icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Heart,
-  Search,
-  X,
-  Loader2,
-  CheckCircle,
-} from "lucide-react";
+import { Heart, Search, X, Loader2, CheckCircle } from "lucide-react";
+
+/* Smart icon matching function */
+function findSrc(title) {
+  const icon = Icons.find(
+    (i) => i.title.toLowerCase() === title.toLowerCase()
+  );
+  return icon ? icon.src : Icons[0].src;
+}
+
+function getIconForSpecialty(name) {
+  if (!name) return Icons[0].src;
+  const cleanName = name.toLowerCase();
+
+  // Exact match
+  const exact = Icons.find(
+    (icon) => icon.title.toLowerCase() === cleanName
+  );
+  if (exact) return exact.src;
+
+  // Keyword mapping
+  if (cleanName.includes("general")) return findSrc("Heart");
+  if (cleanName.includes("cardio")) return findSrc("Heart");
+  if (cleanName.includes("emergency")) return findSrc("Heart");
+  if (cleanName.includes("internal")) return findSrc("Liver");
+  if (cleanName.includes("occupational")) return findSrc("Spine");
+  if (cleanName.includes("chest")) return findSrc("Heart");
+  if (cleanName.includes("brain") || cleanName.includes("neuro"))
+    return findSrc("Brain");
+  if (cleanName.includes("eye") || cleanName.includes("ophthal"))
+    return findSrc("Eyes");
+  if (cleanName.includes("skin") || cleanName.includes("derma"))
+    return findSrc("Skin");
+  if (cleanName.includes("ent")) return findSrc("ENT");
+  if (cleanName.includes("dental") || cleanName.includes("tooth"))
+    return findSrc("Dental");
+  if (cleanName.includes("thyroid")) return findSrc("Thyroid");
+  if (cleanName.includes("breast")) return findSrc("Breast");
+  if (cleanName.includes("liver")) return findSrc("Liver");
+  if (cleanName.includes("pancreas")) return findSrc("Pancreas");
+  if (cleanName.includes("stomach") || cleanName.includes("gastro"))
+    return findSrc("Stomach");
+  if (cleanName.includes("gall")) return findSrc("Gallbladder");
+  if (cleanName.includes("kidney") || cleanName.includes("nephro"))
+    return findSrc("Kidney");
+  if (cleanName.includes("spine")) return findSrc("Spine");
+  if (cleanName.includes("gyne") || cleanName.includes("obstet"))
+    return findSrc("Gynecology");
+  if (cleanName.includes("ivf")) return findSrc("IVF");
+  if (cleanName.includes("repro")) return findSrc("Reproduction");
+  if (cleanName.includes("joint") || cleanName.includes("ortho") || cleanName.includes("bone"))
+    return findSrc("Joint Replacement");
+  if (cleanName.includes("pediatric") || cleanName.includes("child"))
+    return findSrc("Pediatrics");
+  if (cleanName.includes("cancer") || cleanName.includes("onco"))
+    return findSrc("Cancer");
+
+  // Default fallback
+  return Icons[0].src;
+}
 
 const HospitalSpecialtiesList = ({ hospitalId, onClose }) => {
   const [specialties, setSpecialties] = useState([]);
@@ -33,13 +86,13 @@ const HospitalSpecialtiesList = ({ hospitalId, onClose }) => {
       setLoading(true);
       console.log(`🔍 Fetching specialties for hospital: ${hospitalId}`);
       const response = await fetch(`/api/hospital/${hospitalId}/specialties`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch specialties");
-      }
+      if (!response.ok) throw new Error("Failed to fetch specialties");
+
       const data = await response.json();
       console.log(
         `✅ Received ${data.specialties?.length || 0} specialties for this hospital`
       );
+
       setSpecialties(data.specialties || []);
       setFilteredSpecialties(data.specialties || []);
     } catch (err) {
@@ -64,8 +117,6 @@ const HospitalSpecialtiesList = ({ hospitalId, onClose }) => {
     }
     setFilteredSpecialties(filtered);
   };
-
-  const iconsArray = Object.values(Icons);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm lg:bg-white lg:backdrop-blur-0 lg:p-0 p-4 flex items-center lg:block justify-center">
@@ -168,7 +219,8 @@ const HospitalSpecialtiesList = ({ hospitalId, onClose }) => {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 justify-center">
                 {filteredSpecialties.map((spec, index) => {
-                  const icon = iconsArray[index % iconsArray.length]; // cycle icons
+                  const title = spec.speciality?.title || "";
+                  const iconSrc = getIconForSpecialty(title);
                   return (
                     <div
                       key={spec.id || index}
@@ -176,15 +228,15 @@ const HospitalSpecialtiesList = ({ hospitalId, onClose }) => {
                     >
                       <span className="xl:h-24 xl:w-24 md:h-16 md:w-16 mb-3">
                         <Image
-                          src={icon.src}
+                          src={iconSrc}
                           width={200}
                           height={200}
-                          alt={icon.title || spec.speciality?.title || "Specialty"}
+                          alt={title || "Specialty"}
                           className="rounded-xl object-contain"
                         />
                       </span>
                       <p className="text-[#5271FF] font-poppins text-[14px] font-bold mb-2">
-                        {spec.speciality?.title || icon.title || "Specialty"}
+                        {title || "Specialty"}
                       </p>
                       {spec.doctorCount !== undefined && (
                         <p className="text-[12px] text-gray-600 font-medium">
