@@ -1,0 +1,473 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Alata&display=swap');
+
+
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+@media print {
+  @page {
+
+    margin: 0;
+  size: landscape; 
+  }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+/* Custom Styles */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+/* Add this to your global CSS file */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.six-caps-regular {
+  font-family: "Six Caps", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.alata-regular {
+  font-family: "Alata", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "MagnoliaScript";
+  src: url("/fonts/MagnoliaScript.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Amsterdam One";
+  src: url("/fonts/amster") format("TrueType");
+  font-weight: 400;
+  font-style: normal;
+}
+.blurred {
+  filter: blur(10px);
+}
+
+.screenshot-watermark::after {
+  content: "CONFIDENTIAL";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 10rem;
+  color: rgba(255, 0, 0, 0.1);
+  pointer-events: none;
+  z-index: 9999;
+  white-space: nowrap;
+}
+
+
+.poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.poppins-thin-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.poppins-extralight-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.poppins-light-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-medium-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.poppins-bold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.poppins-extrabold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.poppins-black-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+.alex-brush-regular {
+  font-family: "Alex Brush", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+.clip-bucket {
+  clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+}
+/* global.css */
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.alert-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  font-size: 16px;
+}
+
+.alert-box button {
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.alert-box button:hover {
+  background-color: #0056b3;
+}
+
+.bar-hover:hover {
+  fill: rgba(0, 0, 0, 0.1); /* Change to desired hover color */
+}
+
+@media screen and (max-width: 1220px) {
+  .des-hed-gap{
+    gap: 0.25rem;
+  }
+  .des-header-nav-item {
+    font-size: 9px;
+  }
+  .side-bar-text-size{
+    font-size: 6px;
+  }
+}
+@media screen and (min-width: 1220px) {
+  .lgg1{
+    gap:0.3rem;
+  }
+  .lg1{
+    font-size:12px;
+  }
+  .side-bar-lg-text{
+    font-size: 8px;
+  }
+}
+/* Default vertical spacing between sidebar items */
+.custom-sidebar-spacing > * + * {
+  margin-top: 1rem; /* Same as space-y-4 */
+}
+
+/* Reduce spacing at 150% zoom level (~1200px or smaller) */
+@media (max-width: 1200px) {
+  .custom-sidebar-spacing > * + * {
+    margin-top: 0.6rem; /* Reduce gap */
+  }
+}
+.responsive-image {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 100px) {
+    .responsive-image {
+      width: 100px;
+      height: auto;
+    }
+  }
+
+  @media (min-width: 120px) {
+    .responsive-image {
+      width: 120px;
+      height: auto;
+    }
+  }
+
+  @media (min-width: 150px) {
+    .responsive-image {
+      width: 150px;
+      height: auto;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .responsive-image {
+      width: 416px;
+      height: 250px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .responsive-image {
+      width: 500px;
+      height: 300px;
+    }
+  }
+  .react-datepicker-wrapper,
+  .react-datepicker__input-container {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .react-datepicker__input-container input {
+    width: 100% !important;
+  }
+.l1Bold {
+  font-weight: bold;
+  font-size: 25px;
+}
+.l3Bold {
+  font-weight: bold;
+  font-size: 20px;
+}
+.d-external-link-icon{
+  display:inline-block;
+  height: 20px;
+  width: 20px;
+}
+.ndfHFb-c4YZDc-Wrql6b{
+  display: none;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  display: flex;
+  width: max-content;
+  animation: scroll 20s linear infinite;
+}
+/* Container */
+#factbox-expandable {
+  max-width: 900px;         /* keeps it neat */
+  margin: 20px auto;        /* center align */
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* Each Row */
+#factbox-expandable .marginTop-16 {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px; /* space between rows */
+}
+
+/* Left Column (title like "Usually seen in") */
+#factbox-expandable .bodyBold.col-3 {
+  flex: 0 0 220px;          /* fixed width for labels */
+  font-weight: bold;
+  font-size: 15px;
+  color: #333;
+  padding-right: 20px;      /* space between left & right */
+}
+
+/* Right Column (details) */
+#factbox-expandable .col-8 {
+  flex: 1;                  /* take remaining width */
+  font-size: 14px;
+  color: #555;
+}
+
+/* Lists inside right side */
+#factbox-expandable .col-8 ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Icons column - optional hide if empty */
+#factbox-expandable .col-1 {
+  display: none; /* hide icon column if not needed */
+}
+
+.col-12 ul{
+  margin-left: 20px;
+}
+
+.style__pointer___1aMsp{
+  font-weight: bold;
+}
+.style__marginBoth8___1oj61 {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  width: 100%;
+  height: 150px; 
+}
+
+/* Image box */
+.style__card-img___2yxdJ img {
+  display: none;
+  border-radius: 8px;
+  object-fit: cover;
+  width: 104px;
+  height: 136px;
+}
+
+/* Text content */
+.style__card-content___37GN2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.style__card-content___37GN2 .bodySemiBold {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.style__card-content___37GN2 .textSecondary {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+
+.col-12 img{
+  display: none;
+}
+.col-12 ol li a img{
+  display: inline-block;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 4s linear forwards;
+}

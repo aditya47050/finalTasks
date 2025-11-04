@@ -1,0 +1,3104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Payments for Hospital (covers all HspRole)
+model HospitalPayment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  hospitalId    String   @db.ObjectId
+  hospital      Hospital @relation(fields: [hospitalId], references: [id])
+  amount        Float
+  paymentStatus String
+  transactionId String   @unique
+  role          HspRole // Indicates which HspRole this payment is for
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  forwhat       String?
+}
+
+// Payments for Pharmacy
+model PharmacyPayment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  pharmacyId    String   @db.ObjectId
+  pharmacy      Pharmacy @relation(fields: [pharmacyId], references: [id])
+  amount        Float
+  paymentStatus String
+  transactionId String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  forwhat       String?
+}
+
+// Payments for Ambulance
+model AmbulancePayment {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  ambulanceId   String    @db.ObjectId
+  ambulance     Ambulance @relation(fields: [ambulanceId], references: [id])
+  amount        Float
+  paymentStatus String
+  transactionId String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  forwhat       String?
+}
+
+// Payments for Doctor
+model DoctorPayment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  doctorId      String   @db.ObjectId
+  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+  amount        Float
+  paymentStatus String
+  transactionId String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  forwhat       String?
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String    @db.ObjectId
+  providerType       String
+  providerId         String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id])
+
+  @@unique([providerId, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String?
+  email                String?   @unique
+  emailVerified        DateTime?
+  resetToken           String? // Nullable field for storing reset token
+  resetTokenExpiration DateTime? // Nullable field for token expiration
+  image                String?
+  password             String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  role                 Role?     @default(USER)
+  accounts             Account[]
+  sessions             Session[]
+}
+
+model SuperAdminRegisterOtp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model SuperAdminLoginOtp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Otp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model LoginOtp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model BookAppointmentOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model BedBookingOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model EmergencyAmbulanceBookingOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model AmbulanceBookingOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model ContactRequestOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model HealthCardOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model CarrierRequestOTP {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  otp       String
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Patient {
+  id                      String                  @id @default(auto()) @map("_id") @db.ObjectId
+  email                   String                  @unique
+  mobile                  String
+  password                String
+  pincode                 String?
+  firstName               String?
+  middleName              String?
+  lastName                String?
+  dateOfBirth             DateTime?
+  gender                  String?
+  maritalStatus           String?
+  religion                String?
+  caste                   String?
+  subcaste                String?
+  alternateMobile         String?
+  presentAddress          String?
+  permanentAddress        String?
+  city                    String?
+  state                   String?
+  district                String?
+  taluka                  String?
+  resetToken              String? // Nullable field for storing reset token
+  resetTokenExpiration    DateTime? // Nullable field for token expiration
+  bloodgroup              String?
+  passportPhoto           String?
+  aadharCardNumber        String?
+  aadharCardFront         String?
+  aadharCardBack          String?
+  abhacard                Boolean?
+  abhaCardNumber          String?
+  abhaCardFront           String?
+  healthInsurance         Boolean?
+  healthInsuranceNumber   String?
+  healthInsuranceDocument String?
+  provider                String?
+  coverage                String?
+  copay                   String?
+  ayushmancard            Boolean?
+  ayushmanCard            String?
+  ayushmanCardFront       String?
+  rationcard              Boolean?
+  rationCardNumber        String?
+  rationcardtype          String?
+  rationCardFront         String?
+  rationCardBack          String?
+  organDonation           Boolean?
+  bankName                String?
+  accountNumber           String?
+  ifscCode                String?
+  accountType             String?
+  cancelledCheque         String? // Could store file path or URL for the uploaded document
+  micrCode                String?
+  income                  Boolean?
+  incomeCertificateimg    String? // Optional, if income certificate is provided
+  incomeCertificateNo     String? // Optional, if income certificate number is provided
+  incomerange             String?
+  hasPanCard              Boolean?
+  panCardNumber           String?
+  panCard                 String? // Could store file path or URL for the uploaded document
+  contactPersonName       String?
+  contactPersonRelation   String?
+  role                    String?                 @default("Patient")
+  contactmanaadharNumber  String?
+  isCompanyRegistered     Boolean?
+  companyRegistrationNo   String? // Optional
+  employeeIdCard          String?
+  educationlevel          String?
+  occupation              String?
+  ekycdoc                 String?
+  form                    String?
+  familymembers           FamilyMember[]
+  addedAsFamilyMember     FamilyMember[]          @relation("FamilyMemberRegisteredPatient")
+  medicalhistory          MedicalHistory[]
+  bookFreeAppointment     BookFreeAppointment[]   @relation("PatientAppointments")
+  bedbooking              BedBooking[]            @relation("PatientBedBooking")
+  healthcard              HealthCard[]            @relation("HealthCard")
+  bookambulance           BookAmbulance[]         @relation("BookAmbulance")
+  emergencyambulance      EmergencyAmbulance[]    @relation("EmergencyAmbulance")
+  patientMedicalHistory   PatientMedicalHistory[] @relation("PatientMedicalHistory")
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  donar                   donor[]
+  fundraiser              fundraiser[]
+  BookDiagnosticService   BookDiagnosticService[]
+  BookLabTest             BookLabTest[]
+  BookWellnesspackage     BookWellnesspackage[]
+  BookBloodbank           BookBloodbank[]
+  Payment                 PatientPayment[]
+  Eseva                   Eseva?                  @relation(fields: [esevaId], references: [id])
+  esevaId                 String?                 @db.ObjectId
+  subAdminId              String?                 @db.ObjectId
+  subAdmin                EsevaSubAdmin?          @relation(fields: [subAdminId], references: [id])
+
+  profileComplete        Boolean                 @default(false)
+  BookSurgeryTreatment   BookSurgeryTreatment[]
+  reviews                HospitalReview[]
+  BookHomeHealthcare     BookHomeHealthcare[]
+  PharmacyOrder          PharmacyOrder[]
+  reviewsdoctor          DoctorReview[]
+  reviewsambulance       AmbulanceReview[]
+  healthInsuranceReviews HealthInsuranceReview[]
+  prescriptions          Prescription[]
+  VideoConsultation      VideoConsultation[]
+  healthInsurances       UserHealthInsurance[]
+  sentConnectionRequests ConnectionRequest[] @relation("PatientToConnectionRequests")
+}
+model ConnectionRequest {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderEmail   String   // Parent (logged-in user)
+  receiverEmail String   // Child’s email
+  status        ConnectionStatus @default(PENDING)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  parentId      String?  @db.ObjectId
+  remark        String?
+  
+  parent        Patient? @relation("PatientToConnectionRequests", fields: [parentId], references: [id])
+}
+
+enum ConnectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model UserHealthInsurance {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  provider     String
+  policyNumber String
+  document     String?
+  coverage     String?
+  copay        String?
+  patient      Patient  @relation(fields: [patientId], references: [id])
+  patientId    String   @db.ObjectId
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VideoConsultation {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  roomId        String    @unique
+  doctorId      String    @db.ObjectId
+  patientId     String    @db.ObjectId
+  appointmentId String?   @db.ObjectId
+  status        String    @default("requested") // requested | accepted | in_progress | finished | cancelled
+  startedAt     DateTime?
+  endedAt       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  Doctor  Doctor?  @relation(fields: [doctorId], references: [id])
+  Patient Patient? @relation(fields: [patientId], references: [id])
+}
+
+
+model HealthInsurance {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  policyNumber String
+  document     String?
+
+  // 📝 Coverage details
+  coverage    String? // description of covered treatments/diseases
+  coverAmount String? // insured sum assured (e.g. "5,00,000" or "5L")
+
+  // 💰 Financial terms
+  copay          String? // textual rule, e.g. "10% copay"
+  startingAmount String? // base premium (e.g. "5000 per year")
+  discount       String? // % discount (e.g. "10%")
+
+  // 🏥 Extra fields
+  category         String?
+  companyName      String?
+  insuranceType    String?
+  insurancePackage String?
+  diseaseCategory  String?
+  budgetRange      String?
+
+  headOffice       String?
+  contactNumber    String?
+  networkHospitals Int?
+  facilities       String?
+  requiredDocs     String?
+  beneficiaryCount Int?
+  complaints       String?
+  reviews          HealthInsuranceReview[]
+  description      String?
+  logo             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HealthInsuranceReview {
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  healthInsurance   HealthInsurance @relation(fields: [healthInsuranceId], references: [id])
+  healthInsuranceId String          @db.ObjectId
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @db.ObjectId
+
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+}
+
+model HospitalReview {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String   @db.ObjectId
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  patientId  String   @db.ObjectId
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+}
+
+model PatientPayment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId     String   @db.ObjectId
+  amount        Float
+  paymentStatus String
+  transactionId String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  forwhat       String?
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  esevaId       String?  @db.ObjectId
+  eseva         Eseva?   @relation(fields: [esevaId], references: [id])
+
+  esevaSubAdminId String?        @db.ObjectId
+  esevaSubAdmin   EsevaSubAdmin? @relation(fields: [esevaSubAdminId], references: [id])
+}
+
+model PatientMedicalHistory {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  patient   Patient?  @relation("PatientMedicalHistory", fields: [patientId], references: [id])
+  patientId String?   @map("_patientId") @db.ObjectId // Add foreign key for the relation
+  otp       String?
+  otpExpiry DateTime?
+  email     String    @unique
+}
+
+model BookFreeAppointment {
+  id                      String                 @id @default(auto()) @map("_id") @db.ObjectId
+  firstName               String
+  middleName              String?
+  lastName                String
+  mobileNumber            String
+  email                   String // Removed @unique constraint
+  aadharCardNumber        String?
+  city                    String
+  pinCode                 String
+  preferredDate           DateTime?
+  preferredTime           String?
+  gender                  String
+  dateOfBirth             DateTime?
+  category                ExpertDoctorsCategory? @relation(fields: [expertDoctorsCategoryId], references: [id])
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  patient                 Patient?               @relation("PatientAppointments", fields: [patientId], references: [id])
+  patientId               String?                @map("_patientId") @db.ObjectId // Add foreign key for the relation
+  expertDoctorsCategoryId String?                @db.ObjectId
+  status                  ApprovalStatus?        @default(PENDING) // Status: "pending", "approved", "rejected"
+  doctor                  Doctor?                @relation(fields: [doctorId], references: [id])
+  doctorId                String?                @db.ObjectId
+  doctorNotes             String?
+  notes                   String?
+  bookedByType            BookedByType?
+  bookedById              String?                @db.ObjectId
+  hospitalId              String?                @db.ObjectId
+  hspRole                 HspRole?
+  prescriptions           Prescription[]
+}
+
+enum BookedByType {
+  PATIENT
+  RECEPTIONIST
+  HOSPITAL
+}
+
+model BedBooking {
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId // Unique identifier for the booking
+  firstName               String? // First name of the patient
+  middleName              String? // Middle name of the patient (optional)
+  lastName                String? // Last name of the patient
+  dateOfBirth             DateTime? // Date of birth of the patient
+  gender                  String? // Gender of the patient
+  aadharCardNumber        String? // Aadhar card number of the patient
+  mobileNumber            String? // Mobile number of the patient
+  email                   String? // Email address of the patient
+  hospitalType            String? // Type of hospital (e.g., private, government)
+  bedCategory             String? // Category of the bed (e.g., general, deluxe)
+  advanceSearch           String? // Indicates if the booking is for an advanced search
+  hospitalName            String? // Name of the hospital
+  pinCode                 String? // Pincode of the hospital's location
+  city                    String?
+  aadharCardImage         String? // Front image of the Aadhar card (optional)
+  healthcard              Boolean? // Health card number of the patient (optional)
+  medicaldoc1             String? // Medical document 1 (optional)
+  medicaldoc2             String? // Medical document 2 (optional)
+  medicaldoc3             String? // Medical document 3 (optional)
+  medicaldoc4             String? // Medical document 4 (optional)
+  medicaldoc5             String? // Medical document 5 (optional)
+  healthInsurance         Boolean?
+  healthInsuranceNumber   String?
+  healthInsuranceDocument String?
+  ayushmancard            Boolean?
+  ayushmanCardNumber      String?
+  ayushmanCardFront       String?
+  diseaseDetails          String?
+  bloodgroup              String?
+  Bookingdate             DateTime?
+  createdAt               DateTime  @default(now()) // Timestamp for when the booking was created
+  updatedAt               DateTime  @updatedAt // Timestamp for when the booking was last updated
+
+  // Foreign key reference to the Bed model
+  bedId        String?       @db.ObjectId
+  bed          Bed?          @relation(fields: [bedId], references: [id]) // Define the relation to Bed
+  recievedfrom String?       @default("Patient") // Indicates who made the booking, defaulting to "Patient"
+  patient      Patient?      @relation("PatientBedBooking", fields: [patientId], references: [id])
+  patientId    String?       @map("_patientId") @db.ObjectId // Add foreign key for the relation
+  hospital     Hospital?     @relation(fields: [hospitalId], references: [id])
+  hospitalId   String?       @db.ObjectId // Add foreign key for the relation
+  bookedByType BookedByType?
+  bookedById   String?       @db.ObjectId
+  hspRole      HspRole?
+}
+
+model HealthCard {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  firstName        String?
+  middleName       String?
+  lastName         String?
+  dateOfBirth      DateTime?
+  gender           String?
+  aadharCardNumber String?
+  mobileNumber     String?
+  email            String?        @unique
+  pancard          String?
+  pinCode          String?
+  city             String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  approvalStatus   ApprovalStatus @default(PENDING) // Status: "pending", "approved", "rejected"
+  remarks          String?
+  approvedBy       String? // Superadmin User ID who approved/rejected the request
+  patient          Patient?       @relation("HealthCard", fields: [patientId], references: [id])
+  patientId        String?        @map("_patientId") @db.ObjectId
+  cardNo           String?
+  requestfrom      String?
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+enum ApprovalStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+  COMPLETED
+  UPDATED
+}
+
+model BookAmbulance {
+  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
+  firstName               String
+  middleName              String?
+  lastName                String
+  dateOfBirth             DateTime
+  gender                  String
+  aadharCardNumber        String
+  mobileNumber            String
+  email                   String
+  ambulancetype           String
+  ambulancecategory       String
+  hospitaltype            String
+  aadharCardImage         String? // Front image of the Aadhar card (optional)
+  healthcard              Boolean? // Health card number of the patient (optional)
+  medicaldoc1             String? // Medical document 1 (optional)
+  medicaldoc2             String? // Medical document 2 (optional)
+  medicaldoc3             String? // Medical document 3 (optional)F
+  healthInsurance         Boolean?
+  healthInsuranceNumber   String?
+  healthInsuranceDocument String?
+  ayushmancard            Boolean?
+  ayushmanCardNumber      String?
+  ayushmanCardFront       String?
+  diseaseDetails          String?
+  bloodgroup              String?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  patient                 Patient?            @relation("BookAmbulance", fields: [patientId], references: [id])
+  patientId               String?             @map("_patientId") @db.ObjectId
+  ambulanceVaichicle      AmbulanceVaichicle? @relation(fields: [ambulanceVaichicleId], references: [id])
+  ambulanceVaichicleId    String?             @db.ObjectId
+  status                  AmbulanceStatus?    @default(PENDING)
+  remark                  String? // Optional approval/rejection note
+  approvedBy              String? // Admin or system user
+  approvedAt              DateTime? // Timestamp of approval/rejection
+  bookedByType            BookedByType?
+  bookedById              String?             @db.ObjectId
+  hospitalId              String?             @db.ObjectId
+  hspRole                 HspRole?
+}
+
+enum AmbulanceStatus {
+  PENDING
+  BOOKED
+  CONFIRMED
+  ADMITTED
+  AVAILABLE
+  NOT_AVAILABLE
+}
+
+model EmergencyAmbulance {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  email             String // Email address of the patient
+  ambulancecategory String //city is taken as ambulance category
+  pinCode           String
+  locateme          String
+  image             String
+  patient           Patient? @relation("EmergencyAmbulance", fields: [patientId], references: [id])
+  patientId         String?  @map("_patientId") @db.ObjectId // Add foreign key for the relation
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum HspRole {
+  Hospital
+  Clinic
+  homehealthcare
+  Pathology
+  DiagnosticCenter
+}
+
+model HospitalSpeciality {
+  id           String                @id @default(auto()) @map("_id") @db.ObjectId
+  hospital     Hospital              @relation(fields: [hospitalId], references: [id])
+  hospitalId   String                @db.ObjectId
+  speciality   ExpertDoctorsCategory @relation(fields: [specialityId], references: [id])
+  specialityId String                @db.ObjectId
+hospitalDoctors HospitalDoctor[] 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HospitalDoctor {
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  hospital   Hospital        @relation(fields: [hospitalId], references: [id])
+  hospitalId String          @db.ObjectId
+  doctor     Doctor          @relation(fields: [doctorId], references: [id])
+  doctorId   String          @db.ObjectId
+   hospitalSpeciality  HospitalSpeciality? @relation(fields: [hospitalSpecialityId], references: [id]) // New Field
+  hospitalSpecialityId String?        @db.ObjectId 
+  status     ApprovalStatus? @default(PENDING) // Status: "pending", "approved", "rejected"
+  remark     String?
+  approvedBy String?
+  approvedAt DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+    consultationDays String? 
+  consultationTime  String?
+}
+
+model HospitalAmbulance {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  hospital    Hospital        @relation(fields: [hospitalId], references: [id])
+  hospitalId  String          @db.ObjectId
+  ambulance   Ambulance       @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String          @db.ObjectId
+  status      ApprovalStatus? @default(PENDING) // Status: "pending", "approved", "rejected"
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Staff {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  fullName        String
+  mobileNumber    String
+  alternateMobile String?
+  email           String?
+  role            String
+  level           Int
+  hospitalId      String   @db.ObjectId
+  hospital        Hospital @relation(fields: [hospitalId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([hospitalId, level])
+}
+
+model Receptionist {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  email      String   @unique
+  mobile     String
+  password   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  role       String   @default("receptionist")
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String   @db.ObjectId
+}
+
+model HospitalDepartment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  mobileNumber String
+
+  email      String?
+  department String
+
+  hospitalId String   @db.ObjectId
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum BedStatus {
+  AVAILABLE
+  BOOKED
+  RESERVED
+  CONFIRMED
+  AVAILABLE_SOON
+  ADMITTED
+  DISCHARGED
+  UNDER_MAINTENANCE
+}
+
+model BedCategory {
+  id                  String      @id @default(auto()) @map("_id") @db.ObjectId
+  name                String // e.g., "Male Ward"
+  chargeType          ChargeType?
+  minPrice            String?
+  maxPrice            String?
+  finalPrice          String?
+  discount            String?
+  bedCount            Int // Number of beds to auto-create
+  schemabedcounts     String?
+  hasgovernmentschema Boolean?
+  schema              String[]    @default([])
+  hospitalId          String      @db.ObjectId
+  hospital            Hospital    @relation(fields: [hospitalId], references: [id])
+  beds                Bed[]
+  image               String? // Optional image for the category
+  image1              String? // Optional second image for the category
+  image2              String? // Optional third image for the category
+  image3              String? // Optional fourth image for the category
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Bed {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  bedNumber Int
+  status    BedStatus @default(AVAILABLE)
+  doctor    Doctor?   @relation(fields: [doctorId], references: [id])
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  hospitalId String   @db.ObjectId
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+
+  categoryId String       @db.ObjectId
+  category   BedCategory  @relation(fields: [categoryId], references: [id])
+  scheme     String?
+  BedBooking BedBooking[]
+  doctorId   String?      @db.ObjectId
+
+  @@unique([hospitalId, bedNumber])
+}
+
+enum ChargeType {
+  Hourly
+  daily
+}
+
+//hospital is hsp role depainds 
+model Hospital {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  email           String            @unique
+  HospitalPayment HospitalPayment[]
+  mobile          String
+  password        String
+  pincode         String?
+  role            HspRole?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  hspInfo              HspInfo?                   @relation(fields: [hspInfoId], references: [id])
+  hspInfoId            String?                    @unique @db.ObjectId
+  resetToken           String? // Nullable field for storing reset token
+  resetTokenExpiration DateTime? // Nullable field for token expiration
+  hspdetails           Hspdetails?                @relation(fields: [hspdetailsId], references: [id])
+  hspdetailsId         String?                    @unique @db.ObjectId
+  hspcontact           Hspcontact?                @relation(fields: [hspcontactId], references: [id])
+  hspcontactId         String?                    @unique @db.ObjectId
+  hspbranches          Hspbranch[]
+  Bed                  Bed[]
+  staff                Staff[]
+  HospitalDepartment   HospitalDepartment[]
+  HospitalSpeciality   HospitalSpeciality[]
+  HospitalDoctor       HospitalDoctor[]
+  HospitalAmbulance    HospitalAmbulance[]
+  BedCategory          BedCategory[]
+  reviews              HospitalReview[]
+  BedBooking           BedBooking[]
+  diagnosticServices   DiagnosticCenterServices[]
+  Surgeytreatment      Surgerytreatment[]
+
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "pending", "approved", "rejected"
+
+  adminRemarks                 String?
+  HospitalCertificate          HospitalCertificate[]
+  HomeHealthcare               HomeHealthcare[]
+  Receptionist                 Receptionist[]
+  linkedDiagnosticCenters      HospitalDiagnosticCenter[] @relation("HospitalRelation")
+  diagnosticCenterPartnerships HospitalDiagnosticCenter[] @relation("DiagnosticCenterRelation")
+  linkedHomeHealthcare         HospitalHomeHealthcare[]   @relation("HospitalHomeHealthcareRelation")
+  homeHealthcarePartnerships   HospitalHomeHealthcare[]   @relation("HomeHealthcareRelation")
+  LabTest                      LabTest[]
+  BookLabTest                  BookLabTest[]
+  Wellnesspackage              Wellnesspackage[]
+  BookWellnesspackage          BookWellnesspackage[]
+  Bloodbank                    Bloodbank[]
+  BookBloodbank                BookBloodbank[]
+}
+
+model HospitalCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "pending", "approved", "rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  hospital       Hospital       @relation(fields: [hospitalId], references: [id])
+  hospitalId     String         @db.ObjectId
+  cardNo         String?
+}
+
+model HospitalDiagnosticCenter {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  hospital           Hospital @relation("HospitalRelation", fields: [hospitalId], references: [id])
+  hospitalId         String   @db.ObjectId
+  diagnosticCenter   Hospital @relation("DiagnosticCenterRelation", fields: [diagnosticCenterId], references: [id])
+  diagnosticCenterId String   @db.ObjectId
+
+  // Additional fields for the relationship
+  status          ApprovalStatus @default(PENDING) // Pending, Approved, Rejected
+  partnershipType String? // e.g., "Exclusive", "Preferred", "General"
+  agreementDate   DateTime? // When the partnership was established
+  expiryDate      DateTime? // When the partnership expires
+  commissionRate  Float? // Commission percentage for the hospital
+  notes           String? // Any additional notes
+  approvedBy      String? // Admin who approved this relationship
+  approvedAt      DateTime? // When it was approved
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([hospitalId, diagnosticCenterId])
+  @@index([hospitalId])
+  @@index([diagnosticCenterId])
+}
+
+model HospitalHomeHealthcare {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  hospital         Hospital @relation("HospitalHomeHealthcareRelation", fields: [hospitalId], references: [id])
+  hospitalId       String   @db.ObjectId
+  homeHealthcare   Hospital @relation("HomeHealthcareRelation", fields: [homeHealthcareId], references: [id])
+  homeHealthcareId String   @db.ObjectId
+
+  // Optional: Add extra fields for the relationship
+  status          ApprovalStatus @default(PENDING)
+  partnershipType String? // e.g., "Exclusive", "Preferred", "General"
+  agreementDate   DateTime?
+  expiryDate      DateTime?
+  commissionRate  Float? // Commission percentage for the hospital
+  notes           String?
+  approvedBy      String? // Admin who approved this relationship
+  approvedAt      DateTime? // When it was approved
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([hospitalId, homeHealthcareId])
+  @@index([hospitalId])
+  @@index([homeHealthcareId])
+}
+
+model Hspbranch {
+  id                   String  @id @default(auto()) @map("_id") @db.ObjectId
+  branchname           String?
+  branchregno          String?
+  branchcity           String?
+  branchpincode        String?
+  branchreceptionno1   String?
+  branchreceptionno2   String?
+  branchreceptionemail String?
+  branchaddress        String?
+  branchmanagername    String?
+  branchmanagerno      String?
+  branchmanageremail   String?
+  branchadminname      String?
+  branchadminno        String?
+  branchadminemail     String?
+
+  state String?
+
+  district  String?
+  taluka    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign key to link to the Hospital model
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String   @db.ObjectId
+}
+
+model Hspdetails {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  hsplogo             String?
+  hspregno            String?
+  hspregcertificate   String?
+  hspregdate          String?
+  nabhnablapproved    String?
+  nabhnablcertificate String?
+  nabhnabllevel       String?
+  pancardno           String?
+  pancardimg          String?
+  isoapproved         String?
+  bankname            String?
+  bankaccountno       String?
+  ifsccode            String?
+  accounttype         String?
+  cancelledcheque     String?
+  micrcode            String?
+  hospital            Hospital? @relation
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Hspcontact {
+  id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  address               String?
+  city                  String?
+  state                 String?
+  dist                  String?
+  taluka                String?
+  pincode               String?
+  receptioncontact1     String?
+  receptioncontact2     String?
+  receptionemail        String?
+  managername           String?
+  managercontact        String?
+  manageremail          String?
+  adminname             String?
+  admincontact          String?
+  adminemail            String?
+  escalationmatrixsheet String?
+  alternateno           String?
+
+  hospital  Hospital? @relation
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model HspInfo {
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+  regname            String?
+  hspcategoryId      String?       @db.ObjectId // Change field to hold ID of HospitalsCategory
+  hspcategory        HspCategory[] @relation("HspInfoToCategory") // Relation to Join Table
+  totalnoofbed       String?
+  totalspeciality    String?
+  totaldoctor        String?
+  totalambulance     String?
+  onlineconsultation String?
+  homehealthcare     String?
+  hspbranches        String?
+  pharmacy           String?
+  pathology          String?
+  diagnosticservices String?
+  cashlessservices   String?
+  governmentschemes  String?
+  inhousecanteen     String?
+  experience         String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  hospital Hospital? @relation
+}
+
+model HospitalsCategory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hspcategory HspCategory[] @relation("CategoryToHspInfo") // Relation to Join Table
+}
+
+model HspCategory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  hspInfoId      String  @db.ObjectId
+  hspcategoryId  String? @db.ObjectId
+  ambulanceHspId String? @db.ObjectId
+
+  // Relation to HspInfo or Ambulance
+  hspInfo HspInfo @relation(fields: [hspInfoId], references: [id], name: "HspInfoToCategory")
+
+  // Relation to HospitalsCategory master table
+  hspcategory                HospitalsCategory?        @relation(fields: [hspcategoryId], references: [id], name: "CategoryToHspInfo")
+  diagnosticcategory         DiagnosticCenterCategory? @relation(fields: [diagnosticCenterCategoryId], references: [id])
+  // Optional link to AmbulanceHsp
+  ambulanceHsp               AmbulanceHsp?             @relation(fields: [ambulanceHspId], references: [id])
+  diagnosticCenterCategoryId String?                   @db.ObjectId
+}
+
+model Surgerytreatment {
+  id                   String                 @id @default(auto()) @map("_id") @db.ObjectId
+  hospital             Hospital               @relation(fields: [hospitalId], references: [id])
+  hospitalId           String                 @db.ObjectId
+  category             String
+  serviceName          String
+  type                 String?
+  isAvailable          Boolean                @default(true)
+  minPrice             String?
+  maxPrice             String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  BookSurgeryTreatment BookSurgeryTreatment[]
+
+  @@unique([hospitalId, serviceName])
+}
+
+model BookSurgeryTreatment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @db.ObjectId
+
+  service   Surgerytreatment @relation(fields: [serviceId], references: [id])
+  serviceId String           @db.ObjectId
+
+  bookingDate       DateTime   @default(now())
+  preferredDate     DateTime? // Optional preferred date selected by patient
+  preferredTimeSlot String? // 15 min intervalgap using react datepicker
+  status            bookStatus @default(PENDING) // Pending | Confirmed | Cancelled | Completed
+  notes             String? // Any notes or special instructions by patient
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctors      BookSurgeryDoctor[]
+  bookedByType BookedByType?
+  bookedById   String?             @db.ObjectId
+  hospitalId   String?             @db.ObjectId
+  hspRole      HspRole?
+}
+
+model BookSurgeryDoctor {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  booking   BookSurgeryTreatment @relation(fields: [bookingId], references: [id])
+  bookingId String               @db.ObjectId
+
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+  doctorId String @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HomeHealthcare {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  hospital           Hospital             @relation(fields: [hospitalId], references: [id])
+  hospitalId         String               @db.ObjectId
+  serviceName        String?
+  startingPrice      String?
+  isAvailable        Boolean              @default(true)
+  minPrice           String?
+  maxPrice           String?
+  finalprice         String?
+  discount           String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  BookHomeHealthcare BookHomeHealthcare[]
+
+  @@unique([hospitalId, serviceName])
+}
+
+model BookHomeHealthcare {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  patient           Patient    @relation(fields: [patientId], references: [id])
+  patientId         String     @db.ObjectId
+  bookingDate       DateTime   @default(now())
+  preferredDate     DateTime? // Optional preferred date selected by patient
+  preferredTimeSlot String? // 15 min intervalgap using react datepicker
+  status            bookStatus @default(PENDING) // Pending | Confirmed | Cancelled | Completed
+  notes             String? // Any notes or special instructions by patient
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  HomeHealthcare   HomeHealthcare? @relation(fields: [homeHealthcareId], references: [id])
+  homeHealthcareId String?         @db.ObjectId
+}
+
+//DiagnosticCenter
+model DiagnosticCenterCategory {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  title       String        @unique // Ensure unique specialty names
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  HspCategory HspCategory[]
+}
+
+model DiagnosticCenterServices {
+  id                    String                  @id @default(auto()) @map("_id") @db.ObjectId
+  facility              String
+  category              String
+  subCategory           String
+  available             Boolean?
+  minPrice              String?
+  maxPrice              String?
+  finalPrice            String?
+  discount              String?
+  machinemodel          String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  Hospital              Hospital?               @relation(fields: [hospitalId], references: [id])
+  hospitalId            String?                 @db.ObjectId
+  BookDiagnosticService BookDiagnosticService[]
+}
+
+model BookDiagnosticService {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @db.ObjectId
+
+  service   DiagnosticCenterServices @relation(fields: [serviceId], references: [id])
+  serviceId String                   @db.ObjectId
+
+  bookingDate       DateTime   @default(now())
+  preferredDate     DateTime? // Optional preferred date selected by patient
+  preferredTimeSlot String? // 15 min intervalgap using react datepicker
+  status            bookStatus @default(PENDING) // Pending | Confirmed | Cancelled | Completed
+  notes             String? // Any notes or special instructions by patient
+
+  report    String?
+  receipt   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum bookStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model LabTest {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  testname    String?
+  aaprice     Int?
+  price       Int?
+  finalprice  Int?
+  discount    String?
+  available   Boolean?
+  nabl        Boolean?
+  Hospital    Hospital?     @relation(fields: [hospitalId], references: [id])
+  hospitalId  String?       @db.ObjectId
+  BookLabTest BookLabTest[]
+}
+
+model BookLabTest {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @db.ObjectId
+
+  service   LabTest @relation(fields: [serviceId], references: [id])
+  serviceId String  @db.ObjectId
+
+  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId String?   @db.ObjectId
+
+  bookingDate       DateTime   @default(now())
+  preferredDate     DateTime? // Optional preferred date selected by patient
+  preferredTimeSlot String? // 15 min intervalgap using react datepicker
+  status            bookStatus @default(PENDING) // Pending | Confirmed | Cancelled | Completed
+  notes             String? // Any notes or special instructions by patient
+
+  report    String?
+  receipt   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wellnesspackage {
+  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
+  aapackagename       String?
+  labpackagename      String?
+  includestest        String?
+  aaprice             Int? // e.g. 10000 = ₹100.00
+  price               Int?
+  finalpackageprice   Int?
+  available           Boolean?
+  discount            String?
+  homevisit           Boolean?
+  Hospital            Hospital?             @relation(fields: [hospitalId], references: [id])
+  hospitalId          String?               @db.ObjectId
+  BookWellnesspackage BookWellnesspackage[]
+}
+
+model BookWellnesspackage {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @db.ObjectId
+
+  service   Wellnesspackage @relation(fields: [serviceId], references: [id])
+  serviceId String          @db.ObjectId
+
+  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId String?   @db.ObjectId
+
+  bookingDate       DateTime   @default(now())
+  preferredDate     DateTime? // Optional preferred date selected by patient
+  preferredTimeSlot String? // 15 min intervalgap using react datepicker
+  status            bookStatus @default(PENDING) // Pending | Confirmed | Cancelled | Completed
+  notes             String? // Any notes or special instructions by patient
+  report            String?
+  receipt           String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model Bloodbank {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  bloodname     String?
+  available     Boolean?
+  aaprice       Int? // e.g. 10000 = ₹100.00
+  price         Int?
+  finalprice    Int?
+  discount      String?
+  Hospital      Hospital?       @relation(fields: [hospitalId], references: [id])
+  hospitalId    String?         @db.ObjectId
+  BookBloodbank BookBloodbank[]
+}
+
+model BookBloodbank {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId String  @db.ObjectId
+
+  service   Bloodbank @relation(fields: [serviceId], references: [id])
+  serviceId String    @db.ObjectId
+
+  Hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId String?   @db.ObjectId
+
+  bookingDate       DateTime   @default(now())
+  preferredDate     DateTime? // Optional preferred date selected by patient
+  preferredTimeSlot String? // 15 min intervalgap using react datepicker
+  status            bookStatus @default(PENDING) // Pending | Confirmed | Cancelled | Completed
+  notes             String? // Any notes or special instructions by patient
+  report            String?
+  receipt           String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+//coporate
+model Corporate {
+  id                       String                 @id @default(auto()) @map("_id") @db.ObjectId
+  email                    String                 @unique
+  mobile                   String
+  mobileVerified           Boolean                @default(false)
+  companyName              String?
+  additionalEmail          String?
+  emergencyContact         String?
+  dateOfIncorporation      DateTime?
+  cinNumber                String?
+  companyType              String? // one of the provided options
+  companyServiceTypes      String[] // multiple
+  companyPan               String?
+  gstNumber                String?
+  presentAddress           String?
+  city                     String?
+  state                    String?
+  district                 String?
+  taluka                   String?
+  pincode                  String?
+  companyLogo              String?
+  bankName                 String?
+  bankAccountNumber        String?
+  ifscCode                 String?
+  accountType              String?
+  cancelledCheque          String?
+  employeeCount            Int?
+  corporateHealthInsurance Boolean                @default(false)
+  healthInsurancePartners  String[] // multiple
+  factoryInspector         Boolean                @default(false)
+  contactPersonName        String?
+  contactPersonRelation    String?
+  employeeIdCard           String?
+  aadharCardNumber         String?
+  aadharCardFront          String?
+  aadharCardBack           String?
+  panCard                  String?
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  password                 String
+  role                     String?
+  resetToken               String? // Nullable field for storing reset token
+  resetTokenExpiration     DateTime? // Nullable field for token expiration
+  passportPhoto            String?
+  CorporateCertificate     CorporateCertificate[]
+}
+
+model CorporateCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // "PENDING" | "APPROVED" | "REJECTED"
+  remarks        String?
+  approvedBy     String?
+  corporate      Corporate      @relation(fields: [corporateId], references: [id])
+  corporateId    String         @db.ObjectId
+  cardNo         String?
+}
+
+model RegEnqForm {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  mobile    String
+  category  String
+  company   String
+  enqperson String?
+  pincode   String
+  address   String?
+  idproof   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactUs {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  mobile    String
+  fullname  String
+  message   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CareersSite {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  mobile    String
+  fullname  String
+  category  String?
+  cv        String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Doctor {
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  email             String             @unique
+  mobile            String
+  password          String
+  pincode           String?
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  dateOfBirth       DateTime?
+  gender            String?
+  alternatemobileno String?
+  education         String?
+  role              String?            @default("Doctor")
+  // Explicit Many-to-Many relation through DoctorSpeciality
+  specialities      DoctorSpeciality[]
+
+  totalexperience             String?
+  degreecertificate           String?
+  registrationcertificate     String?
+  specialitydegreecertificate String?
+  registrationdate            DateTime?
+  regrenewaldate              DateTime?
+  regno                       String?
+  resetToken                  String?
+  resetTokenExpiration        DateTime?
+  createdAt                   DateTime                  @default(now())
+  updatedAt                   DateTime                  @updatedAt
+  doctorinfo                  Doctorinfo?               @relation(fields: [doctorinfoId], references: [id])
+  doctorinfoId                String?                   @unique @db.ObjectId
+  doctorvisitinghospitals     DoctorVisitingHospitals[]
+  DoctorCertificate           DoctorCertificate[]
+  HospitalDoctor              HospitalDoctor[]
+  Bed                         Bed[]
+  BookFreeAppointment         BookFreeAppointment[]
+  DoctorReview                DoctorReview[]
+  prescriptionTemplates       PrescriptionTemplate[]
+  prescriptions               Prescription[]
+  bookings                    BookSurgeryDoctor[]
+  DoctorPayment               DoctorPayment[]
+  VideoConsultation           VideoConsultation[]
+  products                    Product[]
+}
+
+model PrescriptionTemplate {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String // Template name (e.g., "General Consultation", "Diabetes Follow-up")
+  description String? // Optional description
+  doctorId    String  @db.ObjectId
+  doctor      Doctor  @relation(fields: [doctorId], references: [id])
+
+  // Template structure
+  includeVitals      Boolean @default(true)
+  includeDiagnosis   Boolean @default(true)
+  includeMedications Boolean @default(true)
+  includeDiet        Boolean @default(true)
+  includeHistory     Boolean @default(true)
+  includeFollowUp    Boolean @default(true)
+
+  // Pre-defined options for dropdowns
+  commonDiagnoses   String[] // Array of common diagnoses for this template
+  commonMedications Json[] // Array of {name, unit, dosage} objects
+  commonDiets       String[] // Array of common diet recommendations
+
+  // Default values
+  defaultInstructions String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  prescriptions Prescription[]
+}
+
+model Prescription {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Relations
+  doctorId      String                @db.ObjectId
+  doctor        Doctor                @relation(fields: [doctorId], references: [id])
+  patientId     String                @db.ObjectId
+  patient       Patient               @relation(fields: [patientId], references: [id])
+  appointmentId String?               @db.ObjectId
+  appointment   BookFreeAppointment?  @relation(fields: [appointmentId], references: [id])
+  templateId    String?               @db.ObjectId
+  template      PrescriptionTemplate? @relation(fields: [templateId], references: [id])
+
+  // Patient Information (auto-filled)
+  patientName    String
+  patientAge     Int?
+  patientGender  String?
+  patientPhone   String?
+  patientAddress String?
+
+  // Doctor Information (auto-filled)
+  doctorName         String
+  doctorSpecialty    String?
+  doctorRegistration String?
+
+  // Prescription Date
+  prescriptionDate DateTime @default(now())
+
+  // Vital Signs
+  bloodPressure String?
+  pulseRate     String?
+  weight        String?
+  temperature   String?
+
+  // Medical Information
+  diagnosis    String?
+  allergies    String?
+  disabilities String?
+
+  // Medications - stored as JSON array
+  medications Json[] // [{name, unit, dosage, instructions}]
+
+  // Additional Information
+  dietInstructions     String?
+  patientHistory       String?
+  followUpInstructions String?
+
+  // Status
+  status String @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+
+  note      String?
+  receipt   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DoctorReview {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId  String   @db.ObjectId
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  patientId String   @db.ObjectId
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+}
+
+model DoctorCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "pending", "approved", "rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  doctor         Doctor         @relation(fields: [doctorId], references: [id])
+  doctorId       String         @db.ObjectId
+  cardNo         String?
+}
+
+model ExpertDoctorsCategory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String   @unique // Ensure unique specialty names
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Explicit Many-to-Many relation through DoctorSpeciality
+  doctors DoctorSpeciality[]
+
+  BookFreeAppointment BookFreeAppointment[]
+  HospitalSpeciality  HospitalSpeciality[]
+}
+
+// ✅ New Join Model for Many-to-Many Relationship
+model DoctorSpeciality {
+  id           String                @id @default(auto()) @map("_id") @db.ObjectId
+  doctorId     String                @db.ObjectId
+  specialityId String                @db.ObjectId
+  // Relations
+  doctor       Doctor                @relation(fields: [doctorId], references: [id])
+  speciality   ExpertDoctorsCategory @relation(fields: [specialityId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Doctorinfo {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  passportphoto         String?
+  profiledescription    String?
+  consultationfee       String?
+  finalPrice            String?
+  discount              String?
+  onlineappointment     String?
+  homehealthcarevisit   String?
+  pancardno             String?
+  pancardfront          String?
+  aadharcardno          String?
+  aadharcardfront       String?
+  aadharcardback        String?
+  presentaddress        String?
+  city                  String?
+  state                 String?
+  district              String?
+  taluka                String?
+  bankName              String?
+  accountNumber         String?
+  ifscCode              String?
+  accountType           String?
+  cancelledCheque       String?
+  micrCode              String?
+  pincode               String?
+  personalclinic        String?
+  clinicinouttime       String?
+  clinicconsultationfee String?
+  doctor                Doctor?  @relation()
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model DoctorVisitingHospitals {
+  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  hospitalname             String?
+  hospitalconsultationfee  String?
+  hospitalinouttime        String?
+  hospitalconsultationdays String?
+  hospitalcontactno        String?
+  presentAddress           String?
+  city                     String?
+  state                    String?
+  pincode                  String?
+  district                 String?
+  taluka                   String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  // Foreign key to link to the Hospital model
+  doctor   Doctor @relation(fields: [doctorid], references: [id])
+  doctorid String @db.ObjectId
+}
+
+model BusinessPartnershipEnq {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String?
+  mobile       String?
+  category     String?
+  hspfullname  String?
+  govtdocument String?
+  message      String?
+  address      String?
+  pincode      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AarogyaMitra {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String?
+  mobile       String?
+  category     String?
+  hspfullname  String?
+  govtdocument String?
+  message      String?
+  address      String?
+  pincode      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CorporateGovernance {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String?
+  mobile        String?
+  corporateyear String?
+  fullname      String?
+  govtdocument  String?
+  message       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TeleRadiology {
+  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+  email                String    @unique
+  mobile               String
+  password             String
+  pincode              String?
+  resetToken           String? // Nullable field for storing reset token
+  resetTokenExpiration DateTime? // Nullable field for token expiration
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+model State {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  stateName String
+  districts District[]
+}
+
+model District {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  district     String
+  stateId      String        @db.ObjectId
+  state        State         @relation(fields: [stateId], references: [id])
+  subDistricts SubDistrict[]
+}
+
+model SubDistrict {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subDistrict String
+  districtId  String   @db.ObjectId
+  district    District @relation(fields: [districtId], references: [id])
+}
+
+model FamilyMember {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  email            String?
+  firstName        String?
+  middleName       String?
+  lastName         String?
+  age              Int?
+  relation         String?
+  gender           String?
+  mobile           String?
+  bloodgroup       String?
+  presentAddress   String?
+  city             String?
+  pincode          String?
+  state            String?
+  district         String?
+  taluka           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  Patient          Patient? @relation(fields: [patientId], references: [id])
+  patientId        String?  @db.ObjectId
+  aadharCardNumber String?
+
+  // New relation: if this family member is ALSO a registered patient
+  registeredPatient   Patient? @relation("FamilyMemberRegisteredPatient", fields: [registeredPatientId], references: [id])
+  registeredPatientId String?  @db.ObjectId
+
+  // Track whether the registered patient has confirmed being a family member
+  approvalStatus ApprovalStatus @default(PENDING)
+  Remark         String?
+}
+
+model Ambulance {
+  id                   String             @id @default(auto()) @map("_id") @db.ObjectId
+  email                String             @unique
+  AmbulancePayment     AmbulancePayment[]
+  mobile               String
+  password             String
+  passportphoto        String?
+  category             String?
+  pincode              String?
+  ownerfirstname       String?
+  ownerlastname        String?
+  ownermiddlename      String?
+  dateofbirth          String?
+  gender               String?
+  alternatemobileno    String?
+  owneraadharcardno    String?
+  owneraadharcardfront String?
+  owneraadharcardback  String?
+  ownerpanno           String?
+  ownerpanfront        String?
+  approvalStatus       ApprovalStatus     @default(PENDING) // Status: "pending", "approved", "rejected"
+
+  resetToken           String? // Nullable field for storing reset token
+  resetTokenExpiration DateTime? // Nullable field for token expiration
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  role                 String?                @default("Ambulance")
+  adminname            String?
+  admincontact         String?
+  adminemail           String?
+  HospitalAmbulance    HospitalAmbulance[]
+  AmbulanceHsp         AmbulanceHsp?
+  AmbulanceVaichicle   AmbulanceVaichicle[]
+  AmbulanceDriver      AmbulanceDriver[]
+  adminRemarks         String?
+  AmbulanceCertificate AmbulanceCertificate[]
+  reviews              AmbulanceReview[]
+}
+
+model AmbulanceReview {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @db.ObjectId
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  patientId   String    @db.ObjectId
+  rating      Int
+  comment     String
+  createdAt   DateTime  @default(now())
+}
+
+model AmbulanceCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "pending", "approved", "rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  ambulance      Ambulance      @relation(fields: [ambulanceId], references: [id])
+  ambulanceId    String         @db.ObjectId
+  cardNo         String?
+}
+
+model AmbulanceHsp {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @unique @db.ObjectId
+
+  status            String?
+  hspregname        String?
+  hsplogo           String?
+  hspregcertificate String?
+  hsppancard        String?
+  totalambulance    String?
+  presentaddress    String?
+  city              String?
+  state             String?
+  district          String?
+  taluka            String?
+  pincode           String?
+  accounttype       String?
+  cancelledcheque   String?
+  micrcode          String?
+  bankname          String?
+  accountnumber     String?
+  ifsccode          String?
+  inhousedoctor     String?
+  hspdescription    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation to HspCategory
+  categories HspCategory[]
+}
+
+model AmbulanceVaichicle {
+  id                     String           @id @default(auto()) @map("_id") @db.ObjectId
+  ambulancemodel         String?
+  ambulancecharges       String?
+  ambulancefinalcharge   String?
+  ambulancediscount      String?
+  ambulanceareapincode   String?
+  ambulanceregdate       String?
+  ambulancercno          String?
+  ambulancercbook        String?
+  ambulancetype          String?
+  ambulanceimagefront    String?
+  ambulanceimageback     String?
+  ambulanceimageleft     String?
+  ambulanceimageright    String?
+  ambulanceimageinternal String?
+  ambulancecategory      String?
+  ambulance              Ambulance        @relation(fields: [ambulanceId], references: [id])
+  driver                 AmbulanceDriver? @relation(fields: [driverId], references: [id])
+  latitude               Float?
+  longitude              Float?
+  facilities             String?
+  isOnline               Boolean?         @default(false)
+  driverId               String?          @db.ObjectId
+  puc                    String?
+  insurance              String?
+  ambulanceId            String           @db.ObjectId
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  status                 AmbulanceStatus  @default(AVAILABLE)
+  BookAmbulance          BookAmbulance[]
+  approvalStatus         ApprovalStatus   @default(PENDING)
+  adminRemarks           String?
+  approvedBy             String? // Admin who approved/rejected
+  approvedAt             DateTime? // When it was approved/rejected
+}
+
+model AmbulanceDriver {
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  firstname           String?
+  lastname            String?
+  middlename          String?
+  photo               String?
+  aadharcardno        String?
+  aadharcardfront     String?
+  aadharcardback      String?
+  panno               String?
+  panfront            String?
+  drivinglicence      String?
+  drivinglicencefront String?
+  mobile              String?
+  alternatemobileno   String?
+  dateofbirth         String? //new fields 
+  gender              String?
+  email               String?              @unique
+  bloodgroup          String?
+  pincode             String?
+  password            String?
+  firstaidtraining    Boolean? //add in aarogyamitra also
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  AmbulanceVaichicle  AmbulanceVaichicle[]
+  ambulance           Ambulance?           @relation(fields: [ambulanceId], references: [id])
+  ambulanceId         String?              @db.ObjectId
+}
+
+model MedicalHistory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  Patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?  @unique @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  acquiredRespiratoryDistressSyndrome Boolean?
+  allergies                           Boolean?
+  headaches                           Boolean?
+  angina                              Boolean?
+  backInjury                          Boolean?
+  anxietyOrPanicDisorders             Boolean?
+  bleedingDisorders                   Boolean?
+  arthritis                           Boolean?
+  bowelBladderAbnormalities           Boolean?
+  asthma                              Boolean?
+
+  copd                      Boolean? // Chronic Obstructive Pulmonary Disease
+  dizzyOrFaintingSpells     Boolean?
+  congestiveHeartFailure    Boolean? // Congestive Heart Failure
+  epilepsyOrSeizureDisorder Boolean?
+  fracture                  Boolean?
+  degenerativeDiscDisease   Boolean?
+  hepatitis                 Boolean? // A, B, C
+  hernia                    Boolean?
+  depression                Boolean?
+
+  diabetes                     Boolean?
+  hypoglycemia                 Boolean?
+  emphysema                    Boolean?
+  immunosuppressantCondition   Boolean?
+  hearingImpairment            Boolean?
+  heartAttack                  Boolean?
+  kidneyProblems               Boolean?
+  multipleSclerosis            Boolean?
+  liverGallbladderProblems     Boolean?
+  osteoporosis                 Boolean?
+  metalImplants                Boolean?
+  parkinsonsDisease            Boolean?
+  nauseaVomiting               Boolean?
+  peripheralVascularDisease    Boolean?
+  pacemaker                    Boolean?
+  strokeOrTia                  Boolean?
+  pregnancy                    Boolean?
+  upperGastrointestinalDisease Boolean? // ulcer, hernia, reflux
+  ringingInYourEars            Boolean?
+  sexualDysfunction            Boolean?
+  visualImpairment             Boolean? // cataracts, glaucoma, macular degeneration
+  skinAbnormalities            Boolean?
+  smoking                      Boolean?
+  specialDietGuidelines        Boolean?
+  highBloodPressure            Boolean?
+  bpvalue                      String?
+  tuberculosis                 Boolean?
+  tuberculosisvalue            String?
+  cancer                       Boolean?
+  cancervalue                  String?
+  weight                       String?
+  height                       String?
+  temperature                  String?
+  pulseRate                    String?
+  thyroid                      Boolean?
+  thyroidvalue                 String?
+  cholesterol                  Boolean?
+  cholesterolvalue             String?
+  diabetesvalue                String?
+  diseaseDetails               Json     @default("{}")
+}
+
+//Enquiries
+model AarogyaMitraEnq {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String?
+  mobile    String?
+  category  String?
+  city      String?
+  name      String?
+  pincode   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HspPortalEnq {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String?
+  mobile      String?
+  name        String?
+  designation String?
+  gender      String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CorporateHealthEnq {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String?
+  mobile      String?
+  name        String?
+  designation String?
+  gender      String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TeleRadiologyEnq {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String?
+  mobile      String?
+  name        String?
+  designation String?
+  hspname     String?
+  city        String?
+  message     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AarogyadhanEnq {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  mobile    String?
+  name      String?
+  why       String?
+  cost      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//AarogyaDhan
+model fundraiser {
+  id                  String                @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  patient             Patient?              @relation(fields: [patientId], references: [id])
+  patientId           String?               @db.ObjectId
+  fundraisingCampaign fundraisingCampaign[]
+}
+
+model fundraisingCampaign {
+  id                   String                   @id @default(auto()) @map("_id") @db.ObjectId
+  fundraisertitle      String?
+  description          String?
+  story                String?
+  healthissue          String?
+  goalamount           String?
+  frontimage           String?
+  video1               String?
+  video2               String?
+  image1               String?
+  image2               String?
+  image3               String?
+  recievedamount       String?
+  medicaldoc1          String?
+  medicaldoc2          String?
+  medicaldoc3          String?
+  campaignid           String?
+  photographerDecision PhotographerDecision     @default(PENDING)
+  assignmentStatus     CampaignAssignmentStatus @default(UNASSIGNED)
+  status               ApprovalStatus           @default(PENDING)
+  fundraiser           fundraiser               @relation(fields: [fundraiserId], references: [id])
+  photographer         photographer?            @relation(fields: [photographerId], references: [id])
+  photographerId       String?                  @db.ObjectId
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  fundraiserId         String                   @db.ObjectId
+  Donation             Donation[]
+}
+
+model donor {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  email           String?    @unique
+  fullname        String?
+  mobile          String?
+  pincode         String?
+  city            String?
+  password        String?
+  pancardno       String?
+  pancardimage    String?
+  aadharcardno    String?
+  aadharcardimage String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  patient         Patient?   @relation(fields: [patientId], references: [id])
+  patientId       String?    @db.ObjectId
+  Donation        Donation[]
+}
+
+model Donation {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  amount        String
+  paymentStatus PaymentStatus @default(PENDING)
+  transactionId String?       @unique
+  donorName     String
+  donorEmail    String
+  donorMobile   String
+
+  wantsTaxBenefit Boolean @default(false)
+  panNumber       String? // only if tax benefit checked
+  panCardImage    String? // file URL
+  aadharNumber    String? // only if tax benefit checked
+  aadharCardImage String? // file URL
+
+  donor      donor?              @relation(fields: [donorId], references: [id])
+  donorId    String?             @db.ObjectId
+  campaign   fundraisingCampaign @relation(fields: [campaignId], references: [id])
+  campaignId String              @db.ObjectId
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model ngo {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model photographer {
+  id                      String                    @id @default(auto()) @map("_id") @db.ObjectId
+  email                   String?                   @unique
+  fullname                String?
+  mobile                  String?
+  pincode                 String?
+  city                    String?
+  taluka                  String?
+  district                String?
+  state                   String?
+  password                String?
+  passportphoto           String?
+  aadharcardno            String?
+  aadharcardimage         String?
+  companyname             String?
+  pancardno               String?
+  pancardimage            String?
+  companyaddress          String?
+  alternateno             String?
+  bankName                String?
+  accountNumber           String?
+  ifscCode                String?
+  accountType             String?
+  cancelledCheque         String?
+  status                  ApprovalStatus            @default(PENDING)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  fundraisingCampaign     fundraisingCampaign[]
+  PhotographerCertificate PhotographerCertificate[]
+}
+
+model PhotographerCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "Pending", "Approved", "Rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  photographer   photographer   @relation(fields: [photographerid], references: [id])
+  photographerid String         @db.ObjectId
+  cardNo         String?
+}
+
+enum CampaignAssignmentStatus {
+  UNASSIGNED
+  ASSIGNED
+  COMPLETED
+}
+
+enum PhotographerDecision {
+  PENDING // Default when assigned
+  ACCEPTED
+  REJECTED
+}
+
+// ESeva 
+
+model Eseva {
+  id                   String                 @id @default(auto()) @map("_id") @db.ObjectId
+  status               ApprovalStatus         @default(PENDING)
+  name                 String? // Name of the Eseva center
+  address              String? // Full address
+  district             String? // District or region
+  state                String? // State
+  taluka               String?
+  pincode              String? // ZIP/pincode
+  mobile               String? // Optional contact number
+  email                String?                @unique // Unique code for the center
+  incharge             String? // Name of the center incharge
+  inchargeaadharno     String?
+  inchargeaadhardoc    String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  patients             Patient[] // Patients registered through this Eseva center
+  password             String
+  esevacode            String?
+  addressproofType     String?
+  shopactdoc           String?
+  inchargepanno        String?
+  inchargepandoc       String?
+  addressproofdoc      String?
+  regcertificate       String?
+  alternatemobile      String?
+  bankName             String?
+  accountNumber        String?
+  ifscCode             String?
+  accountType          String?
+  cancelledCheque      String? // Could store file path or URL for the uploaded document
+  micrCode             String?
+  logo                 String?
+  inchargeprofilepic   String?
+  resetToken           String? // nullable token
+  resetTokenExpiration DateTime?
+  payment              EsevaPayment[]
+  adminRemarks         String?
+  role                 EsevaRole?
+  subAdmins            EsevaSubAdmin[]
+  subAdminPayments     EsevaSubAdminPayment[]
+  PatientPayment       PatientPayment[]
+  ESevaCertificate     ESevaCertificate[]
+}
+
+model ESevaCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "Pending", "Approved", "Rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  eseva          Eseva          @relation(fields: [esevaid], references: [id])
+  esevaid        String         @db.ObjectId
+  cardNo         String?
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  DEACTIVATED
+  SUBMITTED
+  APPROVED
+  PENDING
+}
+
+model EsevaSubAdmin {
+  id             String                 @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  panno          String?
+  pandoc         String?
+  aadharno       String?
+  aadhardoc      String?
+  mobile         String?
+  email          String?                @unique
+  password       String
+  esevaId        String                 @db.ObjectId
+  eseva          Eseva                  @relation(fields: [esevaId], references: [id])
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  profilepic     String?
+  address        String?
+  payments       EsevaSubAdminPayment[]
+  subAdminCode   String?                @unique
+  status         Status                 @default(INACTIVE)
+  patients       Patient[]
+  adminRemarks   String?
+  PatientPayment PatientPayment[]
+
+  role                     EsevaRole?
+  ESevaSubAdminCertificate ESevaSubAdminCertificate[]
+  suspendedAt              DateTime?
+  reactivatedAt            DateTime?
+}
+
+model ESevaSubAdminCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "Pending", "Approved", "Rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  esevaSubAdmin  EsevaSubAdmin  @relation(fields: [esevaadminid], references: [id])
+  esevaadminid   String         @db.ObjectId
+  cardNo         String?
+}
+
+enum EsevaRole {
+  Eseva
+  Asha
+  SubAdmin
+}
+
+model EsevaPayment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Float
+  paymentStatus String
+  transactionId String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  forwhat       String?
+  Eseva         Eseva?   @relation(fields: [esevaId], references: [id])
+  esevaId       String?  @db.ObjectId
+}
+
+model EsevaSubAdminPayment {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  subAdminId    String        @db.ObjectId
+  subAdmin      EsevaSubAdmin @relation(fields: [subAdminId], references: [id])
+  esevaId       String?       @db.ObjectId
+  eseva         Eseva?        @relation(fields: [esevaId], references: [id])
+  amount        Float
+  paymentStatus String
+  transactionId String        @unique
+  forwhat       String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+//Pharmy
+model Pharmacy {
+  id                    String                @id @default(auto()) @map("_id") @db.ObjectId
+  email                 String                @unique
+  PharmacyPayment       PharmacyPayment[]
+  mobile                String
+  pincode               String
+  password              String
+  regname               String?
+  regno                 String?
+  regdate               String?
+  regcertificate        String?
+  pharmacypancardno     String?
+  pharmacypancarddoc    String?
+  servicetimeinday      String?
+  servicetimeinweek     String?
+  onlineplotformservice Boolean?
+  homedelivery          Boolean?
+  pharmacytype          String?
+  TotalregPharmacist    String?
+  fulladdress           String?
+  city                  String?
+  state                 String?
+  district              String?
+  taluka                String?
+  primarycontactno      String?
+  alternatemobile       String?
+  secondaryemail        String?
+  bankName              String?
+  accountNumber         String?
+  ifscCode              String?
+  accountType           String?
+  cancelledCheque       String? // Could store file path or URL for the uploaded document
+  micrCode              String?
+  aboutus               String?
+  pharmacylogo          String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  Pharmacist            Pharmacist[]
+  pharmacybranch        pharmacybranch[]
+  Product               Product[]
+  PharmacyCertificate   PharmacyCertificate[]
+  PharmacyOrder         PharmacyOrder[]
+}
+
+model PharmacyCertificate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  approvalStatus ApprovalStatus @default(PENDING) // Status: "pending", "approved", "rejected"
+  remarks        String?
+  approvedBy     String? // Superadmin User ID who approved/rejected the request
+  pharmacy       Pharmacy       @relation(fields: [pharmacyId], references: [id])
+  pharmacyId     String         @db.ObjectId
+  cardNo         String?
+}
+
+model Pharmacist {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  regno       String?
+  fullname    String?
+  regdate     String?
+  panno       String?
+  pandoc      String?
+  gender      String?
+  aadharno    String?
+  aadharfront String?
+  aadharback  String?
+  profilepic  String?
+  pharmacy    Pharmacy @relation(fields: [pharmacyId], references: [id])
+  pharmacyId  String   @db.ObjectId
+}
+
+model pharmacybranch {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  regname            String?
+  regno              String?
+  address            String?
+  city               String?
+  pincode            String?
+  state              String?
+  dist               String?
+  taluka             String?
+  receptionno1       String?
+  receptionno2       String?
+  receptionemail     String?
+  branchmanagername  String?
+  branchmanagerno    String?
+  branchmanageremail String?
+  pharmacy           Pharmacy @relation(fields: [pharmacyId], references: [id])
+  pharmacyId         String   @db.ObjectId
+}
+
+model Product {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  pharmacyId String   @db.ObjectId
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id])
+  doctorId   String?   @db.ObjectId
+  doctor     Doctor?   @relation(fields: [doctorId], references: [id])
+  pharmacyLinkedProductId String?  @db.ObjectId
+  name              String
+  brand             String?
+  category          String? // e.g. Tablets, Syrups, OTC, Personal Care
+  description       String?
+  composition       String? // Active ingredients
+  manufacturer      String?
+  batchNumber       String?
+  expiryDate        DateTime?
+  manufacturingDate DateTime?
+
+  price                Float
+  discountPercent      Float? // e.g. 10 means 10% off
+  discountedPrice      Float? // auto-calculated in service layer, but can be stored
+  stock                Int // Available quantity
+  unit                 String? // e.g. "Strip of 10", "Bottle of 100ml"
+  prescriptionRequired Boolean @default(false)
+
+  productImage String? // Store URL or file path
+  tags         String[] // Search keywords (e.g. ["painkiller","paracetamol"])
+
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  PharmacyOrderItem PharmacyOrderItem[]
+}
+
+model PharmacyOrder {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  pharmacyId String   @db.ObjectId
+  pharmacy   Pharmacy @relation(fields: [pharmacyId], references: [id])
+
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  paymentMethod String // "ONLINE" | "OFFLINE"
+  status        String  @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  totalAmount   Float
+  note          String?
+
+  items PharmacyOrderItem[]
+
+  receipt String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PharmacyOrderItem {
+  id      String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String        @db.ObjectId
+  order   PharmacyOrder @relation(fields: [orderId], references: [id])
+
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+
+  productName         String
+  unitLabel           String? // e.g. "Strip of 10", "Bottle of 100ml"
+  unitCountPerPack    Int? // e.g. 10 for strip of 10
+  quantity            Int // how many packs
+  unitPrice           Float // base price per pack
+  discountPercent     Float? // if any
+  discountedUnitPrice Float? // computed
+  lineTotal           Float // computed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// schema for AarogyaMart
+
+model HomeSection {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  type            String      // 'category' | 'brand' | 'product' | 'discount'
+  filterIds       String[]    @default([])   // optional specific product/category/brand IDs
+  row             Int         @default(1)
+  column          Int         @default(4)
+  position        Int         @default(0)  // 0 = before CategoryGrid, 1 = after CategoryGrid, etc.
+  backgroundImage String?     // optional section background
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+
+model Banner {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  subtitle  String?
+  image     String
+  cta       String? // e.g. "Shop Now"
+  link      String? // optional link for CTA
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  image       String?
+  products    ProductMart[]
+  createdAt   DateTime?     @default(now())
+  updatedAt   DateTime?     @updatedAt
+}
+
+model Brand {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  image     String?
+  products  ProductMart[]
+  sellerId  String        @db.ObjectId // ✅ foreign key to seller
+  seller    MartSeller    @relation(fields: [sellerId], references: [id])
+  createdAt DateTime?     @default(now())
+  updatedAt DateTime?     @updatedAt
+}
+
+model ProductMart {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  price          Float
+  originalPrice  Float?
+  discount       Int?
+  rating         Float?
+  reviewsCount   Int?
+  images         String[]
+  badge          String?
+  keywords       String[] // ✅ searchable tags
+  inStock        Boolean  @default(true)
+  stockCount     Int?
+  description    String?
+  features       String[]
+  specifications Json?
+
+  categoryId String   @db.ObjectId
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  brandId String @db.ObjectId
+  brand   Brand  @relation(fields: [brandId], references: [id])
+
+  sellerId String     @db.ObjectId // ✅ new field
+  seller   MartSeller @relation(fields: [sellerId], references: [id])
+
+  reviews       Review[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  orderItems    OrderItem[]
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
+}
+
+model Review {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  rating   Int
+  comment  String
+  date     DateTime @default(now())
+  verified Boolean  @default(false)
+
+  productId String      @db.ObjectId
+  product   ProductMart @relation(fields: [productId], references: [id])
+
+  userId    String
+  userEmail String
+  userType  String?
+}
+
+model Address {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  phone     String
+  address   String
+  city      String
+  state     String
+  district  String?
+  taluka    String?
+  pincode   String
+  isDefault Boolean @default(false)
+
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+}
+
+model Order {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  orderId           String    @unique
+  paymentId         String
+  total             Float
+  orderDate         DateTime  @default(now())
+  status            String // e.g. "pending" | "shipped" | "delivered"
+  trackingNumber    String?
+  estimatedDelivery DateTime?
+
+  addressId String  @db.ObjectId
+  address   Address @relation(fields: [addressId], references: [id])
+
+  userId   String
+  items    OrderItem[]
+  timeline OrderTimeline[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  brand    String?
+  price    Float
+  quantity Int
+  image    String
+  rating   Float?
+  reviews  Int?
+
+  productId String?      @db.ObjectId
+  product   ProductMart? @relation(fields: [productId], references: [id])
+
+  orderId String @db.ObjectId
+  order   Order  @relation(fields: [orderId], references: [id])
+}
+
+model OrderTimeline {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  status      String
+  date        DateTime @default(now())
+  description String?
+  completed   Boolean  @default(false)
+
+  orderId String @db.ObjectId
+  order   Order  @relation(fields: [orderId], references: [id])
+}
+
+model Cart {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String     @unique // 1 cart per user
+  items     CartItem[]
+  isOpen    Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  quantity Int     @default(1)
+  price    Float
+  name     String
+  image    String?
+  brand    String?
+
+  cartId String @db.ObjectId
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  productId String?      @db.ObjectId
+  product   ProductMart? @relation(fields: [productId], references: [id])
+}
+
+model Wishlist {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String         @unique // 1 wishlist per user
+  items     WishlistItem[]
+  isOpen    Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model WishlistItem {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  price Float
+  image String?
+  brand String?
+
+  wishlistId String   @db.ObjectId
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+
+  productId String?      @db.ObjectId
+  product   ProductMart? @relation(fields: [productId], references: [id])
+}
+
+model MartSeller {
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  email                String       @unique
+  mobile               String       @unique
+  password             String
+  pincode              String?
+  address              String?
+  documents            Json?
+  status               SellerStatus @default(PENDING)
+  resetToken           String? // ✅ for password reset
+  resetTokenExpiration DateTime? // ✅ expiration time
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  products ProductMart[]
+  brands   Brand[]
+}
+
+enum SellerStatus {
+  PENDING // waiting for approval
+  APPROVED // approved by superadmin
+  REJECTED // rejected by superadmin
+}
+
+// ---------------- ENUMS ----------------
+enum UserRole {
+  JOB_SEEKER
+  EMPLOYER
+}
+
+enum ApplicationStatus {
+  APPLIED
+  UNDER_REVIEW
+  SHORTLISTED
+  REJECTED
+  HIRED
+  INTERVIEW_SCHEDULED
+  INTERVIEWED
+  OFFER_EXTENDED
+}
+
+
+// ---------------- USERS ----------------
+model JObUser {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  role      UserRole
+  fullName  String?
+  email     String   @unique
+  phone     String   @unique
+  password  String
+  resetToken String?      // ✅ for password reset
+  resetTokenExpiration DateTime?  // ✅ expiration time
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobSeeker JobSeeker?
+  employer  Employer?
+}
+
+// ---------------- JOB SEEKER PROFILE ----------------
+model JobSeeker {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId String  @unique @db.ObjectId
+  user   JObUser @relation(fields: [userId], references: [id])
+
+  resumeUrl     String?
+  profilePhoto  String? // added profile photo
+  bio           String?
+  skills        SkillOnSeeker[]
+  education     Education[]
+  experience    Experience[]
+  applications  Application[]
+  savedJobs     SavedJob[]
+  follows       Follow[]
+  interests     String[] // ["AI", "FinTech", "Cloud"]
+  notifications Notification[]
+  reviews     JObReview[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Skill {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  name      String          @unique
+  seekers   SkillOnSeeker[]
+  jobs      SkillOnJob[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model SkillOnSeeker {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  seekerId  String    @db.ObjectId
+  skillId   String    @db.ObjectId
+  seeker    JobSeeker @relation(fields: [seekerId], references: [id])
+  skill     Skill     @relation(fields: [skillId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Education {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  seekerId    String    @db.ObjectId
+  seeker      JobSeeker @relation(fields: [seekerId], references: [id])
+  degree      String
+  field       String?
+  institution String
+  startYear   Int?
+  endYear     Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Experience {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  seekerId    String    @db.ObjectId
+  seeker      JobSeeker @relation(fields: [seekerId], references: [id])
+  title       String
+  company     String
+  startDate   DateTime
+  endDate     DateTime?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ---------------- EMPLOYER ----------------
+model Employer {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId String  @unique @db.ObjectId
+  user   JObUser @relation(fields: [userId], references: [id])
+
+  companyId String?  @db.ObjectId
+  company   Company? @relation(fields: [companyId], references: [id])
+  status   String   @default("pending")
+  documents     Document[]
+  jobs          Job[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+
+model Document {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  employerId String   @db.ObjectId
+  employer   Employer @relation(fields: [employerId], references: [id])
+  type       String // e.g., PAN, GST, Address Proof, ID Proof
+  fileUrl    String
+  verified   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ---------------- COMPANY ----------------
+model Company {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  logoUrl    String?
+  founded    Int?
+  about      String?
+  // --- industry mapped to JobCategory ---
+  categoryId String?      @db.ObjectId
+  category   JobCategory? @relation(fields: [categoryId], references: [id])
+
+  // India-specific address fields
+  addressLine1 String?
+  addressLine2 String?
+  district     String?
+  city         String?
+  state        String?
+  pincode      String?
+  country      String? @default("India")
+
+  // New fields
+  mission String?
+  values  String?
+  culture String?
+
+  tags          TagOnCompany[]
+  benefits      BenefitOnCompany[]
+  ratings       EmployeeRating?
+  reviews       JObReview[]
+  jobs          Job[]
+  departments   Department[]
+  followers     Follow[]
+  employers     Employer[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JobCategory {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique
+  companies Company[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Tag {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  name      String         @unique
+  companies TagOnCompany[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model TagOnCompany {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyId String   @db.ObjectId
+  tagId     String   @db.ObjectId
+  company   Company  @relation(fields: [companyId], references: [id])
+  tag       Tag      @relation(fields: [tagId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Benefit {
+  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  name      String             @unique
+  companies BenefitOnCompany[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model BenefitOnCompany {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyId String   @db.ObjectId
+  benefitId String   @db.ObjectId
+  company   Company  @relation(fields: [companyId], references: [id])
+  benefit   Benefit  @relation(fields: [benefitId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmployeeRating {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyId        String   @unique @db.ObjectId
+  company          Company  @relation(fields: [companyId], references: [id])
+  culture          Float
+  skillDevelopment Float
+  workSatisfaction Float
+  workLife         Float
+  careerGrowth     Float
+  jobSecurity      Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model JObReview {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyId String   @db.ObjectId
+  company   Company  @relation(fields: [companyId], references: [id])
+  jobSeekerId String @db.ObjectId
+  jobSeeker JobSeeker @relation(fields: [jobSeekerId], references: [id])
+  rating    Float
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Department {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  openings  Int?
+  companyId String   @db.ObjectId
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------- FOLLOW ----------------
+model Follow {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  seekerId String    @db.ObjectId
+  seeker   JobSeeker @relation(fields: [seekerId], references: [id])
+
+  companyId String  @db.ObjectId
+  company   Company @relation(fields: [companyId], references: [id])
+
+  followedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ---------------- JOB ----------------
+model Job {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  description    String
+  exp            String?
+  salary         String?
+  workMode       String?
+  location       String?
+  openings       Int?
+  education      String?
+  employmentType String?
+  postedAt       DateTime @default(now())
+  status         String   @default("active")
+
+  companyId  String   @db.ObjectId
+  company    Company  @relation(fields: [companyId], references: [id])
+  employerId String   @db.ObjectId
+  employer   Employer @relation(fields: [employerId], references: [id])
+
+  skills        SkillOnJob[]
+  applications  Application[]
+  savedJobs     SavedJob[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SkillOnJob {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobId     String   @db.ObjectId
+  skillId   String   @db.ObjectId
+  job       Job      @relation(fields: [jobId], references: [id])
+  skill     Skill    @relation(fields: [skillId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Application {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  seekerId  String            @db.ObjectId
+  seeker    JobSeeker         @relation(fields: [seekerId], references: [id])
+  jobId     String            @db.ObjectId
+  job       Job               @relation(fields: [jobId], references: [id])
+  status    ApplicationStatus @default(APPLIED)
+  appliedAt DateTime          @default(now())
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model SavedJob {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  seekerId  String    @db.ObjectId
+  seeker    JobSeeker @relation(fields: [seekerId], references: [id])
+  jobId     String    @db.ObjectId
+  job       Job       @relation(fields: [jobId], references: [id])
+  savedAt   DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// ---------------- NOTIFICATIONS ----------------
+enum NotificationType {
+  JOB_POSTED
+  APPLICATION_UPDATE
+  GENERAL
+}
+
+model Notification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Who receives the notification (Job Seeker)
+  receiverId String    @db.ObjectId
+  receiver   JobSeeker @relation(fields: [receiverId], references: [id])
+
+  // Which job triggered the notification
+  jobId String? @db.ObjectId
+  job   Job?    @relation(fields: [jobId], references: [id])
+
+  // Extra context (employer, company)
+  employerId String?   @db.ObjectId
+  employer   Employer? @relation(fields: [employerId], references: [id])
+
+  companyId String?  @db.ObjectId
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  type NotificationType @default(JOB_POSTED)
+
+  message String // e.g. "TCS posted a new job: Software Engineer"
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//Photos
+model Photo {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model AdRequest {
+  id          String    @id @map("_id") @default(auto()) @db.ObjectId
+
+  // User Info
+  userId      String
+  userEmail   String
+  role        String    // Example: 'Patient', 'Doctor', 'Hospital', etc.
+
+  // Targeting
+  cityTargets String    // comma-separated list of cities (e.g., "Delhi,Mumbai,Pune")
+  radiusKm    Int?      // range in kilometers
+
+  // Duration
+  startDate   DateTime
+  endDate     DateTime
+
+  // Status
+  status      AdStatus  @default(PENDING)
+  adminRemarks String?  // reason for rejection or notes
+
+  // Audit Fields
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum AdStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Subscribe {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  email     String   @unique
+  status    String   @default("pending") // pending or approve
+  createdAt DateTime @default(now())
+}
+
+// ---------------- LIVO-FOUNDATION-CONNECT----------------
+model Contact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  phone     String
+  message   String
+  createdAt DateTime @default(now())
+
+  @@map("contacts")
+}
+
+
