@@ -40,3 +40,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 #BedFilters (Hospital)
 Doctors name , Status [Reserved, Booked, Confirm, not avilable ,avilable] , departments , gender , bloodgroup, city , pincode , taluka , district ,state ,room types ,age , and remaining patient filters , doctor gender , diseases , Doctors ranking , hospital name (SA), hospital category(sa) advance search, [crowdfunding (../)],# OurServicesNew
+# finalTasks
