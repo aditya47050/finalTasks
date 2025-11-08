@@ -1,269 +1,218 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Coffee, Info, Clock, UtensilsCrossed, CheckCircle, IndianRupee, Leaf } from "lucide-react";
+import {
+  Utensils,
+  Info,
+  AlertCircle,
+  X,
+  CheckCircle2,
+  MapPin,
+  Phone,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
-const InhouseCanteenList = ({ isOpen, onClose, canteenData, centerName }) => {
+const InhouseCanteenList = ({ isOpen, onClose, diagnosticcenterid }) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 🎨 Unified Theme
+  const unified = {
+    headerGradient: "from-[#1E3B90] to-[#3D85EF]",
+    cardHeaderGradient: "from-[#1E3B90]/10 to-[#3D85EF]/10",
+    accentText: "text-[#1E3B90]",
+    buttonGradient: "from-[#1E3B90] to-[#3D85EF]",
+    lightBg: "bg-[#EEF3FF]",
+    borderColor: "border-[#E1E8FF]",
+  };
+
+  // 📡 Fetch data when dialog opens
+  useEffect(() => {
+    if (!isOpen || !diagnosticcenterid) return;
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          `/api/diagnostic-center/${diagnosticcenterid}/inhouse-canteen`
+        );
+        const result = await res.json();
+        if (result.success) setData(result.data);
+        else console.error("❌ Failed to fetch:", result.message);
+      } catch (err) {
+        console.error("🔥 Error fetching In-House Canteen:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [isOpen, diagnosticcenterid]);
+
+  const hsp = data?.hspInfo || {};
+  const contact = data?.hspcontact || {};
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto p-0">
-        <DialogHeader className="sticky top-0 z-10 bg-gradient-to-r from-amber-600 to-yellow-600 text-white p-4 sm:p-6 rounded-t-lg">
+      <DialogContent
+        className="max-w-3xl max-h-[85vh] overflow-y-auto p-0 rounded-2xl shadow-2xl border-none"
+        hideCloseButton
+      >
+        {/* Header */}
+        <DialogHeader
+          className={`sticky top-0 z-10 bg-gradient-to-r ${unified.headerGradient} text-white p-5 sm:p-6 rounded-t-2xl shadow-md`}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                <Coffee className="w-6 h-6" />
+              <div className="p-2.5 bg-white/25 rounded-xl backdrop-blur-sm shadow-inner">
+                <Utensils className="w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl sm:text-2xl font-bold text-white">
-                  Inhouse Canteen
+                <DialogTitle className="text-2xl font-bold text-white tracking-wide">
+                  In-House Canteen
                 </DialogTitle>
-                <p className="text-amber-100 text-sm mt-1">
-                  Fresh meals and refreshments at {centerName}
+                <p className="text-white/90 text-sm mt-1">
+                  Facility details at{" "}
+                  <span className="font-semibold">
+                    {hsp?.regname || "this center"}
+                  </span>
                 </p>
               </div>
             </div>
+
+            <button
+              onClick={onClose}
+              className="text-white hover:bg-white/20 transition-all p-2 rounded-lg backdrop-blur-sm focus:outline-none"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </DialogHeader>
 
-        <div className="p-4 sm:p-6">
-          {canteenData && canteenData.length > 0 ? (
-            <div className="space-y-4">
-              <div className="text-sm text-gray-600 mb-4">
-                <span className="font-semibold text-amber-600">{canteenData.length}</span> canteen service{canteenData.length > 1 ? 's' : ''} available
-              </div>
-
-              {canteenData.map((canteen, index) => (
-                <Card key={index} className="border border-amber-100 shadow-lg hover:shadow-xl transition-shadow">
-                  <CardContent className="p-4 sm:p-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="p-2 bg-amber-100 rounded-lg">
-                          <UtensilsCrossed className="w-5 h-5 text-amber-600" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            {canteen.name || "Hospital Canteen"}
-                          </h3>
-                          {canteen.description && (
-                            <p className="text-gray-600 text-sm">
-                              {canteen.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      {canteen.operational !== undefined && (
-                        <Badge
-                          className={`${
-                            canteen.operational
-                              ? "bg-green-100 text-green-800 border-green-300"
-                              : "bg-red-100 text-red-800 border-red-300"
-                          } text-xs whitespace-nowrap ml-2`}
-                        >
-                          {canteen.operational ? "Operational" : "Closed"}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      {/* Timing */}
-                      {canteen.timings && (
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Clock className="w-4 h-4 text-blue-600" />
-                            <p className="text-xs font-medium text-blue-600">Operating Hours</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {canteen.timings}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Location */}
-                      {canteen.location && (
-                        <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Coffee className="w-4 h-4 text-purple-600" />
-                            <p className="text-xs font-medium text-purple-600">Location</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {canteen.location}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Price Range */}
-                      {canteen.priceRange && (
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
-                          <div className="flex items-center gap-2 mb-1">
-                            <IndianRupee className="w-4 h-4 text-green-600" />
-                            <p className="text-xs font-medium text-green-600">Price Range</p>
-                          </div>
-                          <p className="text-sm font-semibold text-green-900">
-                            {canteen.priceRange}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Seating Capacity */}
-                      {canteen.seatingCapacity && (
-                        <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
-                          <div className="flex items-center gap-2 mb-1">
-                            <UtensilsCrossed className="w-4 h-4 text-orange-600" />
-                            <p className="text-xs font-medium text-orange-600">Seating</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {canteen.seatingCapacity} persons
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Cuisine Type */}
-                      {canteen.cuisineType && (
-                        <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Leaf className="w-4 h-4 text-indigo-600" />
-                            <p className="text-xs font-medium text-indigo-600">Cuisine</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {canteen.cuisineType}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Contact */}
-                      {canteen.contact && (
-                        <div className="bg-cyan-50 rounded-lg p-3 border border-cyan-200">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Coffee className="w-4 h-4 text-cyan-600" />
-                            <p className="text-xs font-medium text-cyan-600">Contact</p>
-                          </div>
-                          <p className="text-sm font-semibold text-gray-800">
-                            {canteen.contact}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Menu Categories */}
-                    {canteen.menuCategories && canteen.menuCategories.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-xs text-gray-600 mb-2 font-medium">Available Cuisine:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {canteen.menuCategories.map((category, idx) => (
-                            <Badge key={idx} className="bg-amber-100 text-amber-800 border border-amber-300 text-xs">
-                              {category}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Popular Items */}
-                    {canteen.popularItems && canteen.popularItems.length > 0 && (
-                      <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200 mb-3">
-                        <p className="text-xs text-yellow-700 mb-2 font-medium">Popular Items:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {canteen.popularItems.map((item, idx) => (
-                            <div key={idx} className="flex items-start gap-2">
-                              <CheckCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-yellow-800">
-                                {item.name} {item.price && `- ₹${item.price}`}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Facilities/Features */}
-                    {canteen.facilities && canteen.facilities.length > 0 && (
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-3">
-                        <p className="text-xs text-gray-600 mb-2 font-medium">Facilities & Features:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {canteen.facilities.map((facility, idx) => (
-                            <div key={idx} className="flex items-start gap-2">
-                              <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-gray-700">{facility}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Special Features */}
-                    {canteen.specialFeatures && canteen.specialFeatures.length > 0 && (
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                        <p className="text-xs text-green-600 mb-2 font-medium">Special Features:</p>
-                        <div className="space-y-2">
-                          {canteen.specialFeatures.map((feature, idx) => (
-                            <div key={idx} className="flex items-start gap-2">
-                              <Leaf className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                              <p className="text-sm text-green-800">{feature}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Additional Notes */}
-                    {canteen.notes && (
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-sm text-blue-800">
-                          <span className="font-semibold">Note:</span> {canteen.notes}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-
-              {/* Additional Info */}
-              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-start gap-2">
-                  <Info className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-green-800">
-                    <p className="font-semibold mb-1">Canteen Guidelines:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Fresh and hygienic food prepared daily</li>
-                      <li>Seating available for patients and visitors</li>
-                      <li>Follow canteen timings for meal availability</li>
-                      <li>Special diet options available on request</li>
-                    </ul>
+        {/* Main Content */}
+        <div className="p-6 sm:p-8 bg-white">
+          {loading ? (
+            <div className="text-center py-12 text-gray-500">
+              Loading In-House Canteen details...
+            </div>
+          ) : hsp?.inhousecanteen === "Yes" ? (
+            // ✅ Available Case
+            <Card
+              className={`border ${unified.borderColor} shadow-lg hover:shadow-2xl transition-all duration-300 rounded-2xl overflow-hidden bg-white`}
+            >
+              <div className={`h-2 bg-gradient-to-r ${unified.buttonGradient}`} />
+              <CardContent className="p-6 sm:p-8 space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div
+                    className={`p-3 ${unified.lightBg} rounded-xl flex-shrink-0`}
+                  >
+                    <CheckCircle2 className={`w-6 h-6 ${unified.accentText}`} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                      In-House Canteen Available
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Enjoy healthy meals and refreshments within the premises
+                      of{" "}
+                      <span className="font-semibold">
+                        {hsp.regname || "this center"}
+                      </span>
+                      .
+                    </p>
                   </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <Card className="border border-gray-200 shadow-lg">
-              <CardContent className="p-8 sm:p-12">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <Coffee className="w-10 h-10 text-gray-400" />
+
+                {/* Contact and Location */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div
+                    className={`p-4 rounded-xl ${unified.lightBg} border ${unified.borderColor}`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Phone className={`w-5 h-5 ${unified.accentText}`} />
+                      <h4 className="font-semibold text-gray-900 text-sm">
+                        Contact Person
+                      </h4>
+                    </div>
+                    <p className="text-gray-700">
+                      {contact?.managername || "Canteen Manager"} –{" "}
+                      {contact?.managercontact || "N/A"}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Data Not Found
+
+                  <div
+                    className={`p-4 rounded-xl ${unified.lightBg} border ${unified.borderColor}`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <MapPin className={`w-5 h-5 ${unified.accentText}`} />
+                      <h4 className="font-semibold text-gray-900 text-sm">
+                        Location
+                      </h4>
+                    </div>
+                    <p className="text-gray-700">
+                      {contact?.city || "Within center premises"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Info Note */}
+                <div
+                  className={`mt-8 p-5 ${unified.lightBg} ${unified.borderColor} border rounded-xl flex items-start gap-3 hover:opacity-90 transition-all`}
+                >
+                  <div className={`p-2 ${unified.lightBg} rounded-lg`}>
+                    <Info className={`w-5 h-5 ${unified.accentText}`} />
+                  </div>
+                  <div className="text-sm text-gray-800 leading-relaxed">
+                    <p className="font-semibold mb-1">Note:</p>
+                    <p>
+                      The canteen offers a variety of meals and beverages for
+                      patients, visitors, and staff. Timing may vary based on
+                      hospital hours.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            // 🚫 Not Available Case
+            <Card className="border border-gray-200 shadow-lg rounded-2xl bg-white text-center hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-10 sm:p-14">
+                <div className="flex flex-col items-center justify-center space-y-5">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Utensils className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-gray-900">
+                    In-House Canteen Not Available
                   </h3>
-                  <p className="text-gray-600 max-w-md">
-                    Inhouse canteen information is not currently available for
-                    this diagnostic center. Please contact the center directly for
-                    more information about food and refreshment facilities.
+                  <p className="text-gray-600 max-w-md leading-relaxed">
+                    This diagnostic center currently does not provide in-house
+                    canteen facilities. Please contact the center for updates or
+                    nearby meal options.
                   </p>
-                  <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200 max-w-lg">
-                    <div className="flex items-start gap-2">
-                      <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-amber-800">
-                        You can reach out to the center's reception for details about
-                        canteen availability, timings, and menu options.
+
+                  <div
+                    className={`mt-6 p-5 ${unified.lightBg} rounded-xl ${unified.borderColor} border max-w-lg text-left`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 ${unified.lightBg} rounded-lg`}>
+                        <AlertCircle
+                          className={`w-5 h-5 ${unified.accentText}`}
+                        />
+                      </div>
+                      <p className="text-sm text-gray-800 leading-relaxed">
+                        You can contact{" "}
+                        <span className="font-semibold">
+                          {contact?.managername || "center staff"}
+                        </span>{" "}
+                        at{" "}
+                        <span className="text-[#1E3B90] font-medium">
+                          {contact?.managercontact || "N/A"}
+                        </span>{" "}
+                        for any updates regarding canteen services.
                       </p>
                     </div>
                   </div>
@@ -278,4 +227,3 @@ const InhouseCanteenList = ({ isOpen, onClose, canteenData, centerName }) => {
 };
 
 export default InhouseCanteenList;
-

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,9 @@ import BranchesList from './BranchesList';
 import GovtSchemesList from './GovtSchemesList';
 import CashlessList from './CashlessList';
 import OnlineReportsList from './OnlineReportsList';
+import NablCertifiedList from './NablCertifiedList';
+import RatingList from './RatingList';
+
 
 const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest', patientId }) => {
   console.log("🚀 ~ Pathology Lab Data:", hospital)
@@ -47,6 +50,58 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
   const [showGovtSchemes, setShowGovtSchemes] = useState(false);
   const [showCashless, setShowCashless] = useState(false);
   const [showOnlineReports, setShowOnlineReports] = useState(false);
+  const [showNablCertified, setShowNablCertified] = useState(false);
+  const [showRatingList, setShowRatingList] = useState(false);
+  const [showServiceHours, setShowServiceHours] = useState(false);
+const [showQualityAssured, setShowQualityAssured] = useState(false);
+const [showExperience, setShowExperience] = useState(false);
+const [showNablLevel, setShowNablLevel] = useState(false);
+const [branchData, setBranchData] = useState([]);
+const [labTestsCount, setLabTestsCount] = useState(0);
+
+//branches count
+useEffect(() => {
+  if (!hospital?.id) return;
+  const fetchBranches = async () => {
+    try {
+      const res = await fetch(`/api/pathology/branches?hospitalId=${hospital.id}`);
+      const data = await res.json();
+      if (data.success && data.data?.branches) {
+        setBranchData(data.data.branches);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching branch data:", err);
+    }
+  };
+  fetchBranches();
+}, [hospital?.id]);
+
+//labtests count
+useEffect(() => {
+  console.log("🧬 Fetching lab tests for hospital:", hospital?.id);
+  if (!hospital?.id && !("685e7365e4636b3c5cd02d53")) return;
+
+  const fetchLabTests = async () => {
+    try {
+      const res = await fetch(`/api/pathology/lab-tests?hospitalId=${hospital?.id || "685e7365e4636b3c5cd02d53"}`);
+      const data = await res.json();
+      console.log("🧪 Lab Tests API Response:", data);
+
+      if (data.success && Array.isArray(data.data)) {
+        setLabTestsCount(data.data.length);
+        console.log("✅ Set lab test count:", data.data.length);
+      } else {
+        console.warn("⚠️ Unexpected lab tests response:", data);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching lab tests:", err);
+    }
+  };
+  fetchLabTests();
+}, [hospital?.id]);
+
+
+
 
   // Get reviews from hospital data
   const reviews = hospital?.HospitalReview || hospital?.reviews || [];
@@ -57,6 +112,14 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
     ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) 
     : "4.2";
   const totalReviews = reviews.length || 87;
+
+  // 🕒 Dynamic Service Hours (fetch from hospital data)
+const serviceHours =
+  hospital?.hspInfo?.servicehours ||
+  hospital?.hspcontact?.servicehours ||
+  hospital?.hspdetails?.servicehours ||
+  "24/7"; // fallback
+
 
   const labImages = [
     hospital?.hspdetails?.hsplogo,
@@ -227,9 +290,9 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     ))}
                   </div>
                 ) : (
-                  <div className="h-[400px] bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+                  <div className="h-[400px] bg-gradient-to-br from-blue-50 via-emerald-50 to-teal-50 flex items-center justify-center">
                     <div className="text-center p-8">
-                      <TestTube className="w-24 h-24 text-green-400 mx-auto mb-4" />
+                      <TestTube className="w-24 h-24 text-blue-400 mx-auto mb-4" />
                       <h3 className="text-xl font-bold text-gray-700 mb-2">Pathology Lab</h3>
                       <p className="text-gray-500 font-medium">Images will be available soon</p>
                     </div>
@@ -257,7 +320,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                       onClick={() => setActiveTab(tab.id)}
                       className={`py-3 lg:py-4 px-3 lg:px-4 border-b-2 font-medium text-xs lg:text-sm whitespace-nowrap transition-all duration-300 ${
                         activeTab === tab.id
-                          ? 'border-green-500 text-green-600 bg-green-50 rounded-t-md'
+                          ? 'border-blue-500 text-blue-600 bg-blue-50 rounded-t-md'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
                     >
@@ -267,7 +330,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                 </nav>
                 <button
                   onClick={() => setDialogOpen(true)}
-                  className="w-full lg:w-auto mt-3 lg:mt-0 lg:ml-4 mb-3 lg:mb-0 lg:my-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 px-6 lg:px-8 rounded-lg transition-all transform hover:scale-110 shadow-xl border-2 border-green-400 flex items-center justify-center gap-2 whitespace-nowrap text-sm animate-pulse"
+                  className="w-full lg:w-auto mt-3 lg:mt-0 lg:ml-4 mb-3 lg:mb-0 lg:my-2 bg-gradient-to-r from-blue-500 blue-500 hover:from-blue-600 hover:blue-600 text-white font-bold py-3 px-6 lg:px-8 rounded-lg transition-all transform hover:scale-110 shadow-xl border-2 border-blue-400 flex items-center justify-center gap-2 whitespace-nowrap text-sm animate-pulse"
                 >
                   <Calendar className="w-5 h-5" />
                   Book Test Now
@@ -292,22 +355,22 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                       Located in {safeDisplay(hospital?.hspcontact?.city, "your area")}, {safeDisplay(hospital?.hspcontact?.state, "")}, we are committed to
                       excellence in healthcare delivery with state-of-the-art equipment and NABL certified facilities.
                     </p>
-                    <div className="mb-6 p-3 md:p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div className="mb-6 p-3 md:p-4 bg-blue-50 rounded-xl border border-blue-200">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
-                          <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                        <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                          <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-green-900 text-sm md:text-base">Lab Status</h4>
-                          <p className="text-green-700 text-xs md:text-sm break-words">
+                          <h4 className="font-semibold text-blue-900 text-sm md:text-base">Lab Status</h4>
+                          <p className="text-blue-700 text-xs md:text-sm break-words">
                             Registration: {hospital?.hspdetails?.hspregno || "N/A"} | 
                             Established: {getYear(hospital?.hspdetails?.hspregdate)} | 
-                            Status: <span className={`font-semibold ${hospital?.approvalStatus === 'APPROVED' ? 'text-green-600' : 'text-yellow-600'}`}>
+                            Status: <span className={`font-semibold ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
                               {hospital?.approvalStatus || "APPROVED"}
                             </span>
                           </p>
                           {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                            <p className="text-green-700 text-xs md:text-sm mt-1">
+                            <p className="text-blue-700 text-xs md:text-sm mt-1">
                               <Award className="w-3 h-3 md:w-4 md:h-4 inline mr-1" />
                               NABL Accredited - {hospital?.hspdetails?.nabhnabllevel}
                             </p>
@@ -317,15 +380,15 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     </div>
                     <div className="grid grid-cols-2 gap-3 md:gap-4">
                       {[
-                        { icon: <TestTube className="w-4 h-4 md:w-5 md:h-5" />, label: "Total Tests", value: "500+", color: "green" },
+                        { icon: <TestTube className="w-4 h-4 md:w-5 md:h-5" />, label: "Total Tests",  value: labTestsCount > 0 ? `${labTestsCount}` : "0", color: "blue" },
                         { icon: <Clock className="w-4 h-4 md:w-5 md:h-5" />, label: "Report Time", value: "24-48 hrs", color: "blue" },
                         { icon: <Award className="w-4 h-4 md:w-5 md:h-5" />, label: "Certification", value: "NABL", color: "purple" },
                         { icon: <Users className="w-4 h-4 md:w-5 md:h-5" />, label: "Experience", value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "N/A", color: "orange" },
                       ].map((stat, index) => (
                         <div key={index} className="bg-white p-3 md:p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                           <div className="flex items-center gap-2 md:gap-3">
-                            <div className="p-1.5 md:p-2 bg-green-100 rounded-lg flex-shrink-0">
-                              <div className="text-green-600">{stat.icon}</div>
+                            <div className="p-1.5 md:p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                              <div className="text-blue-600">{stat.icon}</div>
                             </div>
                             <div className="min-w-0">
                               <p className="text-lg md:text-2xl font-bold text-gray-900">{stat.value}</p>
@@ -345,7 +408,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                   <CardContent className="p-4 md:p-6">
                     <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Test Details</h3>
                     
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 md:p-6 border border-green-200 mb-6">
+                    <div className="bg-gradient-to-br from-blue-50 blue-50 rounded-xl p-4 md:p-6 border border-blue-200 mb-6">
                       <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-3">{getServiceName()}</h4>
                       <p className="text-gray-700 text-sm md:text-base mb-4">
                         {serviceType === 'wellnesspackage' 
@@ -358,9 +421,9 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                           <p className="text-xs text-gray-600 font-medium">Original Price</p>
                           <p className="text-lg md:text-xl font-bold text-gray-400 line-through">₹{originalPrice}</p>
                         </div>
-                        <div className="bg-green-100 rounded-lg p-3">
-                          <p className="text-xs text-green-600 font-medium">Final Price</p>
-                          <p className="text-lg md:text-xl font-bold text-green-900">₹{finalPrice}</p>
+                        <div className="bg-blue-100 rounded-lg p-3">
+                          <p className="text-xs text-blue-600 font-medium">Final Price</p>
+                          <p className="text-lg md:text-xl font-bold text-blue-900">₹{finalPrice}</p>
                         </div>
                       </div>
 
@@ -373,8 +436,8 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     </div>
 
                     <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                        <CheckCircle className="w-5 h-5 text-green-600" />
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-blue-600" />
                         <span className="text-gray-700">NABL Certified Lab</span>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
@@ -416,17 +479,17 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                           <div
                             key={index}
                             className={`flex items-center gap-4 p-4 rounded-lg ${
-                              isAvailable ? "bg-green-50 border border-green-200" : "bg-gray-50 border border-gray-200"
+                              isAvailable ? "bg-blue-50 border border-blue-200" : "bg-gray-50 border border-gray-200"
                             } hover:shadow-md transition-shadow`}
                           >
-                            <div className={`p-3 rounded-lg ${isAvailable ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}>
+                            <div className={`p-3 rounded-lg ${isAvailable ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400"}`}>
                               {facility.icon}
                             </div>
                             <div className="flex-1">
                               <span className="text-base font-semibold text-gray-900">{facility.label}</span>
                               <p className="text-sm text-gray-600">{isAvailable ? "Available" : "Not Available"}</p>
                             </div>
-                            {isAvailable && <CheckCircle className="w-6 h-6 text-green-600" />}
+                            {isAvailable && <CheckCircle className="w-6 h-6 text-blue-600" />}
                           </div>
                         );
                       })}
@@ -467,7 +530,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                             const patientInitial = patientName.charAt(0).toUpperCase();
                             
                             const bgColors = [
-                              "from-green-50 to-emerald-50 border-green-200",
+                              "from-blue-50 blue-50 border-blue-200",
                               "from-blue-50 to-cyan-50 border-blue-200",
                               "from-purple-50 to-pink-50 border-purple-200",
                               "from-orange-50 to-amber-50 border-orange-200",
@@ -478,7 +541,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                               <div key={review.id || index} className={`bg-gradient-to-r ${bgColors[index % 5]} p-6 rounded-lg border text-left`}>
                                 <div className="flex items-start justify-between mb-3">
                                   <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">
                                       {patientInitial}
                                     </div>
                                     <div>
@@ -522,10 +585,10 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                   <CardContent className="p-4 md:p-6">
                     <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Contact Information</h3>
                     <div className="space-y-4">
-                      <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                        <Phone className="w-6 h-6 text-green-600 mt-1" />
+                      <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <Phone className="w-6 h-6 text-blue-600 mt-1" />
                         <div>
-                          <h4 className="font-semibold text-green-900 mb-1">Phone Numbers</h4>
+                          <h4 className="font-semibold text-blue-900 mb-1">Phone Numbers</h4>
                           <p className="text-gray-900 font-medium">{safeDisplay(hospital?.hspcontact?.receptioncontact1 || hospital?.mobile)}</p>
                           {hospital?.hspcontact?.receptioncontact2 && (
                             <p className="text-gray-700 text-sm mt-1">Reception 2: {hospital.hspcontact.receptioncontact2}</p>
@@ -599,18 +662,18 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                         </div>
                         <div className="bg-gray-50 p-2 rounded">
                           <span className="text-gray-600">Status:</span>
-                          <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-green-600' : 'text-yellow-600'}`}>
+                          <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
                             {hospital?.approvalStatus || "APPROVED"}
                           </p>
                         </div>
                       </div>
                       {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                        <div className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200">
+                        <div className="mt-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
                           <div className="flex items-center gap-2">
-                            <Award className="w-4 h-4 text-green-600" />
-                            <span className="font-semibold text-green-900 text-sm">NABL Accredited</span>
+                            <Award className="w-4 h-4 text-blue-600" />
+                            <span className="font-semibold text-blue-900 text-sm">NABL Accredited</span>
                           </div>
-                          <p className="text-green-700 text-xs mt-1">{hospital.hspdetails.nabhnabllevel}</p>
+                          <p className="text-blue-700 text-xs mt-1">{hospital.hspdetails.nabhnabllevel}</p>
                         </div>
                       )}
                     </CardContent>
@@ -623,13 +686,13 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                         <h3 className="text-base font-bold text-gray-900 mb-3">Management Team</h3>
                         <div className="space-y-2">
                           {hospital?.hspcontact?.managername && (
-                            <div className="p-2 bg-green-50 rounded-lg">
+                            <div className="p-2 bg-blue-50 rounded-lg">
                               <div className="flex items-center gap-2 mb-1">
-                                <User className="w-4 h-4 text-green-600" />
-                                <span className="font-semibold text-green-900 text-sm">Manager</span>
+                                <User className="w-4 h-4 text-blue-600" />
+                                <span className="font-semibold text-blue-900 text-sm">Manager</span>
                               </div>
                               <p className="font-medium text-gray-900 text-sm">{hospital.hspcontact.managername}</p>
-                              <p className="text-xs text-green-700">{hospital.hspcontact.managercontact || "N/A"}</p>
+                              <p className="text-xs text-blue-700">{hospital.hspcontact.managercontact || "N/A"}</p>
                             </div>
                           )}
                           {hospital?.hspcontact?.adminname && (
@@ -671,18 +734,18 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     </div>
                     <div className="bg-gray-50 p-2 rounded">
                       <span className="text-gray-600">Status:</span>
-                      <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-green-600' : 'text-yellow-600'}`}>
+                      <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
                         {hospital?.approvalStatus || "APPROVED"}
                       </p>
                     </div>
                   </div>
                   {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                    <div className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200">
+                    <div className="mt-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2">
-                        <Award className="w-4 h-4 text-green-600" />
-                        <span className="font-semibold text-green-900 text-sm">NABL Accredited</span>
+                        <Award className="w-4 h-4 text-blue-600" />
+                        <span className="font-semibold text-blue-900 text-sm">NABL Accredited</span>
                       </div>
-                      <p className="text-green-700 text-xs mt-1">{hospital.hspdetails.nabhnabllevel}</p>
+                      <p className="text-blue-700 text-xs mt-1">{hospital.hspdetails.nabhnabllevel}</p>
                     </div>
                   )}
                 </CardContent>
@@ -693,8 +756,8 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                 <CardContent className="p-4">
                   <h3 className="text-base font-bold text-gray-900 mb-3">Quick Contact</h3>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-                      <Phone className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
+                      <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-900 text-sm truncate">{safeDisplay(hospital?.hspcontact?.receptioncontact1 || hospital?.mobile)}</p>
                         <p className="text-xs text-gray-600">Reception</p>
@@ -721,7 +784,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
               </Card>
 
               {/* Test Booking Card */}
-              <Card className="border border-green-200 shadow-md rounded-xl bg-gradient-to-br from-green-50 to-emerald-50">
+              <Card className="border border-blue-200 shadow-md rounded-xl bg-gradient-to-br from-blue-50 blue-50">
                 <CardContent className="p-4">
                   <h3 className="text-base font-bold text-gray-900 mb-3 text-center">Book Your Test</h3>
                   
@@ -730,7 +793,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     {discountPercentage > 0 && (
                       <p className="text-sm text-gray-400 line-through">₹{originalPrice}</p>
                     )}
-                    <p className="text-2xl font-bold text-green-600">₹{finalPrice}</p>
+                    <p className="text-2xl font-bold text-blue-600">₹{finalPrice}</p>
                     {discountPercentage > 0 && (
                       <Badge className="bg-red-500 text-white mt-2">
                         {discountPercentage}% OFF
@@ -740,7 +803,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
 
                   <button
                     onClick={() => setDialogOpen(true)}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 rounded-lg transition-all shadow-md text-sm flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-blue-500 blue-500 hover:from-blue-600 hover:blue-600 text-white font-bold py-3 rounded-lg transition-all shadow-md text-sm flex items-center justify-center gap-2"
                   >
                     <TestTube className="w-4 h-4" />
                     Book Now
@@ -754,11 +817,12 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
            <div className="max-w-6xl mx-auto my-6">
             <Card className="border border-gray-100 shadow-xl rounded-2xl overflow-hidden transition-all hover:shadow-2xl">
               <CardContent className="p-0">
-                 <div className="bg-gradient-to-r from-green-600 to-emerald-600 py-4 px-4 text-center">
+                 <div className="bg-gradient-to-r from-blue-600 to-blue-600 py-4 px-4 text-center">
+
                    <h2 className="text-2xl font-bold text-white tracking-tight">
                      Our Services
                    </h2>
-                   <p className="text-green-100 mt-1 text-xs sm:text-sm">
+                   <p className="text-blue-100 mt-1 text-xs sm:text-sm">
                      Comprehensive pathology services for all your needs
                    </p>
                  </div>
@@ -766,20 +830,28 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                  <div className="p-4 sm:p-6 bg-gray-50">
                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
                      {[
-                       { icon: <TestTube className="w-5 h-5 text-green-600" />, label: "Lab Tests", value: "500+",  action: "labTests" },
-                       { icon: <Award className="w-5 h-5 text-purple-600" />, label: "NABL Certified", value: "Certified" },
-                       { icon: <Clock className="w-5 h-5 text-orange-600" />, label: "Service Hours", value: "24/7" },
-                       { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Quality Assured", value: "100%" },
-                       { icon: <Users className="w-5 h-5 text-cyan-600" />, label: "Experience", value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "10+" },
-                       { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Home Collection", value: "Available",  action: "homeCollection" },
-                       { icon: <Video className="w-5 h-5 text-blue-600" />, label: "Online Reports", value: "Available",  action: "onlineReports" },
-                       { icon: <CreditCard className="w-5 h-5 text-orange-600" />, label: "Cashless", value: "Available",  action: "cashless" },
-                       { icon: <FileText className="w-5 h-5 text-blue-600" />, label: "Govt Schemes", value: "Available",  action: "govtSchemes" },
+                       { icon: <TestTube className="w-5 h-5 text-blue-600" />, label: "Lab Tests", value: labTestsCount > 0 ? `${labTestsCount}` : "0",  action: "labTests", clickable:true },
+                       { icon: <Award className="w-5 h-5 text-purple-600" />, label: "NABL Certified", value: "Certified", action: "nablCertified", clickable:true },
+                       { icon: <Clock className="w-5 h-5 text-orange-600" />, label: "Service Hours", value: "24/7", action: "serviceHours", clickable:true },
+                       { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Quality Assured", value: "100%", action: "qualityAssured", clickable:true },
+                       { icon: <Users className="w-5 h-5 text-cyan-600" />, label: "Experience", value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "0", action: "experience", clickable:true },
+                       { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Home Collection", value: "Available",  action: "homeCollection", clickable:true },
+                       { icon: <Video className="w-5 h-5 text-blue-600" />, label: "Online Reports", value: "Available",  action: "onlineReports", clickable:true },
+                       { icon: <CreditCard className="w-5 h-5 text-orange-600" />, label: "Cashless", value: "Available",  action: "cashless", clickable:true },
+                       { icon: <FileText className="w-5 h-5 text-blue-600" />, label: "Govt Schemes", value: "Available",  action: "govtSchemes", clickable:true },
                        ...(hospital?.hspdetails?.nabhnablapproved === "Yes"
-                         ? [{ icon: <Award className="w-5 h-5 text-green-600" />, label: "NABL Level", value: hospital.hspdetails.nabhnabllevel }]
-                         : []),
-                       { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Rating", value: `${avgRating} ★` },
-                       { icon: <Building2 className="w-5 h-5 text-purple-600" />, label: "Branches", value: hospital?.hspbranches?.length || "1+",  action: "branches" },
+  ? [{
+      icon: <Award className="w-5 h-5 text-blue-600" />,
+      label: "NABL Level",
+      value: hospital.hspdetails.nabhnabllevel || "Level 8",
+      action: "nablLevel",
+      clickable: true,
+    }]
+  : []),
+
+                       { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Rating", value: `${avgRating} ★`, action: "rating", clickable: true },
+
+                       { icon: <Building2 className="w-5 h-5 text-purple-600" />, label: "Branches",  value: branchData?.length > 0 ? branchData.length : "0",   action: "branches", clickable:true },
                      ].map((item, idx) => (
                        <div
                          key={idx}
@@ -798,10 +870,30 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                              } else if (item.action === "onlineReports") {
                                setShowOnlineReports(true);
                              }
+                             else if (item.action === "nablCertified") {
+  setShowNablCertified(true);}
+                             else if (item.action === "rating") {
+  setShowRatingList(true);
+}else if (item.action === "serviceHours") {
+  setShowServiceHours(true);
+}
+else if (item.action === "qualityAssured") {
+  setShowQualityAssured(true);
+}else if (item.action === "experience") {
+  setShowExperience(true);
+}
+else if (item.action === "nablLevel") {
+  setShowNablLevel(true);
+}
+
+
+
+
+
                            }
                          }}
                          className={`bg-white p-2 sm:p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center min-h-[85px] sm:min-h-[95px] ${
-                           item.clickable ? 'cursor-pointer hover:border-green-400 hover:bg-green-50' : ''
+                           item.clickable ? 'cursor-pointer hover:border-blue-400 hover:bg-blue-50' : ''
                          }`}
                        >
                          <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 mb-1.5 sm:mb-2">
@@ -810,7 +902,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                          <h3 className="font-semibold text-gray-900 text-[10px] sm:text-xs mb-0.5 leading-tight line-clamp-2">
                            {item.label}
                          </h3>
-                         <p className="font-bold text-green-700 text-[10px] sm:text-xs">
+                         <p className="font-bold text-blue-700 text-[10px] sm:text-xs">
                            {item.value}
                          </p>
                        </div>
@@ -911,9 +1003,9 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                 )}
               </>
             ) : (
-              <div className="h-48 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center rounded-xl">
+              <div className="h-48 bg-gradient-to-br from-blue-50 via-emerald-50 to-teal-50 flex items-center justify-center rounded-xl">
                 <div className="text-center p-6">
-                  <TestTube className="w-16 h-16 text-green-400 mx-auto mb-3" />
+                  <TestTube className="w-16 h-16 text-blue-400 mx-auto mb-3" />
                   <h3 className="text-lg font-bold text-gray-700 mb-1">Pathology Lab</h3>
                   <p className="text-gray-500 text-sm">Images will be available soon</p>
                 </div>
@@ -925,7 +1017,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
           <div className="flex gap-2">
             <button
               onClick={() => setDialogOpen(true)}
-              className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-md text-sm md:text-base flex items-center justify-center gap-2"
+              className="flex-1 bg-gradient-to-r from-blue-500 blue-500 hover:from-blue-600 hover:blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-md text-sm md:text-base flex items-center justify-center gap-2"
             >
               <TestTube className="w-4 h-4 md:w-5 md:h-5" />
               BOOK TEST
@@ -962,7 +1054,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-shrink-0 py-3 px-4 font-medium text-xs md:text-sm whitespace-nowrap transition-all ${
                     activeTab === tab.id
-                      ? 'bg-green-50 text-green-600 border-b-2 border-green-500'
+                      ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
@@ -984,20 +1076,20 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     Located in {safeDisplay(hospital?.hspcontact?.city, "your area")}, {safeDisplay(hospital?.hspcontact?.state, "")}, we are committed to
                     excellence in healthcare delivery with state-of-the-art equipment and NABL certified facilities.
                   </p>
-                  <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-start gap-2">
-                      <ShieldCheck className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <ShieldCheck className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-green-900 text-sm">Lab Status</h4>
-                        <p className="text-green-700 text-xs break-words">
+                        <h4 className="font-semibold text-blue-900 text-sm">Lab Status</h4>
+                        <p className="text-blue-700 text-xs break-words">
                           Reg: {hospital?.hspdetails?.hspregno || "N/A"} | 
                           Est: {getYear(hospital?.hspdetails?.hspregdate)} | 
-                          Status: <span className={`font-semibold ${hospital?.approvalStatus === 'APPROVED' ? 'text-green-600' : 'text-yellow-600'}`}>
+                          Status: <span className={`font-semibold ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
                             {hospital?.approvalStatus || "APPROVED"}
                           </span>
                         </p>
                         {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                          <p className="text-green-700 text-xs mt-1 flex items-center gap-1">
+                          <p className="text-blue-700 text-xs mt-1 flex items-center gap-1">
                             <Award className="w-3 h-3" />
                             NABL Accredited - {hospital?.hspdetails?.nabhnabllevel}
                           </p>
@@ -1014,8 +1106,8 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     ].map((stat, index) => (
                       <div key={index} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-1">
-                          <div className="p-1.5 bg-green-100 rounded-lg flex-shrink-0">
-                            <div className="text-green-600">{stat.icon}</div>
+                          <div className="p-1.5 bg-blue-100 rounded-lg flex-shrink-0">
+                            <div className="text-blue-600">{stat.icon}</div>
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-base font-bold text-gray-900">{stat.value}</p>
@@ -1035,7 +1127,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                 <CardContent className="p-4">
                   <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Test Details</h3>
                   
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200 mb-4">
+                  <div className="bg-gradient-to-br from-blue-50 blue-50 rounded-lg p-4 border border-blue-200 mb-4">
                     <h4 className="text-base font-bold text-gray-900 mb-2">{getServiceName()}</h4>
                     <p className="text-gray-700 text-sm mb-3">
                       {serviceType === 'wellnesspackage' 
@@ -1048,9 +1140,9 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                         <p className="text-xs text-gray-600 font-medium">Original Price</p>
                         <p className="text-sm font-bold text-gray-400 line-through">₹{originalPrice}</p>
                       </div>
-                      <div className="bg-green-100 rounded-lg p-2">
-                        <p className="text-xs text-green-600 font-medium">Final Price</p>
-                        <p className="text-sm font-bold text-green-900">₹{finalPrice}</p>
+                      <div className="bg-blue-100 rounded-lg p-2">
+                        <p className="text-xs text-blue-600 font-medium">Final Price</p>
+                        <p className="text-sm font-bold text-blue-900">₹{finalPrice}</p>
                       </div>
                     </div>
 
@@ -1063,8 +1155,8 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <CheckCircle className="w-4 h-4 text-blue-600" />
                       <span className="text-gray-700 text-sm">NABL Certified Lab</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
@@ -1106,17 +1198,17 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                         <div
                           key={index}
                           className={`flex items-center gap-3 p-3 rounded-lg ${
-                            isAvailable ? "bg-green-50 border border-green-200" : "bg-gray-50 border border-gray-200"
+                            isAvailable ? "bg-blue-50 border border-blue-200" : "bg-gray-50 border border-gray-200"
                           }`}
                         >
-                          <div className={`p-2 rounded-lg flex-shrink-0 ${isAvailable ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}>
+                          <div className={`p-2 rounded-lg flex-shrink-0 ${isAvailable ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400"}`}>
                             {facility.icon}
                           </div>
                           <div className="flex-1 min-w-0">
                             <span className="text-sm font-semibold text-gray-900 block">{facility.label}</span>
                             <p className="text-xs text-gray-600">{isAvailable ? "Available" : "Not Available"}</p>
                           </div>
-                          {isAvailable && <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />}
+                          {isAvailable && <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />}
                         </div>
                       );
                     })}
@@ -1157,7 +1249,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                           const patientInitial = patientName.charAt(0).toUpperCase();
                           
                           const bgColors = [
-                            "from-green-50 to-emerald-50 border-green-200",
+                            "from-blue-50 blue-50 border-blue-200",
                             "from-blue-50 to-cyan-50 border-blue-200",
                             "from-purple-50 to-pink-50 border-purple-200"
                           ];
@@ -1166,7 +1258,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                             <div key={review.id || index} className={`bg-gradient-to-r ${bgColors[index % 3]} p-4 rounded-lg border`}>
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-semibold text-xs">
+                                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold text-xs">
                                     {patientInitial}
                                   </div>
                                   <div>
@@ -1210,10 +1302,10 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                 <CardContent className="p-4">
                   <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Contact Information</h3>
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                      <Phone className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <Phone className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-green-900 mb-1 text-sm">Phone Numbers</h4>
+                        <h4 className="font-semibold text-blue-900 mb-1 text-sm">Phone Numbers</h4>
                         <p className="text-gray-900 font-medium text-sm">{safeDisplay(hospital?.hspcontact?.receptioncontact1 || hospital?.mobile)}</p>
                         {hospital?.hspcontact?.receptioncontact2 && (
                           <p className="text-gray-700 text-xs mt-1">Reception 2: {hospital.hspcontact.receptioncontact2}</p>
@@ -1287,18 +1379,18 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                       </div>
                       <div className="bg-gray-50 p-2 rounded">
                         <span className="text-gray-600 text-xs block mb-0.5">Status:</span>
-                        <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-green-600' : 'text-yellow-600'}`}>
+                        <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
                           {hospital?.approvalStatus || "APPROVED"}
                         </p>
                       </div>
                     </div>
                     {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                      <div className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200">
+                      <div className="mt-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="flex items-center gap-2">
-                          <Award className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <Award className="w-4 h-4 text-blue-600 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <span className="font-semibold text-green-900 text-sm block">NABL Accredited</span>
-                            <p className="text-green-700 text-xs">{hospital.hspdetails.nabhnabllevel}</p>
+                            <span className="font-semibold text-blue-900 text-sm block">NABL Accredited</span>
+                            <p className="text-blue-700 text-xs">{hospital.hspdetails.nabhnabllevel}</p>
                           </div>
                         </div>
                       </div>
@@ -1312,13 +1404,13 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                       <h3 className="text-base font-bold text-gray-900 mb-3">Management Team</h3>
                       <div className="space-y-2">
                         {hospital?.hspcontact?.managername && (
-                          <div className="p-2 bg-green-50 rounded-lg">
+                          <div className="p-2 bg-blue-50 rounded-lg">
                             <div className="flex items-center gap-2 mb-1">
-                              <User className="w-4 h-4 text-green-600 flex-shrink-0" />
-                              <span className="font-semibold text-green-900 text-sm">Manager</span>
+                              <User className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                              <span className="font-semibold text-blue-900 text-sm">Manager</span>
                             </div>
                             <p className="font-medium text-gray-900 text-sm">{hospital.hspcontact.managername}</p>
-                            <p className="text-xs text-green-700">{hospital.hspcontact.managercontact || "N/A"}</p>
+                            <p className="text-xs text-blue-700">{hospital.hspcontact.managercontact || "N/A"}</p>
                           </div>
                         )}
                         {hospital?.hspcontact?.adminname && (
@@ -1342,16 +1434,16 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
           {/* Mobile Services Grid */}
           <Card className="border border-gray-200 shadow-md rounded-xl overflow-hidden">
             <CardContent className="p-0">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-3">
+              <div className="bg-gradient-to-r from-blue-600 blue-600 p-3">
                 <h2 className="text-lg font-bold text-white text-center">Our Services</h2>
-                <p className="text-green-100 text-center text-xs mt-0.5">
+                <p className="text-blue-100 text-center text-xs mt-0.5">
                   Comprehensive pathology services
                 </p>
               </div>
               <div className="p-3">
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { icon: <TestTube className="w-4 h-4 text-green-600" />, label: "Lab Tests", value: "500+",  action: "labTests" },
+                    { icon: <TestTube className="w-4 h-4 text-blue-600" />, label: "Lab Tests", value: "500+",  action: "labTests" },
                     { icon: <Award className="w-4 h-4 text-purple-600" />, label: "NABL", value: "Certified" },
                     { icon: <Clock className="w-4 h-4 text-orange-600" />, label: "Service", value: "24/7" },
                     { icon: <Shield className="w-4 h-4 text-indigo-600" />, label: "Quality", value: "100%" },
@@ -1361,10 +1453,10 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                     { icon: <CreditCard className="w-4 h-4 text-orange-600" />, label: "Cashless", value: "Yes",  action: "cashless" },
                     { icon: <FileText className="w-4 h-4 text-blue-600" />, label: "Govt", value: "Schemes",  action: "govtSchemes" },
                     ...(hospital?.hspdetails?.nabhnablapproved === "Yes"
-                      ? [{ icon: <Award className="w-4 h-4 text-green-600" />, label: "NABL", value: hospital.hspdetails.nabhnabllevel }]
+                      ? [{ icon: <Award className="w-4 h-4 text-blue-600" />, label: "NABL", value: hospital.hspdetails.nabhnabllevel }]
                       : []),
                     { icon: <Star className="w-4 h-4 text-yellow-600" />, label: "Rating", value: `${avgRating} ★` },
-                    { icon: <Building2 className="w-4 h-4 text-purple-600" />, label: "Branches", value: hospital?.hspbranches?.length || "1+",  action: "branches" },
+                    { icon: <Building2 className="w-4 h-4 text-purple-600" />, label: "Branches",   value: branchData.length > 0 ? branchData.length : "0",   action: "branches" },
                   ].map((item, idx) => (
                     <div
                       key={idx}
@@ -1386,7 +1478,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                         }
                       }}
                       className={`bg-white p-2 rounded-lg border border-gray-200 shadow-sm text-center flex flex-col items-center justify-center min-h-[75px] ${
-                        item.clickable ? 'cursor-pointer hover:border-green-400 hover:bg-green-50 active:bg-green-100' : ''
+                        item.clickable ? 'cursor-pointer hover:border-blue-400 hover:bg-blue-50 active:bg-blue-100' : ''
                       }`}
                     >
                       <div className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-50 mb-1">
@@ -1395,7 +1487,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                       <h3 className="font-semibold text-gray-900 text-[10px] mb-0.5 leading-tight line-clamp-2">
                         {item.label}
                       </h3>
-                      <p className="font-bold text-green-700 text-[10px]">
+                      <p className="font-bold text-blue-700 text-[10px]">
                         {item.value}
                       </p>
                     </div>
@@ -1406,7 +1498,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
           </Card>
 
           {/* Mobile Test Booking Card */}
-          <Card className="border border-green-200 shadow-md rounded-xl bg-gradient-to-br from-green-50 to-emerald-50">
+          <Card className="border border-blue-200 shadow-md rounded-xl bg-gradient-to-br from-blue-50 blue-50">
             <CardContent className="p-4">
               <h3 className="text-base font-bold text-gray-900 mb-3 text-center">Book Your Test</h3>
               
@@ -1415,7 +1507,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
                 {discountPercentage > 0 && (
                   <p className="text-sm text-gray-400 line-through">₹{originalPrice}</p>
                 )}
-                <p className="text-xl font-bold text-green-600">₹{finalPrice}</p>
+                <p className="text-xl font-bold text-blue-600">₹{finalPrice}</p>
                 {discountPercentage > 0 && (
                   <Badge className="bg-red-500 text-white mt-1 text-xs">
                     {discountPercentage}% OFF
@@ -1425,7 +1517,7 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
 
               <button
                 onClick={() => setDialogOpen(true)}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 rounded-lg transition-all shadow-md text-sm flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-blue-500 blue-500 hover:from-blue-600 hover:blue-600 text-white font-bold py-3 rounded-lg transition-all shadow-md text-sm flex items-center justify-center gap-2"
               >
                 <TestTube className="w-4 h-4" />
                 Book Now
@@ -1468,57 +1560,327 @@ const PathologySinglePageClient = ({ hospital, service, serviceType = 'labtest',
 
       {/* Lab Tests List Modal */}
       {showLabTests && (
-        <LabTestsList
-          onClose={() => setShowLabTests(false)}
-          pathologyService={{ hospital, service }}
-          serviceName={getServiceName()}
-        />
-      )}
+  <LabTestsList
+    onClose={() => setShowLabTests(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
 
       {/* Home Collection List Modal */}
       {showHomeCollection && (
-        <HomeCollectionList
-          onClose={() => setShowHomeCollection(false)}
-          pathologyService={{ hospital, service }}
-          serviceName={getServiceName()}
-        />
-      )}
+  <HomeCollectionList
+    onClose={() => setShowHomeCollection(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
 
       {/* Branches List Modal */}
       {showBranches && (
-        <BranchesList
-          onClose={() => setShowBranches(false)}
-          pathologyService={{ hospital, service }}
-          serviceName={getServiceName()}
-        />
-      )}
+  <BranchesList
+    onClose={() => setShowBranches(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
 
       {/* Government Schemes List Modal */}
       {showGovtSchemes && (
-        <GovtSchemesList
-          onClose={() => setShowGovtSchemes(false)}
-          pathologyService={{ hospital, service }}
-          serviceName={getServiceName()}
-        />
-      )}
+  <GovtSchemesList
+    onClose={() => setShowGovtSchemes(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
 
       {/* Cashless Services List Modal */}
-      {showCashless && (
-        <CashlessList
-          onClose={() => setShowCashless(false)}
-          pathologyService={{ hospital, service }}
-          serviceName={getServiceName()}
-        />
-      )}
+{showCashless && (
+  <CashlessList
+    onClose={() => setShowCashless(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
+
+
+      {/* NABL Certified List Modal */}
+{showNablCertified && (
+  <NablCertifiedList
+    onClose={() => setShowNablCertified(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
 
       {/* Online Reports List Modal */}
       {showOnlineReports && (
-        <OnlineReportsList
-          onClose={() => setShowOnlineReports(false)}
-          pathologyService={{ hospital, service }}
-          serviceName={getServiceName()}
-        />
-      )}
+  <OnlineReportsList
+    onClose={() => setShowOnlineReports(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
+{showRatingList && (
+  <RatingList
+    onClose={() => setShowRatingList(false)}
+    hospitalId={hospital?.id || "685e7365e4636b3c5cd02d53"}
+  />
+)}
+
+{showServiceHours && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    onClick={() => setShowServiceHours(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative bg-white text-gray-800 rounded-2xl w-[90%] max-w-sm shadow-2xl overflow-hidden border border-gray-200"
+    >
+      {/* Header Bar — same blue as main header */}
+      <div className="bg-[#3D85EF] text-white py-3 px-5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Clock className="w-5 h-5 text-white" />
+          <h3 className="text-base font-semibold tracking-wide">
+            Service Hours
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowServiceHours(false)}
+          className="text-white/80 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-5 bg-white">
+        <p className="text-sm font-medium leading-relaxed text-gray-800">
+          <strong>Lab Hours:</strong>{" "}
+          {serviceHours === "24/7" ? "Open 24 Hours" : serviceHours}
+        </p>
+        <p className="text-sm font-medium leading-relaxed mt-2 text-gray-800">
+          <strong>Home Collection:</strong> 24/7 Available
+        </p>
+      </div>
+    </div>
+  </div>
+)}
+
+{showQualityAssured && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    onClick={() => setShowQualityAssured(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative bg-white text-gray-900 rounded-2xl w-[90%] max-w-md shadow-2xl overflow-hidden border border-gray-200"
+    >
+      {/* Header */}
+      <div className="bg-[#3D85EF] text-white py-4 px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Shield className="w-5 h-5 text-white" />
+          <h3 className="text-lg font-semibold tracking-wide">
+            Quality Assured
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowQualityAssured(false)}
+          className="text-white/80 hover:text-white text-lg"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 bg-white space-y-5">
+        {/* Tags */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="inline-flex items-center justify-center bg-blue-50 text-blue-700 font-medium px-3 py-1 rounded-full text-xs border border-blue-200 uppercase tracking-wide">
+            NABL Certified
+          </span>
+          <span className="inline-flex items-center justify-center bg-green-50 text-green-700 font-medium px-3 py-1 rounded-full text-xs border border-green-200 uppercase tracking-wide">
+            100% Quality
+          </span>
+        </div>
+
+        {/* Description */}
+        <div className="text-[15px] leading-relaxed text-gray-800 space-y-3">
+          <p>
+            Our laboratories strictly adhere to{" "}
+            <span className="font-semibold text-gray-900">
+              NABL-accredited standards
+            </span>
+            , ensuring the highest level of{" "}
+            <span className="text-blue-600 font-medium">precision</span> and{" "}
+            <span className="text-blue-600 font-medium">accuracy</span> in
+            every diagnostic test.
+          </p>
+          <p>
+            All samples are processed using{" "}
+            <span className="font-semibold">advanced automation</span> and
+            verified by certified professionals to deliver{" "}
+            <span className="text-blue-600 font-medium">consistent, reliable</span>{" "}
+            results trusted by healthcare providers and patients nationwide.
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-200"></div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-center text-blue-700 font-semibold text-sm tracking-wide">
+          <Shield className="w-4 h-4 mr-2" />
+          Quality You Can Trust
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showExperience && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    onClick={() => setShowExperience(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative bg-white text-gray-900 rounded-2xl w-[90%] max-w-md shadow-2xl overflow-hidden border border-gray-200"
+    >
+      {/* Header */}
+      <div className="bg-[#3D85EF] text-white py-4 px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Users className="w-5 h-5 text-white" />
+          <h3 className="text-lg font-semibold tracking-wide">
+            Experience
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowExperience(false)}
+          className="text-white/80 hover:text-white text-lg"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 bg-white space-y-5">
+        {/* Tags */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="inline-flex items-center justify-center bg-blue-50 text-blue-700 font-medium px-3 py-1 rounded-full text-xs border border-blue-200 uppercase tracking-wide">
+            {hospital?.hspInfo?.experience
+              ? `${hospital.hspInfo.experience}+ Years`
+              : "0 Years"}{" "}
+            of Excellence
+          </span>
+          <span className="inline-flex items-center justify-center bg-gray-50 text-gray-700 font-medium px-3 py-1 rounded-full text-xs border border-gray-200 uppercase tracking-wide">
+            Trusted Expertise
+          </span>
+        </div>
+
+        {/* Description */}
+        <div className="text-[15px] leading-relaxed text-gray-800 space-y-3">
+          <p>
+            With over{" "}
+            <span className="font-semibold text-gray-900">
+              {hospital?.hspInfo?.experience || "11"} years
+            </span>{" "}
+            of experience in diagnostics and pathology, our experts have built a legacy of{" "}
+            <span className="text-blue-600 font-medium">trust</span>,{" "}
+            <span className="text-blue-600 font-medium">accuracy</span>, and{" "}
+            <span className="text-blue-600 font-medium">excellence</span>.
+          </p>
+          <p>
+            We ensure every diagnostic process meets professional standards and leverages
+            modern medical technology to deliver{" "}
+            <span className="font-semibold">consistent and reliable</span> results for patients and healthcare providers.
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-200"></div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-center text-blue-700 font-semibold text-sm tracking-wide">
+          <Users className="w-4 h-4 mr-2" />
+          Over {hospital?.hspInfo?.experience || "a Decade"} of Trusted Care
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showNablLevel && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    onClick={() => setShowNablLevel(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative bg-white text-gray-900 rounded-2xl w-[90%] max-w-md shadow-2xl overflow-hidden border border-gray-200"
+    >
+      {/* Header */}
+      <div className="bg-[#3D85EF] text-white py-4 px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Award className="w-5 h-5 text-white" />
+          <h3 className="text-lg font-semibold tracking-wide">
+            NABL Accreditation
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowNablLevel(false)}
+          className="text-white/80 hover:text-white text-lg"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 bg-white space-y-5">
+        {/* Tags */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="inline-flex items-center justify-center bg-blue-50 text-blue-700 font-medium px-3 py-1 rounded-full text-xs border border-blue-200 uppercase tracking-wide">
+            NABL Level {hospital?.hspdetails?.nabhnabllevel || "3"}
+          </span>
+          <span className="inline-flex items-center justify-center bg-gray-50 text-gray-700 font-medium px-3 py-1 rounded-full text-xs border border-gray-200 uppercase tracking-wide">
+            National Accreditation Board
+          </span>
+        </div>
+
+        {/* Description */}
+        <div className="text-[15px] leading-relaxed text-gray-800 space-y-3">
+          <p>
+            This laboratory is accredited by the{" "}
+            <span className="font-semibold text-gray-900">
+              National Accreditation Board for Testing and Calibration Laboratories (NABL)
+            </span>, ensuring compliance with international quality standards.
+          </p>
+          <p>
+            <span className="font-semibold">Level {hospital?.hspdetails?.nabhnabllevel || "3"}</span> indicates adherence to rigorous testing protocols, documentation,
+            and precision benchmarks that maintain the lab’s{" "}
+            <span className="text-blue-600 font-medium">technical competence</span> and{" "}
+            <span className="text-blue-600 font-medium">data reliability</span>.
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-200"></div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-center text-blue-700 font-semibold text-sm tracking-wide">
+          <Award className="w-4 h-4 mr-2" />
+          Certified NABL Level {hospital?.hspdetails?.nabhnabllevel || "0"} Laboratory
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
+
     </div>
   );
 };

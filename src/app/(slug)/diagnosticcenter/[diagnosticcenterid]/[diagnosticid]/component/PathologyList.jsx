@@ -1,119 +1,148 @@
 "use client";
-
-import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Stethoscope, Info, FileText, AlertCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  FlaskConical,
+  FileText,
+  ShieldCheck,
+  Microscope,
+  CheckCircle,
+  AlertCircle,
+  Link as LinkIcon
+} from "lucide-react";
 
-const PathologyList = ({ isOpen, onClose, pathologyData, centerName }) => {
-  // Unified Theme
-  const unified = {
-    headerGradient: "from-[#1E3B90] to-[#3D85EF]",
-    cardHeaderGradient: "from-[#1E3B90]/10 to-[#3D85EF]/10",
-    accentText: "text-[#1E3B90]",
-    buttonGradient: "from-[#1E3B90] to-[#3D85EF]",
-    lightBg: "bg-[#EEF3FF]",
-    borderColor: "border-[#E1E8FF]",
-  };
+const PathologyList = ({ open, onOpenChange, diagnosticcenterId }) => {
+  const [pathologyData, setPathologyData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch Pathology details
+  useEffect(() => {
+    if (!open) return;
+    const fetchPathologyData = async () => {
+      try {
+        console.log("🧬 Fetching pathology data for:", diagnosticcenterId);
+        const res = await fetch(
+          `/api/diagnostic-center/${diagnosticcenterId}/pathology`
+        );
+        const data = await res.json();
+        if (data.success) {
+          setPathologyData(data.data);
+        }
+      } catch (error) {
+        console.error("🔥 Error fetching pathology details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPathologyData();
+  }, [open, diagnosticcenterId]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto p-0 bg-white border-none shadow-2xl rounded-2xl">
-        {/* Header */}
-        <DialogHeader className={`sticky top-0 z-10 bg-gradient-to-r ${unified.headerGradient} text-white p-5 rounded-t-2xl shadow-md`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                <Stethoscope className="w-6 h-6" />
-              </div>
-              <div>
-                <DialogTitle className="text-xl sm:text-2xl font-bold text-white">
-                  Pathology Services
-                </DialogTitle>
-                <p className="text-white/90 text-sm mt-1">
-                  Available at <span className="font-semibold">{centerName}</span>
-                </p>
-              </div>
-            </div>
-          </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl">
+        <DialogHeader className="p-6 pb-3 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+            <Microscope className="w-5 h-5" /> Pathology Certification
+          </DialogTitle>
         </DialogHeader>
 
-        {/* Content */}
-        <div className="p-6 bg-white">
-          {pathologyData && pathologyData.trim() !== "" && pathologyData !== "null" ? (
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Left Info */}
-              <Card className={`border ${unified.borderColor} shadow-md hover:shadow-lg transition-shadow rounded-xl`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className={`p-2 ${unified.lightBg} rounded-lg`}>
-                      <FileText className={`w-5 h-5 ${unified.accentText}`} />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        Pathology Lab Information
-                      </h3>
-                      <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                        {pathologyData}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Right Highlight Card */}
-              <Card className={`bg-gradient-to-br from-[#EEF3FF] to-[#E1E8FF] border ${unified.borderColor} shadow-md hover:shadow-lg transition-shadow rounded-xl`}>
-                <CardContent className="p-6 flex flex-col h-full justify-between">
+        <Card className="border-0 rounded-none shadow-none">
+          <CardContent className="p-6">
+            {loading ? (
+              <div className="text-center text-gray-500 py-10">Loading...</div>
+            ) : pathologyData ? (
+              <div className="space-y-6">
+                {/* Center Basic Info */}
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Info className={`w-5 h-5 ${unified.accentText}`} /> Important Note
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      For specific pathology tests and requirements, please contact
-                      the diagnostic center directly for accurate information and availability.
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {pathologyData.hspInfo?.regname || "Diagnostic Center"}
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {pathologyData.email} | {pathologyData.mobile}
                     </p>
+                  </div>
+                  <Badge
+                    className={`${
+                      pathologyData?.hspdetails?.pathologyapproved === "Yes"
+                        ? "bg-green-100 text-green-800 border-green-300"
+                        : "bg-red-100 text-red-800 border-red-300"
+                    } text-sm py-1 px-3 mt-3 sm:mt-0`}
+                  >
+                    {pathologyData?.hspdetails?.pathologyapproved === "Yes"
+                      ? "Certified"
+                      : "Not Certified"}
+                  </Badge>
+                </div>
+
+                {/* Certification Details */}
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <ShieldCheck className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-sm font-semibold text-gray-800">
+                      Certification Details
+                    </h3>
                   </div>
 
-                  <div className={`mt-6 border-t ${unified.borderColor} pt-4`}>
-                    <p className={`text-sm italic ${unified.accentText}`}>
-                      "Accurate reports begin with reliable testing facilities."
+                  <div className="space-y-3 text-sm text-gray-700">
+                    <p className="flex justify-between">
+                      <span className="font-medium">Approval Status:</span>
+                      <span>
+                        {pathologyData?.hspdetails?.pathologyapproved || "N/A"}
+                      </span>
+                    </p>
+                    <p className="flex justify-between">
+                      <span className="font-medium">Certificate:</span>
+                      {pathologyData?.hspdetails?.pathologycertificate ? (
+                        <a
+                          href={pathologyData.hspdetails.pathologycertificate}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-blue-600 hover:underline"
+                        >
+                          <FileText className="w-4 h-4" /> View Certificate
+                        </a>
+                      ) : (
+                        <span className="text-gray-500">Not Available</span>
+                      )}
+                    </p>
+                    <p>
+                      <span className="font-medium">Pathology Types:</span>{" "}
+                      <br />
+                      {pathologyData?.hspdetails?.pathologytype ||
+                        "Details not available"}
                     </p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            // Empty State
-            <Card className="border border-gray-200 shadow-md rounded-2xl">
-              <CardContent className="p-10 flex flex-col items-center text-center">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <Stethoscope className="w-10 h-10 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Data Not Found
-                </h3>
-                <p className="text-gray-600 max-w-md">
-                  Pathology information is not currently available for this diagnostic center.
-                  Please contact the center directly for details.
-                </p>
-                <div className={`mt-6 p-4 ${unified.lightBg} rounded-lg ${unified.borderColor} border max-w-lg`}>
-                  <div className="flex items-start gap-2">
-                    <Info className={`w-5 h-5 ${unified.accentText} flex-shrink-0 mt-0.5`} />
-                    <p className="text-sm text-gray-800">
-                      You can reach out to the center's reception for more information
-                      about available pathology services and tests.
+
+                {/* Quality & Status */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-1" />
+                    <p className="text-xs font-medium text-green-800">
+                      Certified Laboratory
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                    <FlaskConical className="w-6 h-6 text-blue-600 mx-auto mb-1" />
+                    <p className="text-xs font-medium text-blue-800">
+                      {pathologyData?.hspInfo?.pathology === "Yes"
+                        ? "Pathology Available"
+                        : "Not Available"}
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-10 flex flex-col items-center">
+                <AlertCircle className="w-10 h-10 text-gray-400 mb-2" />
+                <p>No Pathology details found.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </DialogContent>
     </Dialog>
   );

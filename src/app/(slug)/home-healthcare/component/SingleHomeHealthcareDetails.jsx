@@ -36,6 +36,12 @@ import InsuranceServicesList from "./InsuranceServicesList";
 import ProfessionalsServicesList from "./ProfessionalsServicesList";
 import CareServicesList from "./CareServicesList";
 import PricingServicesList from "./PricingServicesList";
+import ExperienceServicesList from "./ExperienceServicesList";
+import MonitoringServicesList from "./MonitoringServicesList";
+import EmergencyServicesList from "./EmergencyServicesList";
+import RatingServicesList from "./RatingServicesList";
+import VerifiedServicesList from "./VerifiedServicesList";
+
 
 const HomeHealthcareSingleView = ({
   homeHealthcareService,
@@ -53,6 +59,15 @@ const HomeHealthcareSingleView = ({
   const [showProfessionalsServices, setShowProfessionalsServices] = useState(false);
   const [showCareServices, setShowCareServices] = useState(false);
   const [showPricingServices, setShowPricingServices] = useState(false);
+  const [showExperience, setShowExperience] = useState(false);
+  const [showMonitoring, setShowMonitoring] = useState(false);
+const [showEmergency, setShowEmergency] = useState(false);
+const [showRating, setShowRating] = useState(false);
+const [showVerified, setShowVerified] = useState(false);
+
+
+
+
 
   // Get reviews from service data
   const reviews = homeHealthcareService?.hospital?.reviews || [];
@@ -597,16 +612,16 @@ const HomeHealthcareSingleView = ({
                     {[
                       { icon: <Home className="w-5 h-5 text-blue-600" />, label: "Home Service", value: "Available", clickable: true, action: "home" },
                       { icon: <Clock className="w-5 h-5 text-green-600" />, label: "24/7 Care", value: "Always", clickable: true, action: "24x7" },
-                      { icon: <Award className="w-5 h-5 text-purple-600" />, label: "Experience", value: homeHealthcareService?.hospital?.hspInfo?.experience ? `${homeHealthcareService.hospital.hspInfo.experience}+ yrs` : "5+ yrs" },
+                      { icon: <Award className="w-5 h-5 text-purple-600" />, label: "Experience", value: homeHealthcareService?.hospital?.hspInfo?.experience ? `${homeHealthcareService.hospital.hspInfo.experience}+ yrs` : "5+ yrs", clickable:true, action:"experience" },
                       { icon: <Users className="w-5 h-5 text-blue-600" />, label: "Patients", value: totalPatients > 0 ? `${totalPatients}+` : "Available", clickable: true, action: "patients" },
-                      { icon: <Activity className="w-5 h-5 text-red-600" />, label: "Monitoring", value: "Live" },
+                      { icon: <Activity className="w-5 h-5 text-red-600" />, label: "Monitoring", value: "Live", action:"monitoring", clickable:true },
                       { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Insurance", value: "Accepted", clickable: true, action: "insurance" },
-                      { icon: <Phone className="w-5 h-5 text-orange-600" />, label: "Emergency", value: "24/7" },
+                      { icon: <Phone className="w-5 h-5 text-orange-600" />, label: "Emergency", value: "24/7", action:"emergency", clickable:true },
                       { icon: <Stethoscope className="w-5 h-5 text-cyan-600" />, label: "Professionals", value: "Qualified", clickable: true, action: "professionals" },
                       { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Care", value: "Personal", clickable: true, action: "care" },
                       { icon: <IndianRupee className="w-5 h-5 text-green-600" />, label: "Starting", value: `₹${homeHealthcareService?.minPrice || homeHealthcareService?.startingPrice || "999"}`, clickable: true, action: "pricing" },
-                      { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Rating", value: `${avgRating} ★` },
-                      { icon: <CheckCircle className="w-5 h-5 text-green-600" />, label: "Verified", value: "Provider" },
+                      { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Rating", value: `${avgRating} ★`, action:"rating", clickable:true },
+                      { icon: <CheckCircle className="w-5 h-5 text-green-600" />, label: "Verified", value: "Provider", action:"verified", clickable:true },
                     ].map((item, idx) => (
                       <div
                         key={idx}
@@ -627,6 +642,26 @@ const HomeHealthcareSingleView = ({
                             } else if (item.action === "pricing") {
                               setShowPricingServices(true);
                             }
+                            else if (item.action === "experience") {
+  setShowExperience(true);
+}
+else if (item.action === "monitoring") {
+  setShowMonitoring(true);
+}
+else if (item.action === "emergency") {
+  setShowEmergency(true);
+}
+else if (item.action === "rating") {
+  setShowRating(true);
+}
+else if (item.action === "verified") {
+  setShowVerified(true);
+}
+
+
+
+
+
                           }
                         }}
                         className={`bg-white p-2 sm:p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center min-h-[85px] sm:min-h-[95px] ${
@@ -967,7 +1002,7 @@ const HomeHealthcareSingleView = ({
                     { icon: <Shield className="w-4 h-4 text-indigo-600" />, label: "Insurance", value: "Accepted", clickable: true, action: "insurance" },
                     { icon: <Phone className="w-4 h-4 text-orange-600" />, label: "Emergency", value: "24/7" },
                     { icon: <Stethoscope className="w-4 h-4 text-cyan-600" />, label: "Professionals", value: "Qualified", clickable: true, action: "professionals" },
-                    { icon: <Star className="w-4 h-4 text-yellow-600" />, label: "Rating", value: `${avgRating} ★` },
+                    { icon: <Star className="w-4 h-4 text-yellow-600" />, label: "Rating", value: `${avgRating} ★`,clickable:true, action:"rating" },
                   ].map((item, idx) => (
                     <div
                       key={idx}
@@ -1099,6 +1134,46 @@ const HomeHealthcareSingleView = ({
           serviceName={serviceName}
         />
       )}
+
+      {showExperience && (
+  <ExperienceServicesList
+    onClose={() => setShowExperience(false)}
+    homeHealthcareService={homeHealthcareService}
+  />
+)}
+
+{showMonitoring && (
+  <MonitoringServicesList
+    onClose={() => setShowMonitoring(false)}
+    homeHealthcareService={homeHealthcareService}
+  />
+)}
+
+{showEmergency && (
+  <EmergencyServicesList
+    onClose={() => setShowEmergency(false)}
+    homeHealthcareService={homeHealthcareService}
+  />
+)}
+
+{showRating && (
+  <RatingServicesList
+    onClose={() => setShowRating(false)}
+    homeHealthcareService={homeHealthcareService}
+  />
+)}
+
+{showVerified && (
+  <VerifiedServicesList
+    onClose={() => setShowVerified(false)}
+    homeHealthcareService={homeHealthcareService}
+  />
+)}
+
+
+
+
+
       
       <BookHomeHealthcareDialog
         open={dialogOpen}

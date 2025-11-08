@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,18 @@ import GovtSchemesList from "./GovtSchemesList";
 import HospitalAmbulancesList from "./HospitalAmbulancesList";
 import HospitalWellnessPackagesList from "./HospitalWellnessPackagesList";
 import HospitalHomeHealthcareList from "./HospitalHomeHealthcareList";
+import HospitalBedsList from "./HospitalBedsList";
+import HospitalSurgeryList from "./HospitalSurgeryList";
+import HospitalWellnessList from "./HospitalWellnessList";
+import HospitalTreatmentList from './HospitalTreatmentList';
+import HospitalDiagnosticList from './HospitalDiagnosticList';
+import HospitalReviewList from "./HospitalReviewList";
+import HospitalFacilitiesList from "./HospitalFacilitiesList";
+import HospitalPharmacyList from "./PharmacyList";
+import HospitalNablPathologyList from "./HospitalNablList";
+import AccreditationList from "./AccreditationList";
+import InhouseCanteenList from "./InhouseCanteenList";
+
 
 const HospitalSingleView = ({ hospitalData, patientId }) => {
   console.log("🚀 ~ Hospital Data:", hospitalData)
@@ -48,9 +60,65 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
   const [showAmbulances, setShowAmbulances] = useState(false);
   const [showWellnessPackages, setShowWellnessPackages] = useState(false);
   const [showHomeHealthcare, setShowHomeHealthcare] = useState(false);
+  const [showBeds, setShowBeds] = useState(false);
+  const [showSurgery, setShowSurgery] = useState(false);
+  const [showWellnessList, setShowWellnessList] = useState(false);
+  const [showTreatment, setShowTreatment] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+const [showReviewsModal, setShowReviewsModal] = useState(false);
+const [showFacilities, setShowFacilities] = useState(false);
+const [showNablPathology, setShowNablPathology] = useState(false);
+const [showPharmacy, setShowPharmacy] = useState(false);
+const [showAccreditation, setShowAccreditation] = useState(false);
+const [showCanteen, setShowCanteen] = useState(false);
+// added these states
+const [doctorCount, setDoctorCount] = useState(null);
+const [bedCount, setBedCount] = useState(null);
+const [ambulanceCount, setAmbulanceCount] = useState(null);
+const [specialtyCount, setSpecialtyCount] = useState(null);
+const [showOnlineConsultation, setShowOnlineConsultation] = useState(false);
+const [showCashless, setShowCashless] = useState(false);
+
+
+
+
+
+
+useEffect(() => {
+  if (!hospitalData?.id) return;
+
+  const fetchCounts = async () => {
+    try {
+      const [doctorsRes, bedsRes, ambulanceRes, specialtiesRes] = await Promise.all([
+        fetch(`/api/hospital/${hospitalData.id}/doctors`),
+        fetch(`/api/hospital/${hospitalData.id}/beds`),
+        fetch(`/api/hospital/${hospitalData.id}/ambulances`),
+        fetch(`/api/hospital/${hospitalData.id}/specialties`),
+      ]);
+
+      const [doctorsData, bedsData, ambulancesData, specialtiesData] = await Promise.all([
+        doctorsRes.json(),
+        bedsRes.json(),
+        ambulanceRes.json(),
+        specialtiesRes.json(),
+      ]);
+
+      setDoctorCount(doctorsData?.doctors?.length || 0);
+      setBedCount(bedsData?.beds?.length || 0);
+      setAmbulanceCount(ambulancesData?.ambulances?.length || 0);
+      setSpecialtyCount(specialtiesData?.specialties?.length || 0);
+    } catch (error) {
+      console.error("Error fetching hospital counts:", error);
+    }
+  };
+
+  fetchCounts();
+}, [hospitalData?.id]);
+
+
 
   // Get reviews from hospital data
-  const reviews = hospitalData?.HospitalReview || hospitalData?.reviews || [];
+  const reviews = hospitalData?.HosptalReview || hospitalData?.reviews || [];
   console.log("🚀 ~ Hospital Reviews:", JSON.stringify(reviews, null, 2))
   
   // Calculate average rating from actual reviews
@@ -296,10 +364,10 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
                     </div>
                     <div className="grid grid-cols-2 gap-3 md:gap-4">
                       {[
-                        { icon: <Bed className="w-4 h-4 md:w-5 md:h-5" />, label: "Total Beds", value: hospitalData?.hspInfo?.totalnoofbed || "N/A", color: "blue" },
-                        { icon: <Users className="w-4 h-4 md:w-5 md:h-5" />, label: "Doctors", value: hospitalData?.hspInfo?.totaldoctor || "N/A", color: "green" },
-                        { icon: <Building2 className="w-4 h-4 md:w-5 md:h-5" />, label: "Specialities", value: hospitalData?.hspInfo?.totalspeciality || "N/A", color: "purple" },
-                        { icon: <FaAmbulance className="w-4 h-4 md:w-5 md:h-5" />, label: "Ambulances", value: hospitalData?.hspInfo?.totalambulance || "N/A", color: "orange" },
+                        { icon: <Bed className="w-4 h-4 md:w-5 md:h-5" />, label: "Total Beds", value: bedCount !== null ? bedCount : "—", color: "blue" },
+                        { icon: <Users className="w-4 h-4 md:w-5 md:h-5" />,label: "Doctors", value: doctorCount !== null ? doctorCount : "—", color: "green" },
+                        { icon: <Building2 className="w-4 h-4 md:w-5 md:h-5" />, label: "Specialities", value: specialtyCount !== null ? `${specialtyCount}` : "—", color: "purple" },
+                        { icon: <FaAmbulance className="w-4 h-4 md:w-5 md:h-5" />, label: "Ambulances",  value: ambulanceCount !== null ? ambulanceCount : "—", color: "orange" },
                       ].map((stat, index) => (
                         <div key={index} className="bg-white p-3 md:p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                           <div className="flex items-center gap-2 md:gap-3">
@@ -769,27 +837,35 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
                  <div className="p-4 sm:p-6 bg-gray-50">
                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
                      {[
-                               { icon: <Users className="w-5 h-5 text-blue-600" />, label: "Doctors", value: hospitalData?.hspInfo?.totaldoctor || "250+", clickable: true, action: "doctors" },
-                                 { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Speciality", value: hospitalData?.hspInfo?.totalspeciality || "35+", clickable: true, action: "specialties" },
-                                 { icon: <FaAmbulance className="w-5 h-5 text-orange-600" />, label: "Ambulance", value: "24/7", action: "ambulances" },
-                                 { icon: <Bed className="w-5 h-5 text-green-600" />, label: "Hospital Beds", value: hospitalData?.hspInfo?.totalnoofbed || "100+" },
+                               { icon: <Users className="w-5 h-5 text-blue-600" />, label: "Doctors", value: doctorCount !== null ? doctorCount : "—", clickable: true, action: "doctors" },
+                                 { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Speciality", value: specialtyCount !== null ? `${specialtyCount}` : "—", clickable: true, action: "specialties" },
+                                 { icon: <FaAmbulance className="w-5 h-5 text-orange-600" />, label: "Ambulance", value: "24/7",clickable:"true", action: "ambulances" },
+                                 { icon: <Bed className="w-5 h-5 text-green-600" />, label: "Hospital Beds", value: bedCount !== null ? bedCount : "—", clickable:true, action:"beds" },
                                  { icon: <Building2 className="w-5 h-5 text-purple-600" />, label: "Govt Schemes", value: "Available", clickable: true, action: "govtSchemes" },
-                                 { icon: <TestTube className="w-5 h-5 text-red-600" />, label: "Surgery Packages", value: "Available" },
-                                 { icon: <FileText className="w-5 h-5 text-blue-600" />, label: "Treatment Packages", value: "Available" },
-                                 { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Hospital Facilities", value: "Modern" },
+                                 { icon: <TestTube className="w-5 h-5 text-red-600" />, label: "Surgery Packages", value: "Available", clickable:true, action:"surgery" },
+                                 { icon: <FileText className="w-5 h-5 text-blue-600" />, label: "Treatment Packages", value: "Available", clickable:true, action:"treatment" },
+                                 { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Hospital Facilities", value: "Modern", clickable: true, action: "facilities" },
                                  { icon: <Building2 className="w-5 h-5 text-cyan-600" />, label: "Hospital Branches", value: hospitalData?.hspbranches?.length || "1+", clickable: true, action: "branches" },
-                                 { icon: <TestTube className="w-5 h-5 text-pink-600" />, label: "Pharmacy", value: "24/7" },
-                                 { icon: <TestTube className="w-5 h-5 text-teal-600" />, label: "NABL Pathology", value: "Certified" },
-                                 { icon: <Heart className="w-5 h-5 text-green-600" />, label: "Wellness Packages", value: "Available", action: "wellness" },
-                                 { icon: <Video className="w-5 h-5 text-blue-600" />, label: "Online Consultation", value: "Available" },
-                                 { icon: <Shield className="w-5 h-5 text-yellow-600" />, label: "Diagnostic Services", value: "Advanced" },
-                                 { icon: <CreditCard className="w-5 h-5 text-orange-600" />, label: "Cashless Services", value: "Available" },
-                                 { icon: <User className="w-5 h-5 text-emerald-600" />, label: "Home Healthcare", value: "Available", action: "homeHealthcare" },
+                                 { icon: <TestTube className="w-5 h-5 text-pink-600" />, label: "Pharmacy", value: "24/7", clickable:true, action:"pharmacy" },
+                                 { icon: <TestTube className="w-5 h-5 text-teal-600" />, label: "NABL Pathology", value: "Certified", clickable:true, action:"nablPathology" },
+                                 { icon: <Heart className="w-5 h-5 text-green-600" />, label: "Wellness Packages", value: "Available", clickable:true , action: "wellness" },
+                                { 
+  icon: <Video className="w-5 h-5 text-blue-600" />, 
+  label: "Online Consultation", 
+  value: "Available", 
+  clickable: true, 
+  action: "onlineConsultation" 
+},
+
+                                 { icon: <Shield className="w-5 h-5 text-yellow-600" />, label: "Diagnostic Services", value: "Advanced", clickable:true, action:"diagnostic" },
+                                 { icon: <CreditCard className="w-5 h-5 text-blue-600" />, label: "Cashless Services", value: "Available", clickable:true, action:"cashless" },
+
+                                 { icon: <User className="w-5 h-5 text-emerald-600" />, label: "Home Healthcare", value: "Available", action: "homeHealthcare", clickable:true },
                                  ...(hospitalData?.hspdetails?.nabhnablapproved === "Yes"
-                                   ? [{ icon: <Award className="w-5 h-5 text-green-600" />, label: "NABH Accredited", value: hospitalData.hspdetails.nabhnabllevel }]
+                                   ? [{ icon: <Award className="w-5 h-5 text-green-600" />, label: "NABH Accredited", value: hospitalData.hspdetails.nabhnabllevel, clickable:true, action:"accreditation"  }]
                                    : []),
-                                 { icon: <Building2 className="w-5 h-5 text-amber-600" />, label: "Inhouse Canteen", value: "Available" },
-                                 { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "HSP Reviews", value: `${avgRating} ★` },
+                                 { icon: <Building2 className="w-5 h-5 text-amber-600" />, label: "Inhouse Canteen", value: "Available", clickable:true, action:"canteen" },
+                                 { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "HSP Reviews", value: `${avgRating} ★`, clickable:true, action:"reviews" },
 
                      ].map((item, idx) => (
                        <div
@@ -799,9 +875,26 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
                            else if (item.action === "specialties") setShowSpecialtiesList(true);
                            else if (item.action === "branches") setShowBranchesList(true);
                            else if (item.action === "govtSchemes") setGovtSchemesDialogOpen(true);
-                           //else if (item.action === "ambulances") setShowAmbulances(true);
-                           //else if (item.action === "wellness") setShowWellnessPackages(true);
+                           else if (item.action === "ambulances") setShowAmbulances(true);
+                           else if (item.action === "wellness") setShowWellnessList(true);
+                           else if (item.action === "beds") setShowBeds(true);
                            else if (item.action === "homeHealthcare") setShowHomeHealthcare(true);
+                           else if (item.action === "surgery") setShowSurgery(true);
+                           else if (item.action === "treatment") setShowTreatment(true);
+                           else if (item.action === "diagnostic") setShowDiagnostics(true);
+                          else if (item.action === "reviews") setShowReviewsModal(true);
+                          else if (item.action === "facilities") setShowFacilities(true);
+                          else if (item.action === "pharmacy") setShowPharmacy(true);
+                          else if (item.action === "nablPathology") setShowNablPathology(true);
+                          else if (item.action === "accreditation") setShowAccreditation(true);
+                          else if (item.action === "canteen") setShowCanteen(true);
+                          else if (item.action === "onlineConsultation") setShowOnlineConsultation(true);
+                          else if (item.action === "cashless") {
+  setShowCashless(true);
+}
+
+
+                           
                          } : undefined}
                          className={`bg-white p-2 sm:p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center min-h-[85px] sm:min-h-[95px] ${
                            item.clickable ? 'cursor-pointer hover:border-blue-400 hover:scale-105' : ''
@@ -1004,7 +1097,7 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
                     {[
                       { icon: <Bed className="w-4 h-4" />, label: "Total Beds", value: hospitalData?.hspInfo?.totalnoofbed || "N/A" },
                       { icon: <Users className="w-4 h-4" />, label: "Doctors", value: hospitalData?.hspInfo?.totaldoctor || "N/A" },
-                      { icon: <Building2 className="w-4 h-4" />, label: "Specialities", value: hospitalData?.hspInfo?.totalspeciality || "N/A" },
+                      { icon: <Building2 className="w-4 h-4" />, label: "Specialities", value: specialtyCount !== null ? `${specialtyCount}` : "—" },
                       { icon: <FaAmbulance className="w-4 h-4" />, label: "Ambulances", value: hospitalData?.hspInfo?.totalambulance || "N/A" },
                     ].map((stat, index) => (
                       <div key={index} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
@@ -1396,8 +1489,8 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
                <div className="p-3">
                  <div className="grid grid-cols-3 gap-2">
                    {[
-                     { icon: <Users className="w-4 h-4 text-blue-600" />, label: "Doctors", value: hospitalData?.hspInfo?.totaldoctor || "250+", clickable: true, action: "doctors" },
-                     { icon: <Heart className="w-4 h-4 text-red-600" />, label: "Speciality", value: hospitalData?.hspInfo?.totalspeciality || "35+", clickable: true, action: "specialties" },
+                     { icon: <Users className="w-4 h-4 text-blue-600" />, label: "Doctors", value: doctorCount !== null ? doctorCount : "—", clickable: true, action: "doctors" },
+                     { icon: <Heart className="w-4 h-4 text-red-600" />, label: "Speciality", value: specialtyCount !== null ? `${specialtyCount}` : "—", clickable: true, action: "specialties" },
                      { icon: <FaAmbulance className="w-4 h-4 text-orange-600" />, label: "Ambulance", value: "24/7", clickable: true, action: "ambulances" },
                      { icon: <Bed className="w-4 h-4 text-green-600" />, label: "Hospital Beds", value: hospitalData?.hspInfo?.totalnoofbed || "100+" },
                      { icon: <Building2 className="w-4 h-4 text-purple-600" />, label: "Govt Schemes", value: "Available" },
@@ -1517,9 +1610,9 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
       )}
 
       {/* Hospital Wellness Packages Modal */}
-      {showWellnessPackages && (
-        <HospitalWellnessPackagesList
-          onClose={() => setShowWellnessPackages(false)}
+      {showWellnessList && (
+        <HospitalWellnessList
+          onClose={() => setShowWellnessList(false)}
           hospitalService={hospitalData}
           serviceName={hospitalData?.hspInfo?.regname}
         />
@@ -1533,6 +1626,270 @@ const HospitalSingleView = ({ hospitalData, patientId }) => {
           serviceName={hospitalData?.hspInfo?.regname}
         />
       )}
+
+      {/* Hospital Beds Modal */}
+{showBeds && (
+  <HospitalBedsList
+    onClose={() => setShowBeds(false)}
+    hospitalService={hospitalData}
+  />
+)}
+
+{/* Hospital Surgery Modal */}
+{showSurgery && (
+  <HospitalSurgeryList
+    onClose={() => setShowSurgery(false)}
+    hospitalService={hospitalData}
+  />
+)}
+
+{/* Hospital Treatment Packages Modal */}
+{showTreatment && (
+  <HospitalTreatmentList
+    onClose={() => setShowTreatment(false)}
+    hospitalService={hospitalData}
+  />
+)}
+
+{showDiagnostics && (
+  <HospitalDiagnosticList
+    onClose={() => setShowDiagnostics(false)}
+    hospitalService={hospitalData}
+  />
+)}
+
+{showReviewsModal && (
+  <HospitalReviewList
+    hospitalId={hospitalData?.id}
+    onClose={() => setShowReviewsModal(false)}
+  />
+)}
+
+{showFacilities && (
+  <HospitalFacilitiesList
+    hospitalId={hospitalData?.id}
+    onClose={() => setShowFacilities(false)}
+  />
+)}
+
+{showPharmacy && (
+  <HospitalPharmacyList
+    hospitalId={hospitalData?.id}
+    onClose={() => setShowPharmacy(false)}
+  />
+)}
+
+{showNablPathology && (
+  <HospitalNablPathologyList
+    hospitalId={hospitalData?.id}
+    onClose={() => setShowNablPathology(false)}
+  />
+)}
+
+{showAccreditation && (
+  <AccreditationList
+    hospitalId={hospitalData?.id}
+    onClose={() => setShowAccreditation(false)}
+  />
+)}
+
+{showCanteen && (
+  <InhouseCanteenList
+    hospitalId={hospitalData?.id}
+    onClose={() => setShowCanteen(false)}
+  />
+)}
+
+{showOnlineConsultation && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    onClick={() => setShowOnlineConsultation(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative bg-white text-gray-900 rounded-2xl w-[92%] max-w-xl shadow-2xl overflow-hidden border border-gray-100"
+    >
+      {/* HEADER */}
+      <div className="bg-[#3D85EF] text-white py-5 px-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-white/20 rounded-xl">
+            <Video className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold tracking-wide">
+            Online Consultation
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowOnlineConsultation(false)}
+          className="text-white/80 hover:text-white text-2xl leading-none"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* BODY */}
+      <div className="p-8 bg-white space-y-6">
+        {/* Hero Section */}
+        <div className="flex items-center justify-center">
+          <div className="p-4 bg-blue-50 rounded-full border border-blue-200">
+            <Video className="w-12 h-12 text-[#3D85EF]" />
+          </div>
+        </div>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Connect with Expert Doctors Instantly
+          </h2>
+          <p className="text-gray-600 text-base leading-relaxed max-w-md mx-auto">
+            Consult with certified specialists through secure video sessions — from the
+            comfort of your home. Get real-time advice and prescriptions digitally.
+          </p>
+        </div>
+
+        {/* Highlights Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-center">
+          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+            <Clock className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+            <h4 className="font-semibold text-gray-900 text-base">Quick Access</h4>
+            <p className="text-gray-600 text-sm mt-1">
+              Book and consult within minutes
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+            <ShieldCheck className="w-8 h-8 mx-auto mb-2 text-green-600" />
+            <h4 className="font-semibold text-gray-900 text-base">Secure Platform</h4>
+            <p className="text-gray-600 text-sm mt-1">
+              100% private and encrypted video calls
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+            <User className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
+            <h4 className="font-semibold text-gray-900 text-base">Expert Doctors</h4>
+            <p className="text-gray-600 text-sm mt-1">
+              Certified specialists across all departments
+            </p>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-200 mt-8"></div>
+
+        {/* Bottom Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
+          <div>
+            <p className="text-sm text-gray-500">Consultation Hours</p>
+            <p className="text-lg font-semibold text-[#3D85EF]">
+              Monday – Saturday, 9:00 AM – 6:00 PM
+            </p>
+          </div>
+          <button
+            onClick={() => alert("Online consultation booking feature coming soon!")}
+            className="bg-[#3D85EF] hover:bg-blue-700 text-white font-semibold text-base px-6 py-3 rounded-xl shadow-md transition-all hover:scale-[1.03]"
+          >
+            Book Consultation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showCashless && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+    onClick={() => setShowCashless(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative bg-white text-gray-900 rounded-2xl w-[92%] max-w-xl shadow-2xl overflow-hidden border border-gray-100"
+    >
+      {/* HEADER */}
+      <div className="bg-[#3D85EF] text-white py-5 px-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-white/20 rounded-xl">
+            <CreditCard className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold tracking-wide">
+            Cashless Services
+          </h3>
+        </div>
+        <button
+          onClick={() => setShowCashless(false)}
+          className="text-white/80 hover:text-white text-2xl leading-none"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* BODY */}
+      <div className="p-8 bg-white space-y-6">
+        {/* Icon Hero */}
+        <div className="flex items-center justify-center">
+          <div className="p-4 bg-blue-50 rounded-full border border-blue-200">
+            <CreditCard className="w-12 h-12 text-[#3D85EF]" />
+          </div>
+        </div>
+
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Cashless Health Insurance Facility
+          </h2>
+          <p className="text-gray-600 text-base leading-relaxed max-w-md mx-auto">
+            Avail treatments without paying upfront. We provide seamless cashless
+            hospitalization through major insurance providers and government health schemes.
+          </p>
+        </div>
+
+        {/* Highlights */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-center">
+          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+            <Building2 className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+            <h4 className="font-semibold text-gray-900 text-base">Partnered Hospitals</h4>
+            <p className="text-gray-600 text-sm mt-1">
+              Wide network of empanelled hospitals
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+            <ShieldCheck className="w-8 h-8 mx-auto mb-2 text-green-600" />
+            <h4 className="font-semibold text-gray-900 text-base">Hassle-Free Claims</h4>
+            <p className="text-gray-600 text-sm mt-1">
+              Quick approval & direct settlement
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+            <CreditCard className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
+            <h4 className="font-semibold text-gray-900 text-base">Multiple Insurers</h4>
+            <p className="text-gray-600 text-sm mt-1">
+              Accepted across top insurance providers
+            </p>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-200 mt-8"></div>
+
+        {/* Footer */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
+          <div>
+            <p className="text-sm text-gray-500">Status</p>
+            <p className="text-lg font-semibold text-[#3D85EF]">
+              Cashless Facility Available
+            </p>
+          </div>
+          <button
+            onClick={() => alert('Insurance partners list coming soon!')}
+            className="bg-[#3D85EF] hover:bg-blue-700 text-white font-semibold text-base px-6 py-3 rounded-xl shadow-md transition-all hover:scale-[1.03]"
+          >
+            View Insurance Partners
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
     </div>
   );
 };

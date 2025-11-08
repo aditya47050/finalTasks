@@ -1,80 +1,79 @@
+import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+
+const prisma = new PrismaClient();
 
 export async function GET(req, { params }) {
   try {
-    const { hospitalid } = params;
+    // ✅ Await params since Next.js 15+ makes them async
+    const { hospitalid } = await params;
 
     if (!hospitalid) {
+      console.error("❌ Missing hospitalid in route params");
       return NextResponse.json(
-        { error: "Hospital ID is required" },
+        { success: false, message: "Hospital ID is required" },
         { status: 400 }
       );
     }
 
-    // Verify hospital exists
-    const hospital = await db.Hospital.findUnique({
-      where: { id: hospitalid },
-      select: { id: true },
-    });
+    console.log(`🏥 Fetching specialties for hospital: ${hospitalid}`);
 
-    if (!hospital) {
-      return NextResponse.json(
-        { error: "Hospital not found" },
-        { status: 404 }
-      );
-    }
-
-    // Fetch ONLY specialties assigned to THIS specific hospital
-    const hospitalSpecialties = await db.HospitalSpeciality.findMany({
-      where: { 
-        hospitalId: hospitalid, // Only this hospital's specialties
-      },
-      include: {
-        speciality: true, // Include specialty details
-      },
-    });
-
-    console.log(`✅ Found ${hospitalSpecialties.length} specialties for hospital ${hospitalid}`);
-
-    // Get doctor count for each specialty at this hospital
-    const specialtiesWithDoctorCount = await Promise.all(
-      hospitalSpecialties.map(async (hs) => {
-        // Count only doctors at THIS hospital with this specialty
-        const doctorCount = await db.HospitalDoctor.count({
-          where: {
-            hospitalId: hospitalid,
-            doctor: {
-              specialities: {
-                some: {
-                  specialityId: hs.specialityId,
+    // ✅ Fetch doctors that belong to this hospital (via HospitalDoctor relation)
+    const hospitalDoctors = await prisma.hospitalDoctor.findMany({
+      where: { hospitalId: hospitalid },
+      select: {
+        doctor: {
+          select: {
+            id: true,
+            specialities: {
+              select: {
+                speciality: {
+                  select: { id: true, title: true },
                 },
               },
             },
           },
-        });
+        },
+      },
+    });
 
-        return {
-          id: hs.id,
-          specialityId: hs.specialityId,
-          hospitalId: hs.hospitalId,
-          speciality: hs.speciality,
-          doctorCount,
-        };
-      })
-    );
+    // 🧠 Collect specialties and count doctors per specialty
+    const specialityMap = new Map();
+
+    hospitalDoctors.forEach(({ doctor }) => {
+      doctor?.specialities?.forEach((spec) => {
+        const s = spec.speciality;
+        if (!s) return;
+        if (!specialityMap.has(s.id)) {
+          specialityMap.set(s.id, {
+            id: s.id,
+            title: s.title,
+            doctorCount: 1,
+          });
+        } else {
+          specialityMap.get(s.id).doctorCount += 1;
+        }
+      });
+    });
+
+    const specialties = Array.from(specialityMap.values());
+    console.log(`✅ Found ${specialties.length} specialties for hospital ${hospitalid}`);
 
     return NextResponse.json({
       success: true,
-      specialties: specialtiesWithDoctorCount,
-      count: specialtiesWithDoctorCount.length,
+      specialties,
     });
   } catch (error) {
-    console.error("Error fetching hospital specialties:", error);
+    console.error("🔥 Error fetching specialties:", error);
     return NextResponse.json(
-      { error: "Failed to fetch specialties", details: error.message },
+      {
+        success: false,
+        message: "Failed to fetch specialties",
+        error: error.message,
+      },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
-

@@ -42,7 +42,10 @@ import ExperienceList from "./ExperienceList";
 import CashlessServicesList from "./CashlessServicesList";
 import InhouseCanteenList from "./InhouseCanteenList";
 import ReviewsList from "./ReviewsList";
+import HomeCollectionList from "./HomeCollectionList";
 import { useSearchParams } from "next/navigation";
+
+
 
 const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, patientId }) => {
   console.log("🚀 ~ Diagnostic Center Data:", diagnosticcenterdata)
@@ -60,6 +63,7 @@ const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, pa
   const [cashlessDialogOpen, setCashlessDialogOpen] = useState(false);
   const [canteenDialogOpen, setCanteenDialogOpen] = useState(false);
   const [reviewsDialogOpen, setReviewsDialogOpen] = useState(false);
+  const [homeCollectionDialogOpen, setHomeCollectionDialogOpen] = useState(false);
   const searchParams = useSearchParams();
   const serviceId = searchParams.get("serviceId");
 
@@ -859,20 +863,20 @@ const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, pa
                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
                      {[
                        { icon: <TestTube className="w-5 h-5 text-blue-600" />, label: "Diagnostic Tests", value: diagnosticcenterdata?.diagnosticServices?.length || "50+", clickable: true },
-                       { icon: <Award className="w-5 h-5 text-green-600" />, label: "NABL Certified", value: "Certified"},
-                       { icon: <Clock className="w-5 h-5 text-orange-600" />, label: "Service Hours", value: "24/7" },
+                       { icon: <Award className="w-5 h-5 text-green-600" />, label: "NABL Certified", value: "Certified",clickable:true },
+                       { icon: <Clock className="w-5 h-5 text-orange-600" />, label: "Service Hours", value: "24/7",clickable:true },
                        { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Diagnostic Services", value: "Advanced", clickable: true },
                       { icon: <Building2 className="w-5 h-5 text-purple-600" />, label: "Govt Schemes", value: "Available", clickable: true },
                       { icon: <Stethoscope className="w-5 h-5 text-red-600" />, label: "Pathology", value: "NABL", clickable: true },
-                      { icon: <Video className="w-5 h-5 text-blue-600" />, label: "Online Consultation", value: "Available"},
-                      { icon: <Users className="w-5 h-5 text-cyan-600" />, label: "Experience", value: diagnosticcenterdata?.hspInfo?.experience ? `${diagnosticcenterdata.hspInfo.experience}+ Years` : "10+" },
-                      { icon: <CreditCard className="w-5 h-5 text-orange-600" />, label: "Cashless Services", value: "Available"},
-                      { icon: <User className="w-5 h-5 text-emerald-600" />, label: "Home Collection", value: "Available" },
+                      { icon: <Video className="w-5 h-5 text-blue-600" />, label: "Online Consultation", value: "Available", clickable:true},
+                      { icon: <Users className="w-5 h-5 text-cyan-600" />, label: "Experience", value: diagnosticcenterdata?.hspInfo?.experience ? `${diagnosticcenterdata.hspInfo.experience}+ Years` : "10+", clickable:true },
+                      { icon: <CreditCard className="w-5 h-5 text-orange-600" />, label: "Cashless Services", value: "Available", clickable:true},
+                      { icon: <User className="w-5 h-5 text-emerald-600" />, label: "Home Collection", value: "Available", clickable:true },
                       ...(diagnosticcenterdata?.hspdetails?.nabhnablapproved === "Yes"
-                        ? [{ icon: <Award className="w-5 h-5 text-green-600" />, label: "NABL Accredited", value: diagnosticcenterdata.hspdetails.nabhnabllevel }]
+                        ? [{ icon: <Award className="w-5 h-5 text-green-600" />, label: "NABL Accredited", value: diagnosticcenterdata.hspdetails.nabhnabllevel, clickable:true }]
                         : []),
-                      { icon: <Building2 className="w-5 h-5 text-amber-600" />, label: "Inhouse Canteen", value: "Available" },
-                       { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Reviews", value: `${avgRating} ★` },
+                      { icon: <Building2 className="w-5 h-5 text-amber-600" />, label: "Inhouse Canteen", value: "Available", clickable:true },
+                       { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Reviews", value: `${avgRating} ★`,clickable:true },
                      ].map((item, idx) => (
                        <div
                          key={idx}
@@ -900,6 +904,12 @@ const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, pa
                            } else if (item.label === "Reviews") {
                              setReviewsDialogOpen(true);
                            }
+                           else if (item.label === "NABL Accredited") {
+                             setNablDialogOpen(true);}
+                           else if (item.label === "Home Collection") {
+  setHomeCollectionDialogOpen(true);}
+                            
+
                          } : undefined}
                          className={`bg-white p-2 sm:p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center min-h-[85px] sm:min-h-[95px] ${item.clickable ? 'cursor-pointer hover:border-blue-400 hover:scale-105' : ''}`}
                        >
@@ -1643,11 +1653,12 @@ const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, pa
       />
 
       {/* NABL Certified Dialog */}
-      <NABLCertifiedList
-        open={nablDialogOpen}
-        onOpenChange={setNablDialogOpen}
-        diagnosticCenterData={diagnosticcenterdata}
-      />
+      {nablDialogOpen && (
+  <NABLCertifiedList
+    diagnosticcenterId={diagnosticcenterdata?.id}
+    onClose={() => setNablDialogOpen(false)}
+  />
+)}
 
       {/* Government Schemes Dialog */}
       <GovtSchemesList
@@ -1659,51 +1670,54 @@ const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, pa
 
       {/* Pathology Dialog */}
       <PathologyList
-        isOpen={pathologyDialogOpen}
-        onClose={() => setPathologyDialogOpen(false)}
-        pathologyData={diagnosticcenterdata?.hspInfo?.pathology}
-        centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
-      />
+  open={pathologyDialogOpen}
+  onOpenChange={setPathologyDialogOpen}
+  diagnosticcenterId={diagnosticcenterdata?.id}
+/>
+
 
       {/* Online Consultation Dialog */}
-      <OnlineConsultationList
-        isOpen={onlineConsultationDialogOpen}
-        onClose={() => setOnlineConsultationDialogOpen(false)}
-        consultationData={diagnosticcenterdata?.onlineConsultation || []}
-        centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
-      />
+     <OnlineConsultationList
+  isOpen={onlineConsultationDialogOpen}
+  onClose={() => setOnlineConsultationDialogOpen(false)}
+  consultationData={diagnosticcenterdata?.onlineConsultation || []}
+  centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
+/>
+
 
       {/* Experience Dialog */}
       <ExperienceList
-        isOpen={experienceDialogOpen}
-        onClose={() => setExperienceDialogOpen(false)}
-        experienceData={diagnosticcenterdata?.experience || []}
-        centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
-      />
+  isOpen={experienceDialogOpen}
+  onClose={() => setExperienceDialogOpen(false)}
+  experienceData={diagnosticcenterdata?.experience || { years: "8+ Years" }}
+  centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
+/>
 
-      {/* Cashless Services Dialog */}
-      <CashlessServicesList
-        isOpen={cashlessDialogOpen}
-        onClose={() => setCashlessDialogOpen(false)}
-        cashlessData={diagnosticcenterdata?.cashlessServices || []}
-        centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
-      />
+
+{/* 💳 Cashless Services Dialog */}
+<CashlessServicesList
+  isOpen={cashlessDialogOpen}
+  onClose={() => setCashlessDialogOpen(false)}
+  diagnosticcenterid={diagnosticcenterdata?.id}
+/>
+
 
       {/* Inhouse Canteen Dialog */}
       <InhouseCanteenList
-        isOpen={canteenDialogOpen}
-        onClose={() => setCanteenDialogOpen(false)}
-        canteenData={diagnosticcenterdata?.inhouseCanteen || []}
-        centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
-      />
+  isOpen={canteenDialogOpen}
+  onClose={() => setCanteenDialogOpen(false)}
+  diagnosticcenterid={diagnosticcenterdata?.id}
+/>
+
 
       {/* Reviews Dialog */}
       <ReviewsList
-        isOpen={reviewsDialogOpen}
-        onClose={() => setReviewsDialogOpen(false)}
-        reviewsData={reviews}
-        centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
-      />
+  isOpen={reviewsDialogOpen}
+  onClose={() => setReviewsDialogOpen(false)}
+  diagnosticcenterid={diagnosticcenterdata?.id}   // ✅ ADD THIS LINE
+  centerName={diagnosticcenterdata?.hspInfo?.regname || "this center"}
+/>
+
 
       {/* Book Diagnostic Service Dialog */}
       <BookDiagnosticDialog
@@ -1714,6 +1728,24 @@ const DiagnosticCenterSingleView = ({ diagnosticcenterdata, diagnosticCenter, pa
         patientId={patientId}
         serviceId={serviceId}
       />
+
+      {/* Home Collection Dialog */}
+{/* 🏠 Home Collection Dialog */}
+<HomeCollectionList
+  isOpen={homeCollectionDialogOpen}
+  onClose={() => setHomeCollectionDialogOpen(false)}
+  diagnosticcenterid={diagnosticcenterdata?.id || diagnosticCenter?.id}
+/>
+
+<ServiceHoursList
+  open={serviceHoursDialogOpen}
+  onOpenChange={setServiceHoursDialogOpen}
+  diagnosticCenterData={diagnosticcenterdata}
+/>
+
+
+
+
     </div>
   );
 };

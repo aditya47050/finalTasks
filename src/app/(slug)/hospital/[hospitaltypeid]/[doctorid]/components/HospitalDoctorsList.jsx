@@ -14,7 +14,7 @@ import {
   Briefcase,
   Star,
 } from "lucide-react";
-import { FaClinicMedical, FaUserMd } from "react-icons/fa";
+import { FaUserMd } from "react-icons/fa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,7 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
       const response = await fetch(`/api/hospital/${hospitalId}/doctors`);
       if (!response.ok) throw new Error("Failed to fetch doctors");
       const data = await response.json();
+
       setDoctors(data.doctors || []);
       setFilteredDoctors(data.doctors || []);
     } catch (err) {
@@ -93,10 +94,9 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-      {/* Scrollable content */}
       <div className="w-full h-full overflow-y-auto">
         <Card className="w-full max-w-[95vw] lg:max-w-none lg:rounded-none lg:border-0 lg:shadow-none mx-auto min-h-screen bg-white">
-          {/* Header */}
+          {/* HEADER */}
           <CardHeader className="border-b bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] text-white sticky top-0 z-10 shadow-md">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
@@ -127,10 +127,10 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
             </div>
           </CardHeader>
 
-          {/* Content */}
+          {/* CONTENT */}
           <CardContent className="relative z-0 p-6 lg:px-8 lg:py-8 bg-gradient-to-b from-gray-50 to-white">
             <div className="max-w-7xl mx-auto">
-              {/* Search & Filter */}
+              {/* Search */}
               <div className="mb-8 space-y-5">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -182,9 +182,9 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
                             selectedSpecialty === "all" ? "default" : "outline"
                           }
                           onClick={() => setSelectedSpecialty("all")}
-                          className={`rounded-full font-semibold px-5 py-2 transition-all transform hover:scale-105 ${
+                          className={`rounded-full font-semibold px-5 py-2 ${
                             selectedSpecialty === "all"
-                              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-0"
+                              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
                               : "bg-white hover:bg-blue-50 hover:text-blue-600 border-2 border-blue-200"
                           }`}
                         >
@@ -195,9 +195,9 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
                             key={spec.id}
                             size="sm"
                             onClick={() => setSelectedSpecialty(spec.id)}
-                            className={`rounded-full font-semibold px-4 py-2 transition-all hover:scale-105 ${
+                            className={`rounded-full font-semibold px-4 py-2 ${
                               selectedSpecialty === spec.id
-                                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-0"
+                                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
                                 : "bg-white hover:bg-blue-50 hover:text-blue-600 border-2 border-blue-200"
                             }`}
                           >
@@ -215,9 +215,8 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
                 <div className="text-center py-16">
                   <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                    Loading Doctors
+                    Loading Doctors...
                   </h3>
-                  <p className="text-gray-600">Please wait...</p>
                 </div>
               ) : error ? (
                 <div className="text-center py-16">
@@ -244,116 +243,76 @@ const HospitalDoctorsList = ({ hospitalId, onClose }) => {
                   {filteredDoctors.map((item, index) => (
                     <Card
                       key={`${item.id}-${index}`}
-                      className="h-full min-h-[320px] flex flex-col overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-white rounded-2xl hover:translate-y-[-4px]"
+                      className="h-full flex flex-col overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl bg-white rounded-2xl hover:-translate-y-1 transition-all duration-300"
                     >
                       <CardContent className="p-0 flex flex-col flex-grow">
                         {/* Header */}
-                        <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-6 rounded-t-2xl">
-                          <div className="flex items-center gap-4">
-                            {item.doctorinfo?.passportphoto ? (
-                              <Image
-                                src={item.doctorinfo.passportphoto}
-                                width={80}
-                                height={80}
-                                alt={item.firstName}
-                                className="rounded-full h-20 w-20 object-cover border-4 border-white shadow-lg"
-                              />
-                            ) : (
-                              <div className="w-20 h-20 bg-gradient-to-br from-[#1E3B90]/20 to-[#3D85EF]/30 border-4 border-white rounded-full flex items-center justify-center text-white shadow-lg">
-                                <FaUserMd className="w-8 h-8" />
-                              </div>
-                            )}
-
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-xl font-bold text-gray-800 mb-1 truncate">
-                                Dr. {item.firstName} {item.lastName}
-                              </h3>
-                              {item.specialities?.length > 0 && (
-                                <p className="text-[#1E3B90] text-base font-semibold mb-2">
-                                  {item.specialities[0].speciality?.title}
-                                </p>
-                              )}
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm">
-                                  {[...Array(5)].map((_, i) => (
-                                    <Star
-                                      key={i}
-                                      className={`h-3 w-3 ${
-                                        i < 4
-                                          ? "text-yellow-400 fill-yellow-400"
-                                          : "text-gray-300"
-                                      }`}
-                                    />
-                                  ))}
-                                  <span className="text-xs font-medium text-gray-700 ml-1">
-                                    4.0
-                                  </span>
-                                </div>
-                                <span className="text-xs text-gray-600">
-                                  (129 Reviews)
-                                </span>
-                              </div>
+                        <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-6 rounded-t-2xl flex items-center gap-4">
+                          {item.doctorinfo?.passportphoto ? (
+                            <Image
+                              src={item.doctorinfo.passportphoto}
+                              width={80}
+                              height={80}
+                              alt={item.firstName}
+                              className="rounded-full h-20 w-20 object-cover border-4 border-white shadow-lg"
+                            />
+                          ) : (
+                            <div className="w-20 h-20 bg-gradient-to-br from-[#1E3B90]/20 to-[#3D85EF]/30 border-4 border-white rounded-full flex items-center justify-center text-white shadow-lg">
+                              <FaUserMd className="w-8 h-8" />
                             </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-xl font-bold text-gray-800 truncate">
+                              Dr. {item.firstName} {item.lastName}
+                            </h3>
+                            <p className="text-[#1E3B90] text-sm font-semibold">
+                              {item.specialities?.[0]?.speciality?.title ||
+                                "General Practitioner"}
+                            </p>
                           </div>
                         </div>
 
                         {/* Body */}
-                        <div className="p-6 space-y-3 flex-grow">
-                          {/* Experience & Fee */}
-                          <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <Briefcase className="h-4 w-4 text-[#1E3B90]" />
-                              <span>
-                                {item.totalexperience ||
-                                  item.doctorinfo?.experience ||
-                                  "Not Available"}{" "}
-                                yrs exp
-                              </span>
-                            </div>
+                        <div className="p-6 space-y-3 flex-grow text-gray-700">
+                          {/* <div className="flex items-center gap-2">
+                            <Briefcase className="h-4 w-4 text-[#1E3B90]" />
+                            <span>
+                              {item.doctorinfo?.experience || "N/A"} yrs exp
+                            </span>
+                          </div> */}
 
-                            <div className="flex items-center justify-end gap-2 text-gray-700">
-          
-                              <span>
-                                ₹
-                                {item.doctorinfo?.consultationfee ||
-                                  "Not Available"}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Address */}
-                          <div className="flex items-center gap-2 text-gray-700">
+                          <div className="flex items-center gap-2">
                             <MapPin className="h-4 w-4 text-[#1E3B90]" />
-                            <span className="text-sm line-clamp-2">
-                              {item.doctorinfo?.address?.trim()
-                                ? item.doctorinfo.address
+                            <span className="line-clamp-2">
+                              {item.doctorinfo?.presentaddress
+                                ? `${item.doctorinfo.presentaddress}, ${item.doctorinfo.city}, ${item.doctorinfo.state}`
                                 : "Not Available"}
                             </span>
                           </div>
 
-                          {/* Education */}
-                          <div className="flex items-center gap-2 text-gray-700">
+                          <div className="flex items-center gap-2">
                             <GraduationCap className="h-4 w-4 text-[#1E3B90]" />
-                            <span className="text-sm truncate">
-                              {item.education?.trim()
-                                ? item.education
-                                : "Not Available"}
+                            <span>{item.education || "Not Available"}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Stethoscope className="h-4 w-4 text-[#1E3B90]" />
+                            <span>
+                              ₹{item.doctorinfo?.consultationfee || "N/A"} Fee
                             </span>
                           </div>
                         </div>
 
                         {/* Footer */}
-                        <div className="px-6 pb-6 pt-2">
-                          <div className="flex gap-3">
-                            <button className="flex-1 bg-gradient-to-r from-[#1E3B90] to-[#1E3B90] text-white font-medium py-2.5 px-3 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
-                              <Calendar className="h-3 w-3" />
-                              Book Now
-                            </button>
-                            <button className="flex-1 bg-gradient-to-r from-[#3D85EF] to-[#3D85EF] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
-                              <Stethoscope className="h-3 w-3" />
-                              Profile
-                            </button>
-                          </div>
+                        <div className="px-6 pb-6 pt-2 flex gap-3">
+                          <button className="flex-1 bg-[#1E3B90] text-white py-2.5 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+                            <Calendar className="h-3 w-3" />
+                            Book Now
+                          </button>
+                          <button className="flex-1 bg-[#3D85EF] text-white py-2.5 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+                            <Stethoscope className="h-3 w-3" />
+                            Profile
+                          </button>
                         </div>
                       </CardContent>
                     </Card>

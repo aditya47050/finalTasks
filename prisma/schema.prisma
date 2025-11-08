@@ -350,6 +350,9 @@ model HealthInsurance {
   startingAmount String? // base premium (e.g. "5000 per year")
   discount       String? // % discount (e.g. "10%")
 
+  //cashless
+  cashlessServices Json?
+
   // 🏥 Extra fields
   category         String?
   companyName      String?
@@ -774,6 +777,13 @@ model Hospital {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
+  homecollectionservices Json?
+   onlinereportsservices   Json?
+    cashlessservices      Json? 
+    govtschemeservices Json?
+    pathologyrating Json?
+
+
   hspInfo              HspInfo?                   @relation(fields: [hspInfoId], references: [id])
   hspInfoId            String?                    @unique @db.ObjectId
   resetToken           String? // Nullable field for storing reset token
@@ -811,6 +821,12 @@ model Hospital {
   BookWellnesspackage          BookWellnesspackage[]
   Bloodbank                    Bloodbank[]
   BookBloodbank                BookBloodbank[]
+  facilitiesJson               Json?
+  pharmacyJson                 Json?
+   nablPathologyJson    Json?
+  accreditationJson Json?
+  inhouseCanteenJson      Json?  
+
 }
 
 model HospitalCertificate {
@@ -925,6 +941,20 @@ model Hspdetails {
   hospital            Hospital? @relation
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+
+   // 🧬 Add these new Pathology fields 👇
+  pathologyapproved    String?
+  pathologycertificate String?
+  pathologytype        String?
+
+    // 🏠 Home Collection Fields
+  homecollection    String?
+  homecollectionavailable   String?
+  homecollectiontiming      String?
+  homecollectioncontact     String?
+  homecollectioncoverage    String?
+  //for payment method
+   paymentmodes Json?
 }
 
 model Hspcontact {
@@ -2536,13 +2566,19 @@ model Review {
   date     DateTime @default(now())
   verified Boolean  @default(false)
 
-  productId String      @db.ObjectId
-  product   ProductMart @relation(fields: [productId], references: [id])
+  // Optional product review link
+  productId String?      @db.ObjectId
+  product   ProductMart? @relation(fields: [productId], references: [id])
+
+  // Optional home healthcare link
+  homeHealthcareId String?  @db.ObjectId
+  hospitalId       String?  @db.ObjectId
 
   userId    String
   userEmail String
   userType  String?
 }
+
 
 model Address {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId

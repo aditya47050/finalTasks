@@ -47,6 +47,9 @@ const Hospitalmainclient = ({
   const [visibleHospitals, setVisibleHospitals] = useState(9);
   const [showFilters, setShowFilters] = useState(false);
   const [expertHospitals, setExpertHospitals] = useState(false);
+  // Store counts for each hospital ID
+const [hospitalCounts, setHospitalCounts] = useState({});
+
   
   // State for row expansion
   const [expandedRows, setExpandedRows] = useState({
@@ -140,6 +143,54 @@ const Hospitalmainclient = ({
   const handleViewMore = () => {
     setVisibleHospitals(visibleHospitals + 8);
   };
+
+useEffect(() => {
+  if (!filteredHospitals || filteredHospitals.length === 0) return;
+
+  const fetchHospitalCounts = async () => {
+    try {
+      const updatedCounts = {};
+
+      await Promise.all(
+        filteredHospitals.slice(0, visibleHospitals).map(async (hospital) => {
+          try {
+            const [doctorsRes, bedsRes, ambulancesRes, reviewsRes] = await Promise.all([
+              fetch(`/api/hospital/${hospital.id}/doctors`),
+              fetch(`/api/hospital/${hospital.id}/beds`),
+              fetch(`/api/hospital/${hospital.id}/ambulances`),
+              fetch(`/api/hospital/${hospital.id}/reviews`),
+            ]);
+
+            const [doctorsData, bedsData, ambulancesData, reviewsData] = await Promise.all([
+              doctorsRes.json(),
+              bedsRes.json(),
+              ambulancesRes.json(),
+              reviewsRes.json(),
+            ]);
+
+            updatedCounts[hospital.id] = {
+              doctors: doctorsData?.doctors?.length || 0,
+              beds: bedsData?.beds?.length || 0,
+              ambulances: ambulancesData?.ambulances?.length || 0,
+              reviews: reviewsData?.reviews?.length || 0,
+            };
+          } catch (err) {
+            console.error(`Error fetching counts for hospital ${hospital.id}:`, err);
+            updatedCounts[hospital.id] = { doctors: 0, beds: 0, ambulances: 0, reviews: 0 };
+          }
+        })
+      );
+
+      setHospitalCounts(updatedCounts);
+    } catch (error) {
+      console.error("Error fetching hospital counts:", error);
+    }
+  };
+
+  fetchHospitalCounts();
+}, [filteredHospitals, visibleHospitals]);
+
+
 
   useEffect(() => {
     if (member.state) {
@@ -338,7 +389,13 @@ const Hospitalmainclient = ({
                       ))}
                       <span className="text-xs font-medium text-gray-700 ml-1">4.0</span>
                     </div>
-                    <span className="text-xs text-gray-600">({item.reviewsCount || 129} Reviews)</span>
+                    <span className="text-xs text-gray-600">
+  ({hospitalCounts[item.id]?.reviews !== undefined 
+    ? hospitalCounts[item.id].reviews 
+    : "—"}{" "}
+  Reviews)
+</span>
+
                   </div>
                 </div>
               </div>
@@ -350,11 +407,23 @@ const Hospitalmainclient = ({
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2 text-gray-700">
                 <Briefcase className="h-4 w-4 text-[#1E3B90]" />
-                <span>{item.hspInfo?.totaldoctor || "Not available"} doctors</span>
+                <span>
+  {hospitalCounts[item.id]?.doctors !== undefined
+    ? `${hospitalCounts[item.id].doctors}`
+    : "Loading..."}{" "}
+  doctors
+</span>
+
               </div>
               <div className="flex items-center gap-2 text-gray-700">
                 <Star className="h-4 w-4 text-[#1E3B90]" />
-                <span className="truncate">{item.hspInfo?.totalnoofbed || "Not available"} beds</span>
+                <span className="truncate">
+  {hospitalCounts[item.id]?.beds !== undefined
+    ? `${hospitalCounts[item.id].beds}`
+    : "Loading..."}{" "}
+  beds
+</span>
+
               </div>
             </div>
 
