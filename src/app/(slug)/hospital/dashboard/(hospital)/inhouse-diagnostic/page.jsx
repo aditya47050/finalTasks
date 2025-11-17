@@ -17,34 +17,34 @@ const InhouseDiagnosticsPage = async () => {
 
 
   // Fetch the hospital data including linked diagnostic centers
-  const hospitalData = await db.hospital.findUnique({
-    where: { id: hospital.id },
-    include: { 
-      hspInfo: {
-        select: {
-          id: true,
-          regname: true,
-        },
-      },
-      linkedDiagnosticCenters: {
-        select: {
-          id: true,
-          diagnosticCenter: {
-            select: {
-              id: true,
-              email: true,
-              mobile: true,
-              hspInfo: {
-                select: {
-                  regname: true,
-                },
-              },
-            },
-          },
-        },
+const hospitalData = await db.hospital.findUnique({
+  where: { id: hospital.id },
+  include: {
+    hspInfo: {
+      select: {
+        id: true,
+        regname: true,
       },
     },
-  });
+    linkedDiagnosticCenters: {
+      select: {
+        id: true,
+        diagnosticCenterId: true,
+        diagnosticCenter: {
+          select: {
+            id: true,
+            email: true,
+            mobile: true,
+            hspInfo: {
+              select: { regname: true }
+            }
+          }
+        }
+      }
+    }
+  },
+});
+
 
   if (!hospitalData) {
     return <div>Hospital not found</div>;
@@ -67,11 +67,17 @@ const InhouseDiagnosticsPage = async () => {
 
   return (
     <div>
-      <InhouseDiagnosticComponent
-        hospitalId={hospital.id}
-        diagnosticCenters={hospitalData.linkedDiagnosticCenters}
-        allDiagnosticCenters={allDiagnosticCenters}
-      />
+<InhouseDiagnosticComponent
+  hospitalId={hospital.id}
+  diagnosticCenters={hospitalData.linkedDiagnosticCenters.map((link) => ({
+    id: link.id,
+    diagnosticCenterId: link.diagnosticCenterId,
+    diagnosticCenter: link.diagnosticCenter, // ✔ This already exists from API
+  }))}
+  allDiagnosticCenters={allDiagnosticCenters}
+/>
+
+
     </div>
   );
 };

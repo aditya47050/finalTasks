@@ -52,6 +52,12 @@ import {
   ExternalLink,
   ChevronRight
 } from 'lucide-react';
+import InhouseCanteenForm from "../services/inhouse-canteen-form";
+import HomeHealthcareForm from "../services/home-healthcare-form";
+import DiagnosticPartnershipForm from "../services/diagnostic-form";
+
+
+
 
 // Professional Medical Navigation Component
 const NavigationSidebar = ({ activeSection, onSectionChange }) => {
@@ -235,6 +241,20 @@ const HospitalDashboard = ({ hospitaldata }) => {
       });
     });
   }
+
+  //new inhouse canteen form addition
+  const [openCanteenForm, setOpenCanteenForm] = useState(false);
+const [canteenData, setCanteenData] = useState(
+  hospitaldata.inhouseCanteenJson || null
+);
+// NEW - Home healthcare form
+const [openHealthcareForm, setOpenHealthcareForm] = useState(false);
+const [healthcareEditData, setHealthcareEditData] = useState(null);
+
+//diagnostic partnership form
+const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
+
+
   
   // Sort by date (most recent first) and limit to 5
   recentActivities.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
@@ -905,10 +925,37 @@ const HospitalDashboard = ({ hospitaldata }) => {
                   <h3 className="text-xl font-semibold text-gray-600 mb-2">Hospital Services</h3>
                   <p className="text-gray-500 mb-6">Manage hospital services and facilities</p>
                   <div className="flex gap-3 justify-center">
-                    <Button className="rounded-xl">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Service
-                    </Button>
+
+{/* // services buttons */}
+<Button 
+  className="rounded-xl"
+  onClick={() => setOpenCanteenForm(true)}
+>
+  <Plus className="w-4 h-4 mr-2" />
+  Add Canteen Details
+</Button>
+
+<Button 
+  className="rounded-xl"
+  onClick={() => {
+    setHealthcareEditData(null);
+    setOpenHealthcareForm(true);
+  }}
+>
+  <Plus className="w-4 h-4 mr-2" />
+  Add Home Healthcare Service
+</Button>
+
+<Button
+  className="rounded-xl"
+  onClick={() => setOpenDiagnosticForm(true)}
+>
+  <Plus className="w-4 h-4 mr-2" />
+  Add Diagnostic Service
+</Button>
+
+
+
                     <Button variant="outline" className="rounded-xl">
                       <Settings className="w-4 h-4 mr-2" />
                       Service Settings
@@ -973,6 +1020,33 @@ const HospitalDashboard = ({ hospitaldata }) => {
               </div>
             </InfoCard>
           )}
+
+           {/* Healthcare Services */}
+<HomeHealthcareForm
+  hospitalId={hospitaldata.id}
+  initialData={healthcareEditData}
+  open={openHealthcareForm}
+  onClose={() => setOpenHealthcareForm(false)}
+  onSaved={() => location.reload()}
+/>
+
+
+{/* Inhouse canteen Services */}
+          <InhouseCanteenForm
+  hospitalId={hospitaldata.id}
+  initialData={canteenData}
+  open={openCanteenForm}
+  onClose={() => setOpenCanteenForm(false)}
+  onSaved={() => location.reload()}
+/>
+
+<DiagnosticPartnershipForm
+  hospitalId={hospitaldata.id}
+  open={openDiagnosticForm}
+  onClose={() => setOpenDiagnosticForm(false)}
+/>
+
+
         </div>
       </div>
     </div>

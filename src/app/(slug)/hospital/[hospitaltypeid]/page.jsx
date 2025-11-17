@@ -8,15 +8,13 @@ const Hsptypedatashowpage = async ({ params }) => {
 
   const session = await getSession();
 
-  let patient = null; // ✅ properly declare patient
+  let patient = null;
 
   if (session?.email) {
     patient = await db.patient.findFirst({
       where: { email: session.email },
       select: { city: true },
     });
-  } else {
-    console.log("⚠️ No session found, skipping patient lookup.");
   }
 
   // Fetch linked hospital categories
@@ -27,7 +25,7 @@ const Hsptypedatashowpage = async ({ params }) => {
 
   const hspInfoIds = linkedHspCategories.map((cat) => cat.hspInfoId);
 
-  // Fetch hospital details with all necessary fields
+  // ⭐ FETCH HOSPITAL DETAILS INCLUDING DIAGNOSTIC LINKING (FIXED)
   const hospitaldetailsRaw = await db.Hospital.findMany({
     where: {
       hspInfoId: { in: hspInfoIds },
@@ -38,6 +36,7 @@ const Hsptypedatashowpage = async ({ params }) => {
       mobile: true,
       pincode: true,
       role: true,
+
       hspInfo: {
         select: {
           regname: true,
@@ -47,6 +46,7 @@ const Hsptypedatashowpage = async ({ params }) => {
           totalambulance: true,
         },
       },
+
       hspdetails: {
         select: {
           hsplogo: true,
@@ -54,6 +54,7 @@ const Hsptypedatashowpage = async ({ params }) => {
           nabhnablapproved: true,
         },
       },
+
       hspcontact: {
         select: {
           city: true,
@@ -63,7 +64,28 @@ const Hsptypedatashowpage = async ({ params }) => {
           pincode: true,
         },
       },
-      // Fetch Surgerytreatment with category and count of BookSurgeryTreatment
+
+      // ⭐⭐ THE FIX — ADD THIS ⭐⭐
+      linkedDiagnosticCenters: {
+        select: {
+          id: true,
+          diagnosticCenterId: true,
+          diagnosticCenter: {
+            select: {
+              id: true,
+              email: true,
+              mobile: true,
+              hspInfo: {
+                select: {
+                  regname: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      // ⭐⭐ END FIX ⭐⭐
+
       Surgeytreatment: {
         select: {
           category: true,
@@ -75,9 +97,11 @@ const Hsptypedatashowpage = async ({ params }) => {
           },
         },
       },
+
       BedCategory: { select: { name: true } },
       diagnosticServices: { select: { facility: true } },
       HomeHealthcare: { select: { serviceName: true } },
+
       HospitalAmbulance: {
         select: {
           ambulance: {
@@ -85,9 +109,7 @@ const Hsptypedatashowpage = async ({ params }) => {
               AmbulanceVaichicle: {
                 select: {
                   _count: {
-                    select: {
-                      BookAmbulance: true,
-                    },
+                    select: { BookAmbulance: true },
                   },
                 },
               },
@@ -95,21 +117,28 @@ const Hsptypedatashowpage = async ({ params }) => {
           },
         },
       },
+
       HospitalSpeciality: {
         select: { speciality: { select: { title: true } } },
       },
       HospitalDepartment: { select: { department: true } },
+
       HospitalDoctor: {
         select: {
           doctor: { select: { firstName: true, lastName: true } },
         },
       },
+
       hspbranches: { select: { branchname: true, branchcity: true } },
+
       LabTest: { select: { testname: true } },
       Wellnesspackage: { select: { aapackagename: true } },
       Bloodbank: { select: { bloodname: true, available: true } },
+
       Receptionist: { select: { name: true } },
+
       HospitalCertificate: { select: { cardNo: true } },
+
       _count: {
         select: {
           BedBooking: true,
@@ -119,42 +148,71 @@ const Hsptypedatashowpage = async ({ params }) => {
     },
   });
 
-  // Process and normalize hospital details
+  // Normalize data
   const hospitaldetails = hospitaldetailsRaw.map((hospital) => {
     const contact = {
       ...hospital.hspcontact,
       district: hospital.hspcontact?.dist || "",
     };
 
-    // Separate surgeries and treatments based on category
-    const surgeryCategories = hospital.Surgeytreatment?.filter(st => st.category === 'Surgery').map(st => ({
-      serviceName: st.serviceName,
-      bookingCount: st._count.BookSurgeryTreatment,
-    })) || [];
+    const surgeryCategories =
+      hospital.Surgeytreatment?.filter((st) => st.category === "Surgery").map(
+        (st) => ({
+          serviceName: st.serviceName,
+          bookingCount: st._count.BookSurgeryTreatment,
+        })
+      ) || [];
 
-    const treatmentCategories = hospital.Surgeytreatment?.filter(st => st.category === 'Treatment').map(st => ({
-      serviceName: st.serviceName,
-      bookingCount: st._count.BookSurgeryTreatment,
-    })) || [];
+    const treatmentCategories =
+      hospital.Surgeytreatment?.filter(
+        (st) => st.category === "Treatment"
+      ).map((st) => ({
+        serviceName: st.serviceName,
+        bookingCount: st._count.BookSurgeryTreatment,
+      })) || [];
 
-    const bedCategories = hospital.BedCategory?.map((b) => b.name).filter(Boolean) || [];
+    const bedCategories =
+      hospital.BedCategory?.map((b) => b.name).filter(Boolean) || [];
 
     const facilitiesSet = new Set();
-    hospital.diagnosticServices?.forEach((d) => d.facility && facilitiesSet.add(d.facility));
-    hospital.HomeHealthcare?.forEach((h) => h.serviceName && facilitiesSet.add(h.serviceName));
-    hospital.HospitalAmbulance?.forEach((a) => a.ambulance?.category && facilitiesSet.add(a.ambulance.category));
-    hospital.HospitalSpeciality?.forEach((s) => s.speciality && facilitiesSet.add(s.speciality));
-    hospital.HospitalDepartment?.forEach((d) => d.department && facilitiesSet.add(d.department));
+
+    hospital.diagnosticServices?.forEach(
+      (d) => d.facility && facilitiesSet.add(d.facility)
+    );
+    hospital.HomeHealthcare?.forEach(
+      (h) => h.serviceName && facilitiesSet.add(h.serviceName)
+    );
+
+    hospital.HospitalAmbulance?.forEach(
+      (a) => a.ambulance?.category && facilitiesSet.add(a.ambulance.category)
+    );
+
+    hospital.HospitalSpeciality?.forEach(
+      (s) => s.speciality && facilitiesSet.add(s.speciality)
+    );
+
+    hospital.HospitalDepartment?.forEach(
+      (d) => d.department && facilitiesSet.add(d.department)
+    );
+
     hospital.HospitalDoctor?.forEach((d) => {
-      if (d.doctor?.firstName && d.doctor?.lastName) facilitiesSet.add("Doctors");
+      if (d.doctor?.firstName && d.doctor?.lastName)
+        facilitiesSet.add("Doctors");
     });
-    hospital.hspbranches?.forEach((b) => b.branchname && facilitiesSet.add("Other Branches"));
+
+    hospital.hspbranches?.forEach(
+      (b) => b.branchname && facilitiesSet.add("Other Branches")
+    );
+
     hospital.LabTest?.forEach((l) => l.testname && facilitiesSet.add("Lab Tests"));
-    hospital.Wellnesspackage?.forEach((w) => w.aapackagename && facilitiesSet.add("Wellness"));
+
+    hospital.Wellnesspackage?.forEach((w) =>
+      w.aapackagename && facilitiesSet.add("Wellness")
+    );
+
     hospital.Bloodbank?.forEach((b) => b.bloodname && facilitiesSet.add("Blood Bank"));
-    hospital.homeHealthcarePartnerships?.forEach((h) => h.serviceName && facilitiesSet.add(h.serviceName));
-    hospital.linkedHomeHealthcare?.forEach((h) => h.serviceName && facilitiesSet.add(h.serviceName));
-    hospital.diagnosticCenterPartnerships?.forEach((d) => d.name && facilitiesSet.add("Diagnostic Centers"));
+
+    // ⭐⭐ NEW DIAGNOSTIC LINK FACILITY
     hospital.linkedDiagnosticCenters?.forEach((d) =>
       d.diagnosticCenterId && facilitiesSet.add("Diagnostic Centers")
     );
@@ -169,10 +227,10 @@ const Hsptypedatashowpage = async ({ params }) => {
     };
   });
 
-  // Fetch hospital category name
-  const hspcategoryname = await db.HospitalsCategory.findFirst({ where: { id: hospitaltypeid } });
+  const hspcategoryname = await db.HospitalsCategory.findFirst({
+    where: { id: hospitaltypeid },
+  });
 
-  // Fetch state, district, and subdistrict lists
   const [state, district, subdistrict] = await Promise.all([
     db.state.findMany(),
     db.district.findMany(),

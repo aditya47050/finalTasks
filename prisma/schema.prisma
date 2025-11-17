@@ -371,6 +371,10 @@ model HealthInsurance {
   reviews          HealthInsuranceReview[]
   description      String?
   logo             String?
+  networkService   Json?
+  healthCheckService Json?
+  noClaimBonusService Json?
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -826,7 +830,6 @@ model Hospital {
    nablPathologyJson    Json?
   accreditationJson Json?
   inhouseCanteenJson      Json?  
-
 }
 
 model HospitalCertificate {
@@ -844,20 +847,21 @@ model HospitalCertificate {
 
 model HospitalDiagnosticCenter {
   id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  hospital           Hospital @relation("HospitalRelation", fields: [hospitalId], references: [id])
-  hospitalId         String   @db.ObjectId
-  diagnosticCenter   Hospital @relation("DiagnosticCenterRelation", fields: [diagnosticCenterId], references: [id])
-  diagnosticCenterId String   @db.ObjectId
+  hospital           Hospital  @relation("HospitalRelation", fields: [hospitalId], references: [id])
+  hospitalId         String    @db.ObjectId
 
-  // Additional fields for the relationship
-  status          ApprovalStatus @default(PENDING) // Pending, Approved, Rejected
-  partnershipType String? // e.g., "Exclusive", "Preferred", "General"
-  agreementDate   DateTime? // When the partnership was established
-  expiryDate      DateTime? // When the partnership expires
-  commissionRate  Float? // Commission percentage for the hospital
-  notes           String? // Any additional notes
-  approvedBy      String? // Admin who approved this relationship
-  approvedAt      DateTime? // When it was approved
+  diagnosticCenterId String?   @db.ObjectId
+  diagnosticCenter   Hospital? @relation("DiagnosticCenterRelation", fields: [diagnosticCenterId], references: [id])
+
+  // Additional fields
+  status          ApprovalStatus @default(PENDING)
+  partnershipType String?
+  agreementDate   DateTime?
+  expiryDate      DateTime?
+  commissionRate  Float?
+  notes           String?
+  approvedBy      String?
+  approvedAt      DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1752,10 +1756,10 @@ model Ambulance {
   adminname            String?
   admincontact         String?
   adminemail           String?
-  HospitalAmbulance    HospitalAmbulance[]
-  AmbulanceHsp         AmbulanceHsp?
-  AmbulanceVaichicle   AmbulanceVaichicle[]
-  AmbulanceDriver      AmbulanceDriver[]
+  HospitalAmbulance    HospitalAmbulance[] //<- this one
+  AmbulanceHsp         AmbulanceHsp? //<- group of ambulances
+  AmbulanceVaichicle   AmbulanceVaichicle[] // <- types of vehicles
+  AmbulanceDriver      AmbulanceDriver[] 
   adminRemarks         String?
   AmbulanceCertificate AmbulanceCertificate[]
   reviews              AmbulanceReview[]

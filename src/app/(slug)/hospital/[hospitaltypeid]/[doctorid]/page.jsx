@@ -9,22 +9,22 @@ export const dynamic = "force-dynamic";
 const HospitalPage = async ({ params }) => {
   try {
     const { doctorid: hospitalid } = params;
-    
+
     // ✅ 1. Get session
     const session = await getSession();
 
-  if (!session || !session.email) {
-    return <AccessErrorDisplay />;
-  }
+    if (!session || !session.email) {
+      return <AccessErrorDisplay />;
+    }
 
     // ✅ 2. Find patient by email
     const patient = await db.patient.findUnique({
       where: { email: session.email },
     });
 
-   if (!patient) {
-    return <AccessErrorDisplay />;
-  }
+    if (!patient) {
+      return <AccessErrorDisplay />;
+    }
 
     const patientId = patient.id;
 
@@ -36,9 +36,28 @@ const HospitalPage = async ({ params }) => {
         hspcontact: true,
         hspdetails: true,
         hspbranches: true,
+
         HospitalSpeciality: {
           include: {
             speciality: true,
+          },
+        },
+
+        // ⭐⭐⭐ FINAL IMPORTANT BLOCK ⭐⭐⭐
+        linkedDiagnosticCenters: {
+          select: {
+            id: true,
+            diagnosticCenterId: true,
+            diagnosticCenter: {
+              select: {
+                id: true,
+                email: true,
+                mobile: true,
+                hspInfo: {
+                  select: { regname: true },
+                },
+              },
+            },
           },
         },
       },
@@ -46,8 +65,8 @@ const HospitalPage = async ({ params }) => {
 
     return (
       <HospitalSingleView 
-        hospitalData={hospitalData} 
-        patientId={patientId} 
+        hospitalData={hospitalData}
+        patientId={patientId}
       />
     );
   } catch (error) {

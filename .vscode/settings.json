@@ -13,5 +13,6 @@
       "**/public": true,
       "**/prisma": true
     },
+    "postman.settings.dotenv-detection-notification-visibility": false,
    
   }

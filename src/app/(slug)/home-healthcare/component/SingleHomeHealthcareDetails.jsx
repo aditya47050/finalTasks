@@ -93,7 +93,7 @@ const [showVerified, setShowVerified] = useState(false);
       : [...serviceImages, ...serviceImages, ...serviceImages].slice(0, 6)
     : [];
 
-  const mainImage = images[0] || "/placeholder-hospital.jpg";
+  const mainImage = images[0];
 
   // Helper to format year from date string
   const getYear = (dateStr) => {

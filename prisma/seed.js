@@ -1,71 +1,44 @@
-import { PrismaClient } from "@prisma/client";
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("💳 Seeding Cashless Payment Methods...");
+  console.log("🌱 Seeding No Claim Bonus Service into HealthInsurance...");
 
-  // Find existing insurance record
-  const insurance = await prisma.healthInsurance.findUnique({
-    where: { id: "6880cdd55f7a804c4ff8d547" },
-  });
+  const insurances = await prisma.healthInsurance.findMany();
 
-  if (!insurance) {
-    console.log("❌ No insurance found with given ID!");
+  if (insurances.length === 0) {
+    console.log("⚠️ No HealthInsurance records found. Please seed base data first.");
     return;
   }
 
-  // Define cashless services JSON
-  const cashlessServices = [
-    {
-      type: "BHIM UPI",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/BHIM_UPI_logo.svg/512px-BHIM_UPI_logo.svg.png",
-      description: "Instant UPI-based payments via linked bank accounts for cashless claim settlements.",
-    },
-    {
-      type: "Google Pay",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Google_Pay_Logo.svg",
-      description: "Secure and fast UPI payments through Google Pay.",
-    },
-    {
-      type: "PhonePe",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/f/f2/PhonePe-Logo.svg",
-      description: "Cashless UPI & wallet payments via PhonePe.",
-    },
-    {
-      type: "Paytm Wallet & UPI",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/5/55/Paytm_logo.png",
-      description: "Supports both Paytm wallet and UPI for instant transactions.",
-    },
-    {
-      type: "Debit / Credit Cards",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Credit_card_font_awesome.svg",
-      description: "Visa, MasterCard, and RuPay cards accepted for cashless insurance settlements.",
-    },
-    {
-      type: "Net Banking",
-      icon: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Online-banking-icon.png",
-      description: "Instant net banking options through all major Indian banks.",
-    },
-  ];
+  for (const insurance of insurances) {
+    const noClaimBonusData = {
+      title: "No Claim Bonus",
+      value: "Yes",
+      description:
+        "Reward for claim-free years with increased sum insured or premium discounts. Encourages healthy living and responsible usage of policy.",
+      icon: "Award",
+      isAvailable: true,
+    };
 
-  // Update insurance with cashless JSON
-  await prisma.healthInsurance.update({
-    where: { id: insurance.id },
-    data: {
-      cashlessServices,
-    },
-  });
+    await prisma.healthInsurance.update({
+      where: { id: insurance.id },
+      data: {
+        noClaimBonusService: noClaimBonusData,
+      },
+    });
 
-  console.log("✅ Cashless payment methods added for:", insurance.companyName);
+    console.log(`✅ Added No Claim Bonus service for: ${insurance.companyName || insurance.policyNumber}`);
+  }
+
+  console.log("🎉 No Claim Bonus service seeding complete!");
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-    console.log("🌱 Seeding completed successfully!");
-  })
-  .catch(async (err) => {
-    console.error("❌ Seed error:", err);
-    await prisma.$disconnect();
+  .catch((err) => {
+    console.error("❌ Error while seeding No Claim Bonus Service:", err);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

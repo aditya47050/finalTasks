@@ -16,8 +16,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function HospitalWellnessList({ onClose, hospitalService }) {
+  const router = useRouter();
+
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,10 +61,18 @@ export default function HospitalWellnessList({ onClose, hospitalService }) {
             : true
         );
 
+  // 🔥 Navigation Handler
+  const goToPackagePage = (hospitalId, serviceId) => {
+    router.push(
+      `/pathology/hospital/${hospitalId}/service/${serviceId}`
+    );
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
       <div className="w-full h-full overflow-y-auto">
         <Card className="w-full max-w-[95vw] lg:max-w-none lg:rounded-none lg:border-0 lg:shadow-none mx-auto min-h-screen bg-white">
+          
           {/* Header */}
           <CardHeader className="border-b bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] text-white sticky top-0 z-10 shadow-md">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -148,12 +159,14 @@ export default function HospitalWellnessList({ onClose, hospitalService }) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  
                   {filteredPackages.map((pkg, index) => (
                     <Card
                       key={`${pkg.id}-${index}`}
                       className="h-full min-h-[300px] flex flex-col overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-white rounded-2xl hover:translate-y-[-4px]"
                     >
                       <CardContent className="p-0 flex flex-col flex-grow">
+                        
                         {/* Header */}
                         <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-6 rounded-t-2xl">
                           <div className="flex items-center gap-4">
@@ -220,22 +233,39 @@ export default function HospitalWellnessList({ onClose, hospitalService }) {
                           </div>
                         </div>
 
-                        {/* Footer */}
+                        {/* Footer Buttons */}
                         <div className="px-6 pb-6 pt-2">
                           <div className="flex gap-3">
-                            <button className="flex-1 bg-gradient-to-r from-[#1E3B90] to-[#1E3B90] text-white font-medium py-2.5 px-3 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+
+                            {/* 🔵 BOOK NOW */}
+                            <button
+                              onClick={() =>
+                                goToPackagePage(pkg.hospitalId, pkg.id)
+                              }
+                              className="flex-1 bg-gradient-to-r from-[#1E3B90] to-[#1E3B90] text-white font-medium py-2.5 px-3 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm"
+                            >
                               <HeartPulse className="h-4 w-4" />
                               Book Package
                             </button>
-                            <button className="flex-1 bg-gradient-to-r from-[#3D85EF] to-[#3D85EF] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+
+                            {/* 🔵 DETAILS */}
+                            <button
+                              onClick={() =>
+                                goToPackagePage(pkg.hospitalId, pkg.id)
+                              }
+                              className="flex-1 bg-gradient-to-r from-[#3D85EF] to-[#3D85EF] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm"
+                            >
                               <ClipboardList className="h-4 w-4" />
                               Details
                             </button>
+
                           </div>
                         </div>
+
                       </CardContent>
                     </Card>
                   ))}
+
                 </div>
               )}
             </div>

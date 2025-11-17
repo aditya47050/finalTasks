@@ -12,30 +12,57 @@ export async function GET(req, { params }) {
       );
     }
 
-    // Fetch ambulances linked to this hospital
+    // Fetch ambulances assigned to hospital
     const hospitalAmbulances = await db.HospitalAmbulance.findMany({
       where: { hospitalId: hospitalid },
       include: {
-        ambulance: true, // Include full ambulance details
+        ambulance: {
+          include: {
+            AmbulanceVaichicle: {
+              include: {
+                driver: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    // Format the ambulance data
     const ambulances = hospitalAmbulances.map((ha) => {
-      const ambulance = ha.ambulance;
+      const a = ha.ambulance;
+      const v = a?.AmbulanceVaichicle?.[0] || null; // single vehicle
+      const d = v?.driver || null;
+
       return {
-        id: ambulance.id,
-        model: ambulance.ambulancemodel,
-        number: ambulance.ambulancenumber,
-        type: ambulance.ambulancetype,
-        driverName: ambulance.drivername,
-        driverNumber: ambulance.drivernumber,
-        status: ha.status || "pending",
+        id: ha.id, // HospitalAmbulance ID
+        email: a.email,
+        mobile: a.mobile,
+        category: a.category,
+        status: ha.status || "PENDING",
         createdAt: ha.createdAt,
         hospitalId: ha.hospitalId,
+
+        // 🔥 MOST IMPORTANT → This is the ID for the single view page
+        vehicleId: v?.id || null,
+
+        vehicle: {
+          model: v?.ambulancemodel || null,
+          type: v?.ambulancetype || null,
+          category: v?.ambulancecategory || null,
+          pincode: v?.ambulanceareapincode || null,
+          frontImage: v?.ambulancefrontimage || null,
+          insideImage: v?.ambulanceinsideimage || null,
+          rcBook: v?.ambulancercbook || null,
+          insurance: v?.ambulanceinsurance || null,
+        },
+
+        driver: {
+          name: `${d?.firstname || ""} ${d?.lastname || ""}`.trim() || "N/A",
+          mobile: d?.mobile || null,
+        },
       };
     });
 

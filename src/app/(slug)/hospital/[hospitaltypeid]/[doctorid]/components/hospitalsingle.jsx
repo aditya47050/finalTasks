@@ -78,8 +78,58 @@ const [ambulanceCount, setAmbulanceCount] = useState(null);
 const [specialtyCount, setSpecialtyCount] = useState(null);
 const [showOnlineConsultation, setShowOnlineConsultation] = useState(false);
 const [showCashless, setShowCashless] = useState(false);
+const [showModernFacilities, setShowModernFacilities] = useState(false);
+
+const modernFacilitiesServices = [
+  { 
+    label: "Online Consultation", 
+    value: hospitalData?.hspInfo?.onlineconsultation, 
+    icon: <Video className="w-5 h-5" />, 
+    desc: "Consult with doctors remotely" 
+  },
+  { 
+    label: "Home Healthcare", 
+    value: hospitalData?.hspInfo?.homehealthcare, 
+    icon: <User className="w-5 h-5" />, 
+    desc: "Medical care at your home" 
+  },
+  { 
+    label: "24/7 Pharmacy", 
+    value: hospitalData?.hspInfo?.pharmacy, 
+    icon: <TestTube className="w-5 h-5" />, 
+    desc: "Round-the-clock pharmacy services" 
+  },
+  { 
+    label: "Pathology Lab", 
+    value: hospitalData?.hspInfo?.pathology, 
+    icon: <TestTube className="w-5 h-5" />, 
+    desc: "Comprehensive lab testing" 
+  },
+  { 
+    label: "Radiology", 
+    value: hospitalData?.hspInfo?.diagnosticservices, 
+    icon: <Shield className="w-5 h-5" />, 
+    desc: "X-Ray, CT, MRI services" 
+  },
+  { 
+    label: "Blood Bank", 
+    value: "Yes", 
+    icon: <Shield className="w-5 h-5" />, 
+    desc: "24/7 blood availability" 
+  },
+];
 
 
+const validCenters = hospitalData?.linkedDiagnosticCenters?.filter(
+  (c) => c.diagnosticCenter !== null
+);
+
+const diagnosticCenterId = validCenters?.[0]?.diagnosticCenterId;
+
+
+    console.log("🐛 FULL HOSPITAL DATA:", hospitalData);
+
+console.log("🐛 LINKED CENTERS RAW:", hospitalData?.linkedDiagnosticCenters);
 
 
 
@@ -141,7 +191,7 @@ useEffect(() => {
       : [...hospitalImages, ...hospitalImages, ...hospitalImages].slice(0, 6)
     : [];
 
-  const mainImage = images[0] || "/placeholder-hospital.jpg";
+  const mainImage = images[0];
 
   // Helper to format year from date string
   const getYear = (dateStr) => {
@@ -387,43 +437,170 @@ useEffect(() => {
               )}
 
               {/* FACILITIES TAB */}
-              {activeTab === 'facilities' && (
-                <Card className="border border-gray-200 shadow-md rounded-xl">
-                  <CardContent className="p-4 md:p-6">
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Hospital Facilities</h3>
-                    <div className="space-y-3">
-                      {[
-                        { label: "Diagnostic Services", value: hospitalData?.hspInfo?.diagnosticservices, icon: <Shield className="w-5 h-5" /> },
-                        { label: "Cashless Services", value: hospitalData?.hspInfo?.cashlessservices, icon: <CreditCard className="w-5 h-5" /> },
-                        { label: "Government Schemes", value: hospitalData?.hspInfo?.governmentschemes, icon: <FileText className="w-5 h-5" /> },
-                        { label: "In-house Canteen", value: hospitalData?.hspInfo?.inhousecanteen, icon: <Building2 className="w-5 h-5" /> },
-                        { label: "24/7 Emergency", value: "Yes", icon: <Shield className="w-5 h-5" /> },
-                        { label: "ICU", value: hospitalData?.hspInfo?.totalnoofbed ? "Yes" : "No", icon: <Bed className="w-5 h-5" /> },
-                        { label: "Ambulance Service", value: hospitalData?.hspInfo?.totalambulance ? "Yes" : "No", icon: <FaAmbulance className="w-5 h-5" /> },
-                      ].map((facility, index) => {
-                        const isAvailable = facility.value === "yes" || facility.value === "Yes";
-                        return (
-                          <div
-                            key={index}
-                            className={`flex items-center gap-4 p-4 rounded-lg ${
-                              isAvailable ? "bg-green-50 border border-green-200" : "bg-gray-50 border border-gray-200"
-                            } hover:shadow-md transition-shadow`}
-                          >
-                            <div className={`p-3 rounded-lg ${isAvailable ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}>
-                              {facility.icon}
-                            </div>
-                            <div className="flex-1">
-                              <span className="text-base font-semibold text-gray-900">{facility.label}</span>
-                              <p className="text-sm text-gray-600">{isAvailable ? "Available" : "Not Available"}</p>
-                            </div>
-                            {isAvailable && <CheckCircle className="w-6 h-6 text-green-600" />}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+{activeTab === 'facilities' && (
+  <Card className="border border-gray-200 shadow-sm rounded-xl">
+    <CardContent className="p-5">
+
+      {/* Title */}
+      <h3 className="text-xl font-bold text-gray-900 mb-4">Facilities</h3>
+
+      {/* Agoda Style Facility Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+        {[
+          // --- Real Facilities ---
+          { label: "Diagnostic Services", available: hospitalData?.hspInfo?.diagnosticservices },
+          { label: "Cashless Services", available: hospitalData?.hspInfo?.cashlessservices },
+          { label: "Government Schemes", available: hospitalData?.hspInfo?.governmentschemes },
+          { label: "In-house Canteen", available: hospitalData?.hspInfo?.inhousecanteen },
+          { label: "24/7 Emergency", available: "Yes" },
+          { label: "ICU Available", available: hospitalData?.hspInfo?.totalnoofbed ? "Yes" : "No" },
+          { label: "Ambulance Service", available: hospitalData?.hspInfo?.totalambulance ? "Yes" : "No" },
+
+          // --- MOCK Facilities (Hospital style, NOT Hotel ones) ---
+          { label: "Parking Facility", available: "Yes" },
+          { label: "Wheelchair Accessible", available: "Yes" },
+          { label: "Lifts Available", available: "Yes" },
+          { label: "CCTV Surveillance", available: "Yes" },
+          { label: "Fire Safety Equipment", available: "Yes" },
+          { label: "Waiting Lounge", available: "Yes" },
+          { label: "Drinking Water", available: "Yes" },
+          { label: "Restrooms", available: "Yes" },
+          { label: "Nurse Station", available: "Yes" },
+
+        ].map((item, idx) => {
+          const isAvailable =
+            item.available === "yes" ||
+            item.available === "Yes" ||
+            item.available === "Available";
+
+          return (
+            <div key={idx} className="flex items-center gap-2">
+              {/* Checkmark */}
+              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+
+              {/* Facility Text */}
+              <span className="text-sm text-gray-800">{item.label}</span>
+            </div>
+          );
+        })}
+
+      </div>
+
+      {/* ---- ABOUT HOSPITAL (Agoda Style) ---- */}
+<div className="mt-8 p-5 border rounded-xl bg-white">
+  <h3 className="text-xl font-bold text-gray-900 mb-2">About hospital</h3>
+  <p className="text-gray-700 text-sm leading-relaxed">
+    This hospital offers modern medical facilities, experienced doctors, 24/7
+    emergency care, pathology and diagnostic services, and patient-friendly
+    infrastructure designed for safety and comfort.
+  </p>
+  <button className="text-blue-600 font-semibold text-sm mt-2 hover:underline">
+    Read more
+  </button>
+</div>
+
+
+{/* ---- HIGHLIGHT BANNER ---- */}
+<div className="mt-6 p-4 border rounded-xl bg-orange-50 flex gap-4 items-center">
+  <div className="w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center">
+    <Clock className="text-white w-6 h-6" />
+  </div>
+
+  <div>
+    <p className="text-orange-800 font-semibold text-sm">
+      Many patients visit this hospital daily
+    </p>
+    <p className="text-orange-700 text-xs">
+      Popular healthcare facility — trusted by thousands.
+    </p>
+  </div>
+</div>
+
+
+{/* ---- GOOD TO KNOW ---- */}
+<div className="mt-8">
+  <h3 className="text-lg font-bold text-gray-900 mb-4">Good to know</h3>
+
+  <div className="grid grid-cols-2 gap-4 text-sm border rounded-xl p-4 bg-white">
+
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Years of experience</span>
+      <span className="font-semibold text-gray-900">15+ years</span>
+    </div>
+
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Total doctors</span>
+      <span className="font-semibold text-gray-900">{doctorCount || "—"}</span>
+    </div>
+
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">ICU beds</span>
+      <span className="font-semibold text-gray-900">
+        {hospitalData?.hspInfo?.totalnoofbed || "—"}
+      </span>
+    </div>
+
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Ambulances</span>
+      <span className="font-semibold text-gray-900">
+        {hospitalData?.hspInfo?.totalambulance || "—"}
+      </span>
+    </div>
+
+  </div>
+</div>
+
+{/* ---- IMPORTANT INFORMATION (Hospital Relevant) ---- */}
+<div className="mt-8">
+  <h3 className="text-lg font-bold text-gray-900 mb-4">Important Information</h3>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm border rounded-xl p-4 bg-white">
+
+    {/* Visiting Hours */}
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Visiting hours</span>
+      <span className="font-semibold text-gray-900">10:00 AM – 6:00 PM</span>
+    </div>
+
+    {/* OPD Timings */}
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">OPD timings</span>
+      <span className="font-semibold text-gray-900">9:00 AM – 8:00 PM</span>
+    </div>
+
+    {/* Emergency */}
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Emergency services</span>
+      <span className="font-semibold text-gray-900">24/7 Available</span>
+    </div>
+
+    {/* Payment Modes */}
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Payment methods</span>
+      <span className="font-semibold text-gray-900">Cash, Card, UPI</span>
+    </div>
+
+    {/* Insurance */}
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">Insurance accepted</span>
+      <span className="font-semibold text-gray-900">Yes (Cashless)</span>
+    </div>
+
+    {/* Admission Requirement */}
+    <div className="flex justify-between border-b pb-2">
+      <span className="text-gray-600">ID proof required</span>
+      <span className="font-semibold text-gray-900">Aadhaar / PAN</span>
+    </div>
+
+  </div>
+</div>
+
+
+    </CardContent>
+  </Card>
+)}
+
 
               {/* SERVICES TAB */}
               {activeTab === 'services' && (
@@ -815,6 +992,29 @@ useEffect(() => {
                   </div>
                 </CardContent>
               </Card>
+                {/* Landmarks */}
+  <div className="bg-white border rounded-xl p-5 shadow-sm mt-6">
+    <h2 className="text-xl font-bold text-gray-900 mb-3">Popular Landmarks</h2>
+
+    <div className="space-y-3 text-sm">
+      {[
+        { name: "Qutub Minar", km: "29.7 km" },
+        { name: "Lotus Temple", km: "37.5 km" },
+        { name: "Lodhi Garden", km: "37.6 km" },
+        { name: "Gurdwara Bangla Sahib", km: "39.1 km" },
+        { name: "India Gate", km: "39.4 km" },
+      ].map((place, i) => (
+        <div key={i} className="flex justify-between">
+          <span className="text-gray-700">{place.name}</span>
+          <span className="font-semibold">{place.km}</span>
+        </div>
+      ))}
+
+      <button className="text-blue-600 font-semibold mt-2 hover:underline">
+        See nearby places
+      </button>
+    </div>
+  </div>
             </div>
           </div>
 
@@ -844,7 +1044,7 @@ useEffect(() => {
                                  { icon: <Building2 className="w-5 h-5 text-purple-600" />, label: "Govt Schemes", value: "Available", clickable: true, action: "govtSchemes" },
                                  { icon: <TestTube className="w-5 h-5 text-red-600" />, label: "Surgery Packages", value: "Available", clickable:true, action:"surgery" },
                                  { icon: <FileText className="w-5 h-5 text-blue-600" />, label: "Treatment Packages", value: "Available", clickable:true, action:"treatment" },
-                                 { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Hospital Facilities", value: "Modern", clickable: true, action: "facilities" },
+                                 { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Hospital Facilities", value: "Modern", clickable: true, action: "modernFacilities" },
                                  { icon: <Building2 className="w-5 h-5 text-cyan-600" />, label: "Hospital Branches", value: hospitalData?.hspbranches?.length || "1+", clickable: true, action: "branches" },
                                  { icon: <TestTube className="w-5 h-5 text-pink-600" />, label: "Pharmacy", value: "24/7", clickable:true, action:"pharmacy" },
                                  { icon: <TestTube className="w-5 h-5 text-teal-600" />, label: "NABL Pathology", value: "Certified", clickable:true, action:"nablPathology" },
@@ -858,7 +1058,19 @@ useEffect(() => {
 },
 
                                  { icon: <Shield className="w-5 h-5 text-yellow-600" />, label: "Diagnostic Services", value: "Advanced", clickable:true, action:"diagnostic" },
-                                 { icon: <CreditCard className="w-5 h-5 text-blue-600" />, label: "Cashless Services", value: "Available", clickable:true, action:"cashless" },
+                               {
+  icon: <CreditCard className="w-5 h-5 text-blue-600" />,
+  label: "Cashless Services",
+  value: (() => {
+  const cashless = hospitalData?.hspInfo?.cashlessservices;
+  if (!cashless || cashless.trim() === "") return "Not Available";
+  if (cashless.toLowerCase() === "no") return "Not Available";
+  return "Available";
+})(),
+
+  clickable: true,
+  action: "cashless",
+},
 
                                  { icon: <User className="w-5 h-5 text-emerald-600" />, label: "Home Healthcare", value: "Available", action: "homeHealthcare", clickable:true },
                                  ...(hospitalData?.hspdetails?.nabhnablapproved === "Yes"
@@ -883,7 +1095,7 @@ useEffect(() => {
                            else if (item.action === "treatment") setShowTreatment(true);
                            else if (item.action === "diagnostic") setShowDiagnostics(true);
                           else if (item.action === "reviews") setShowReviewsModal(true);
-                          else if (item.action === "facilities") setShowFacilities(true);
+                          else if (item.action === "modernFacilities") setShowModernFacilities(true);
                           else if (item.action === "pharmacy") setShowPharmacy(true);
                           else if (item.action === "nablPathology") setShowNablPathology(true);
                           else if (item.action === "accreditation") setShowAccreditation(true);
@@ -1653,10 +1865,15 @@ useEffect(() => {
 
 {showDiagnostics && (
   <HospitalDiagnosticList
+    hospitalId={hospitalData?.id}
+    diagnosticCenterId={diagnosticCenterId}
     onClose={() => setShowDiagnostics(false)}
-    hospitalService={hospitalData}
   />
 )}
+
+
+
+
 
 {showReviewsModal && (
   <HospitalReviewList
@@ -1698,6 +1915,80 @@ useEffect(() => {
     hospitalId={hospitalData?.id}
     onClose={() => setShowCanteen(false)}
   />
+)}
+
+{showModernFacilities && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    onClick={() => setShowModernFacilities(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-5 rounded-t-2xl sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/20 rounded-lg">
+              <Shield className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold">Modern Hospital Facilities</h3>
+          </div>
+          <button
+            onClick={() => setShowModernFacilities(false)}
+            className="text-white hover:bg-white/20 rounded-full p-1 transition"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 space-y-4">
+        <p className="text-gray-600 text-center mb-4">
+          We provide state-of-the-art healthcare services with modern infrastructure and 24/7 support.
+        </p>
+
+        <div className="space-y-3">
+          {modernFacilitiesServices.map((service, index) => {
+            const isAvailable = service.value === "yes" || service.value === "Yes" || service.value === true;
+            return (
+              <div
+                key={index}
+                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                  isAvailable 
+                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 shadow-md" 
+                    : "bg-gray-50 border-gray-200 opacity-75"
+                }`}
+              >
+                <div className={`p-3 rounded-xl flex-shrink-0 ${
+                  isAvailable ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400"
+                }`}>
+                  {service.icon}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-900 text-lg">{service.label}</h4>
+                  <p className="text-gray-600 text-sm">{service.desc}</p>
+                </div>
+                {isAvailable ? (
+                  <CheckCircle className="w-7 h-7 text-blue-600 flex-shrink-0" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full border-2 border-gray-300 flex-shrink-0" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+          <p className="text-blue-900 font-semibold text-center">
+            All services are backed by NABH standards and 24/7 emergency support.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 )}
 
 {showOnlineConsultation && (
@@ -1821,14 +2112,16 @@ useEffect(() => {
       </div>
 
       {/* BODY */}
-      <div className="p-8 bg-white space-y-6">
-        {/* Icon Hero */}
+      <div className="p-4 bg-white space-y-2">
+
+        {/* Icon */}
         <div className="flex items-center justify-center">
           <div className="p-4 bg-blue-50 rounded-full border border-blue-200">
             <CreditCard className="w-12 h-12 text-[#3D85EF]" />
           </div>
         </div>
 
+        {/* Title */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Cashless Health Insurance Facility
@@ -1844,49 +2137,91 @@ useEffect(() => {
           <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
             <Building2 className="w-8 h-8 mx-auto mb-2 text-blue-600" />
             <h4 className="font-semibold text-gray-900 text-base">Partnered Hospitals</h4>
-            <p className="text-gray-600 text-sm mt-1">
-              Wide network of empanelled hospitals
-            </p>
+            <p className="text-gray-600 text-sm mt-1">Wide network of empanelled hospitals</p>
           </div>
+
           <div className="p-4 rounded-lg bg-green-50 border border-green-200">
             <ShieldCheck className="w-8 h-8 mx-auto mb-2 text-green-600" />
             <h4 className="font-semibold text-gray-900 text-base">Hassle-Free Claims</h4>
-            <p className="text-gray-600 text-sm mt-1">
-              Quick approval & direct settlement
-            </p>
+            <p className="text-gray-600 text-sm mt-1">Quick approval & direct settlement</p>
           </div>
+
           <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
             <CreditCard className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
             <h4 className="font-semibold text-gray-900 text-base">Multiple Insurers</h4>
-            <p className="text-gray-600 text-sm mt-1">
-              Accepted across top insurance providers
-            </p>
+            <p className="text-gray-600 text-sm mt-1">Accepted across top insurance providers</p>
           </div>
         </div>
 
-        {/* Divider */}
+      {/* Premium Insurance List */}
+{(() => {
+  const cashless = hospitalData?.hspInfo?.cashlessservices;
+
+  if (!cashless || cashless.trim() === "" || cashless.toLowerCase() === "no") {
+    return null;
+  }
+
+  if (cashless.toLowerCase() === "yes") {
+    return null;
+  }
+
+  const insurers = cashless.split(",").map(i => i.trim());
+
+  return (
+    <div className="mt-8">
+      <h3 className="text-xl font-bold text-gray-900 mb-4 text-center tracking-wide">
+        Insurance Partners
+      </h3>
+
+      <div className="space-y-3">
+        {insurers.map((name, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 shadow-sm
+                       hover:shadow-md transition-all duration-200 bg-white"
+          >
+            <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></span>
+
+            <p className="text-[15px] font-semibold text-gray-900">
+              {name}
+            </p>
+
+            <div className="ml-auto px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700 font-medium">
+              Partner
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+})()}
         <div className="border-t border-gray-200 mt-8"></div>
 
-        {/* Footer */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
-          <div>
-            <p className="text-sm text-gray-500">Status</p>
-            <p className="text-lg font-semibold text-[#3D85EF]">
-              Cashless Facility Available
-            </p>
-          </div>
-          <button
-            onClick={() => alert('Insurance partners list coming soon!')}
-            className="bg-[#3D85EF] hover:bg-blue-700 text-white font-semibold text-base px-6 py-3 rounded-xl shadow-md transition-all hover:scale-[1.03]"
-          >
-            View Insurance Partners
-          </button>
+        {/* Status */}
+        <div className="pt-4">
+          <p className="text-sm text-gray-500">Status</p>
+          <p className="text-lg font-semibold text-[#3D85EF]">
+            {(() => {
+              const cashless = hospitalData?.hspInfo?.cashlessservices;
+
+              if (!cashless || cashless.trim() === "")
+                return "Cashless Facility Not Available";
+
+              if (cashless.toLowerCase() === "yes")
+                return "Cashless Facility Available";
+
+              if (cashless.toLowerCase() === "no")
+                return "Cashless Facility Not Available";
+
+              return "Cashless Facility Available";
+            })()}
+          </p>
         </div>
+
       </div>
     </div>
   </div>
 )}
-
 
 
 

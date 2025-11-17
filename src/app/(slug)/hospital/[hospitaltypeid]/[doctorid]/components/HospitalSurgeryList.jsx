@@ -16,12 +16,23 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { useRouter } from "next/navigation";  // ✅ ADDED
 
 export default function HospitalSurgeryList({ onClose, hospitalService }) {
   const [surgeries, setSurgeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const router = useRouter(); // ✅ ADDED
+
+  // ⭐ NAVIGATION FUNCTION
+  const goToSurgeryPage = (serviceId) => {
+    const hospitalId = hospitalService?.id || hospitalService?._id;
+    if (!hospitalId || !serviceId) return;
+
+    router.push(`/surgerypackages/${hospitalId}?serviceId=${serviceId}`);
+  };
 
   useEffect(() => {
     const hospitalId = hospitalService?.id || hospitalService?._id;
@@ -61,6 +72,7 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
       <div className="w-full h-full overflow-y-auto">
         <Card className="w-full max-w-[95vw] lg:max-w-none lg:rounded-none lg:border-0 lg:shadow-none mx-auto min-h-screen bg-white">
+
           {/* Header */}
           <CardHeader className="border-b bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] text-white sticky top-0 z-10 shadow-md">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -81,6 +93,7 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
                   </p>
                 </div>
               </div>
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -119,7 +132,6 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">
                     Loading Surgery Packages
                   </h3>
-                  <p className="text-gray-600">Please wait...</p>
                 </div>
               ) : error ? (
                 <div className="text-center py-16">
@@ -127,12 +139,6 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
                     Error Loading Surgeries
                   </h3>
                   <p className="text-red-600 mb-6">{error}</p>
-                  <Button
-                    onClick={() => window.location.reload()}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Try Again
-                  </Button>
                 </div>
               ) : filteredSurgeries.length === 0 ? (
                 <div className="text-center py-16">
@@ -143,12 +149,13 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredSurgeries.map((surgery, index) => (
+                  {filteredSurgeries.map((surgery) => (
                     <Card
-                      key={`${surgery.id}-${index}`}
-                      className="h-full min-h-[300px] flex flex-col overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 bg-white rounded-2xl hover:translate-y-[-4px]"
+                      key={surgery.id}
+                      className="h-full flex flex-col overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl hover:translate-y-[-3px] transition-all duration-300 bg-white rounded-2xl"
                     >
                       <CardContent className="p-0 flex flex-col flex-grow">
+
                         {/* Header */}
                         <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-6 rounded-t-2xl">
                           <div className="flex items-center gap-4">
@@ -169,9 +176,7 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
                                     : "bg-red-100 text-red-700 border-red-300"
                                 }`}
                               >
-                                {surgery.isAvailable
-                                  ? "Available"
-                                  : "Unavailable"}
+                                {surgery.isAvailable ? "Available" : "Unavailable"}
                               </span>
                             </div>
                           </div>
@@ -179,12 +184,10 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
 
                         {/* Body */}
                         <div className="p-6 space-y-3 flex-grow text-sm text-gray-700">
-                          {surgery.type && (
-                            <div className="flex items-center gap-2">
-                              <Activity className="h-4 w-4 text-[#1E3B90]" />
-                              <span>Type: {surgery.type}</span>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2">
+                            <Activity className="h-4 w-4 text-[#1E3B90]" />
+                            <span>Type: {surgery.type}</span>
+                          </div>
 
                           <div className="flex items-center gap-2">
                             <Wallet className="h-4 w-4 text-[#1E3B90]" />
@@ -202,19 +205,31 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
                           </div>
                         </div>
 
-                        {/* Footer */}
+                        {/* Footer (⭐ NAVIGATION ADDED) */}
                         <div className="px-6 pb-6 pt-2">
                           <div className="flex gap-3">
-                            <button className="flex-1 bg-gradient-to-r from-[#1E3B90] to-[#1E3B90] text-white font-medium py-2.5 px-3 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+
+                            {/* ⭐ BOOK SURGERY BUTTON */}
+                            <button
+                              onClick={() => goToSurgeryPage(surgery.id)}
+                              className="flex-1 bg-gradient-to-r from-[#1E3B90] to-[#1E3B90] text-white font-medium py-2.5 px-3 rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm"
+                            >
                               <BadgeDollarSign className="h-4 w-4" />
                               Book Surgery
                             </button>
-                            <button className="flex-1 bg-gradient-to-r from-[#3D85EF] to-[#3D85EF] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+
+                            {/* ⭐ DETAILS BUTTON */}
+                            <button
+                              onClick={() => goToSurgeryPage(surgery.id)}
+                              className="flex-1 bg-gradient-to-r from-[#3D85EF] to-[#3D85EF] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm"
+                            >
                               <Stethoscope className="h-4 w-4" />
                               Details
                             </button>
+
                           </div>
                         </div>
+
                       </CardContent>
                     </Card>
                   ))}
@@ -222,6 +237,7 @@ export default function HospitalSurgeryList({ onClose, hospitalService }) {
               )}
             </div>
           </CardContent>
+
         </Card>
       </div>
     </div>
