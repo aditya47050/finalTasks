@@ -135,7 +135,14 @@ const FACILITIES = [
   "CCTV Camera",
   "Cashless Payment",
   "Children's Play Area",
-  "Mosquito Killer Machine"
+  "Mosquito Killer Machine",
+    // 🔥 Your New Required Items
+  "MSW",
+  "Parking",
+  "Relative Stay",
+  "Lift",
+  "Floor",
+  "Emergency Staircase"
 ];
 
 // Professional Medical Navigation Component

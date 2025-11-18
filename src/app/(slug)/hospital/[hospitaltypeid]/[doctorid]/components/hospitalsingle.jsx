@@ -79,6 +79,9 @@ const [specialtyCount, setSpecialtyCount] = useState(null);
 const [showOnlineConsultation, setShowOnlineConsultation] = useState(false);
 const [showCashless, setShowCashless] = useState(false);
 const [showModernFacilities, setShowModernFacilities] = useState(false);
+const roomFacilities = hospitalData?.facilitiesJson?.roomFacilities || [];
+const [bedsData, setBedsData] = useState(null);
+
 
 const modernFacilitiesServices = [
   { 
@@ -146,25 +149,43 @@ useEffect(() => {
         fetch(`/api/hospital/${hospitalData.id}/specialties`),
       ]);
 
-      const [doctorsData, bedsData, ambulancesData, specialtiesData] = await Promise.all([
+      const [doctorsData, bedsJson, ambulancesData, specialtiesData] = await Promise.all([
         doctorsRes.json(),
         bedsRes.json(),
         ambulanceRes.json(),
         specialtiesRes.json(),
       ]);
 
+      // Counts set kar rahe hain
       setDoctorCount(doctorsData?.doctors?.length || 0);
-      setBedCount(bedsData?.beds?.length || 0);
+      setBedCount(bedsJson?.beds?.length || 0);
+      setBedsData(bedsJson);                    // ← YE NAZAR ANDAZ MAT KARNA (Important!)
       setAmbulanceCount(ambulancesData?.ambulances?.length || 0);
       setSpecialtyCount(specialtiesData?.specialties?.length || 0);
+
     } catch (error) {
-      console.error("Error fetching hospital counts:", error);
+      console.error("Error fetching hospital data:", error);
     }
   };
 
   fetchCounts();
 }, [hospitalData?.id]);
 
+
+const bedCategoryMapping = {
+  "MALE_WARD": "Male Ward",
+  "FEMALE_WARD": "Female Ward",
+  "NON_AC_SEMI_PRIVATE_SHARING_ROOM": "Non AC Semi Private Bed",
+  "AC_SEMI_PRIVATE_SHARING_ROOM": "AC Semi Private Bed",
+  "GENERAL_WARD": "General Ward",
+  "DELUXE": "Deluxe Bed",
+  "SUITE": "Suite Bed",
+  "ICU_WITHOUT_VENTILATOR": "ICU Bed Without Ventilator",
+  "ICU_WITH_VENTILATOR": "ICU Ventilator Bed",
+  "NICU": "NICU Bed",
+  "PICU": "PICU Bed",
+  "HDU": "HDU Bed",
+};
 
 
   // Get reviews from hospital data
@@ -445,47 +466,16 @@ useEffect(() => {
       <h3 className="text-xl font-bold text-gray-900 mb-4">Facilities</h3>
 
       {/* Agoda Style Facility Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+{/* Agoda Style Facility Grid (Dynamic Room Facilities from API) */}
+<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+  {roomFacilities.map((facility, idx) => (
+    <div key={idx} className="flex items-center gap-2">
+      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+      <span className="text-sm text-gray-800">{facility}</span>
+    </div>
+  ))}
+</div>
 
-        {[
-          // --- Real Facilities ---
-          { label: "Diagnostic Services", available: hospitalData?.hspInfo?.diagnosticservices },
-          { label: "Cashless Services", available: hospitalData?.hspInfo?.cashlessservices },
-          { label: "Government Schemes", available: hospitalData?.hspInfo?.governmentschemes },
-          { label: "In-house Canteen", available: hospitalData?.hspInfo?.inhousecanteen },
-          { label: "24/7 Emergency", available: "Yes" },
-          { label: "ICU Available", available: hospitalData?.hspInfo?.totalnoofbed ? "Yes" : "No" },
-          { label: "Ambulance Service", available: hospitalData?.hspInfo?.totalambulance ? "Yes" : "No" },
-
-          // --- MOCK Facilities (Hospital style, NOT Hotel ones) ---
-          { label: "Parking Facility", available: "Yes" },
-          { label: "Wheelchair Accessible", available: "Yes" },
-          { label: "Lifts Available", available: "Yes" },
-          { label: "CCTV Surveillance", available: "Yes" },
-          { label: "Fire Safety Equipment", available: "Yes" },
-          { label: "Waiting Lounge", available: "Yes" },
-          { label: "Drinking Water", available: "Yes" },
-          { label: "Restrooms", available: "Yes" },
-          { label: "Nurse Station", available: "Yes" },
-
-        ].map((item, idx) => {
-          const isAvailable =
-            item.available === "yes" ||
-            item.available === "Yes" ||
-            item.available === "Available";
-
-          return (
-            <div key={idx} className="flex items-center gap-2">
-              {/* Checkmark */}
-              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-
-              {/* Facility Text */}
-              <span className="text-sm text-gray-800">{item.label}</span>
-            </div>
-          );
-        })}
-
-      </div>
 
       {/* ---- ABOUT HOSPITAL (Agoda Style) ---- */}
 <div className="mt-8 p-5 border rounded-xl bg-white">
@@ -992,29 +982,39 @@ useEffect(() => {
                   </div>
                 </CardContent>
               </Card>
-                {/* Landmarks */}
+{/* Landmarks (Dynamic from API) */}
+{hospitalData?.facilitiesJson?.landmarks?.length > 0 && (
   <div className="bg-white border rounded-xl p-5 shadow-sm mt-6">
     <h2 className="text-xl font-bold text-gray-900 mb-3">Popular Landmarks</h2>
 
     <div className="space-y-3 text-sm">
-      {[
-        { name: "Qutub Minar", km: "29.7 km" },
-        { name: "Lotus Temple", km: "37.5 km" },
-        { name: "Lodhi Garden", km: "37.6 km" },
-        { name: "Gurdwara Bangla Sahib", km: "39.1 km" },
-        { name: "India Gate", km: "39.4 km" },
-      ].map((place, i) => (
+      {hospitalData.facilitiesJson.landmarks.map((place, i) => (
         <div key={i} className="flex justify-between">
           <span className="text-gray-700">{place.name}</span>
-          <span className="font-semibold">{place.km}</span>
+          <span className="font-semibold">{place.distance}</span>
         </div>
       ))}
-
-      <button className="text-blue-600 font-semibold mt-2 hover:underline">
-        See nearby places
-      </button>
     </div>
   </div>
+)}
+
+{/* Transportation */}
+{hospitalData?.facilitiesJson?.transportation?.length > 0 && (
+  <div className="bg-white border rounded-xl p-5 shadow-sm mt-6">
+    <h2 className="text-xl font-bold text-gray-900 mb-3">Nearby Transportation</h2>
+
+    <div className="space-y-3 text-sm">
+      {hospitalData.facilitiesJson.transportation.map((item, i) => (
+        <div key={i} className="flex justify-between">
+          <span className="text-gray-700">{item.name}</span>
+          <span className="font-semibold">{item.distance}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
             </div>
           </div>
 
@@ -1077,6 +1077,45 @@ useEffect(() => {
                                    ? [{ icon: <Award className="w-5 h-5 text-green-600" />, label: "NABH Accredited", value: hospitalData.hspdetails.nabhnabllevel, clickable:true, action:"accreditation"  }]
                                    : []),
                                  { icon: <Building2 className="w-5 h-5 text-amber-600" />, label: "Inhouse Canteen", value: "Available", clickable:true, action:"canteen" },
+                                 // 👉 Add below inside the Service Grid array
+
+{
+  icon: <User className="w-5 h-5 text-gray-700" />,
+  label: "MSW",
+  value: roomFacilities.includes("MSW") ? "Available" : "Not Available",
+  clickable: false
+},
+{
+  icon: <Building2 className="w-5 h-5 text-blue-700" />,
+  label: "Parking",
+  value: roomFacilities.includes("Parking") ? "Available" : "Not Available",
+  clickable: false
+},
+{
+  icon: <Users className="w-5 h-5 text-green-700" />,
+  label: "Relative Stay",
+  value: roomFacilities.includes("Relative Stay") ? "Available" : "Not Available",
+  clickable: false
+},
+{
+  icon: <Building2 className="w-5 h-5 text-yellow-700" />,
+  label: "Lift",
+  value: roomFacilities.includes("Lift") ? "Available" : "Not Available",
+  clickable: false
+},
+{
+  icon: <Building2 className="w-5 h-5 text-indigo-700" />,
+  label: "Floor",
+  value: roomFacilities.includes("Floor") ? "Available" : "Not Available",
+  clickable: false
+},
+{
+  icon: <Shield className="w-5 h-5 text-red-700" />,
+  label: "Emergency Staircase",
+  value: roomFacilities.includes("Emergency Staircase") ? "Available" : "Not Available",
+  clickable: false
+},
+
                                  { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "HSP Reviews", value: `${avgRating} ★`, clickable:true, action:"reviews" },
 
                      ].map((item, idx) => (
@@ -1129,6 +1168,62 @@ useEffect(() => {
             </Card>
           </div>
 
+{/* ==================== BED CATEGORIES ==================== */}
+{bedsData && (
+  <div className="max-w-7xl mx-auto px-4 mt-10 mb-8">
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      
+      <div className="flex flex-wrap items-center justify-start gap-x-4 gap-y-3">
+        {[
+          "ICU Bed Without Ventilator",
+          "ICU Ventilator Bed",
+          "NICU Bed",
+          "PICU Bed",
+          "HDU Bed",
+          "Male Ward",
+          "Female Ward",
+          "General Ward",
+          "Non AC Semi Private Bed",
+          "AC Semi Private Bed",
+          "Non AC Private Bed",
+          "AC Private Bed",
+          "Deluxe Bed",
+          "Suite Bed",
+          "Govt Scheme Bed",
+        ].map((displayName) => {
+          
+          const backendName = Object.keys(bedCategoryMapping).find(
+            key => bedCategoryMapping[key] === displayName
+          );
+
+          const bedsInCategory = bedsData.beds?.filter((bed) => 
+            bed.category?.name === backendName
+          ) || [];
+          
+          const hasBeds = bedsInCategory.length > 0;
+
+          return (
+            <button
+              key={displayName}
+              onClick={() => hasBeds && setShowBeds(true)}
+              disabled={!hasBeds}
+              className={`
+                px-5 py-2 rounded-full text-sm font-medium transition-all duration-200
+                ${hasBeds 
+                  ? "bg-blue-50 text-slate-900 hover:bg-blue-100" // Available: Blue Capsule
+                  : "bg-transparent text-slate-400 cursor-not-allowed" // Unavailable: Plain Text
+                }
+              `}
+            >
+              {displayName}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}
+{/* ==================== END BED CATEGORIES ==================== */}
         </div>
       </div>
 
