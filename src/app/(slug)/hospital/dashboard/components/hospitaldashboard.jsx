@@ -55,9 +55,88 @@ import {
 import InhouseCanteenForm from "../services/inhouse-canteen-form";
 import HomeHealthcareForm from "../services/home-healthcare-form";
 import DiagnosticPartnershipForm from "../services/diagnostic-form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
-
+// Full Facilities List
+const FACILITIES = [
+  "Electric Bed",
+  "Adjustable Bed",
+  "Normal Bed",
+  "IV Stand",
+  "Patient Call Bell System",
+  "Bedside Table",
+  "Central Oxygen",
+  "Nitrogen Supply",
+  "Oxygen Cylinder",
+  "Vacuum Lines",
+  "Mechanical Ventilator",
+  "Defibrillator",
+  "Suction Machine",
+  "Infusion Pumps",
+  "Syringe Pumps",
+  "Crash Cart Trolly",
+  "Temperature & Humidity Control",
+  "Air Filtration System",
+  "24x7 Nursing Station Access",
+  "Communication Device For Family",
+  "Noise Reduction / Soundproofing",
+  "Power Sockets",
+  "Charging Point",
+  "Room AC/Heater",
+  "Room Fan",
+  "Windows",
+  "Ventilation System",
+  "Attached Indian Toilet",
+  "Attached Western Toilet",
+  "Shared Indian Toilet",
+  "Shared Western Toilet",
+  "Attached Bathroom",
+  "Shared Bathroom",
+  "Water Geyser",
+  "Washbasin",
+  "Mirror",
+  "Towels, Soap, Shampoo",
+  "Hand Sanitizer",
+  "Biohazard Dustbin",
+  "Regular Dustbin",
+  "Patient Meal Table",
+  "Water Filtered",
+  "Tea/Coffee Making Facility",
+  "Daily Cleaning & Linen Change",
+  "Daily Sanitized",
+  "Laundry Service",
+  "Patient Monitoring System",
+  "Privacy Curtain/Partition",
+  "Bed Sheets",
+  "Pillow",
+  "Blanket",
+  "T.V Unit",
+  "Wi-Fi Access",
+  "Intercom Access",
+  "Refrigerator",
+  "Sofa or Recliner",
+  "Visitor Chair or Stool",
+  "Cupboard",
+  "Bed Side Locker",
+  "Dedicated Room Attendant",
+  "Male Housekeeper",
+  "Female Housekeeper",
+  "Emergency Alert System",
+  "Fire Extinguisher",
+  "Security Surveillance",
+  "CCTV Camera",
+  "Cashless Payment",
+  "Children's Play Area",
+  "Mosquito Killer Machine"
+];
 
 // Professional Medical Navigation Component
 const NavigationSidebar = ({ activeSection, onSectionChange }) => {
@@ -143,6 +222,10 @@ const NavigationSidebar = ({ activeSection, onSectionChange }) => {
 
 const HospitalDashboard = ({ hospitaldata }) => {
   const [activeSection, setActiveSection] = useState('overview');
+
+  const hospitalId = hospitaldata?.id;   // <-- added hospital id
+  const [openViewFacilityDialog, setOpenViewFacilityDialog] = useState(false);
+
 
   // Handle section navigation
   const handleSectionChange = (sectionId) => {
@@ -254,6 +337,85 @@ const [healthcareEditData, setHealthcareEditData] = useState(null);
 //diagnostic partnership form
 const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
 
+// Facilities dialog state
+const [openFacilityDialog, setOpenFacilityDialog] = useState(false);
+const [selectedFacilities, setSelectedFacilities] = useState([]);
+
+const [openNearbyDialog, setOpenNearbyDialog] = useState(false);
+const [transportation, setTransportation] = useState([]);
+const [landmarks, setLandmarks] = useState([]);
+
+const [newTransport, setNewTransport] = useState({ name: "", distance: "" });
+const [newLandmark, setNewLandmark] = useState({ name: "", distance: "" });
+
+
+
+const toggleFacility = (facility) => {
+  setSelectedFacilities((prev) =>
+    prev.includes(facility)
+      ? prev.filter((f) => f !== facility)
+      : [...prev, facility]
+  );
+};
+
+//for facilites
+useEffect(() => {
+  if (!hospitalId) return;
+
+  const loadFacilities = async () => {
+    try {
+      const res = await fetch(`/api/hospital/${hospitalId}/facilities`);
+      const data = await res.json();
+
+if (data.success) {
+  setSelectedFacilities(data.facilities.roomFacilities || []);
+  setTransportation(data.facilities.transportation || []);
+  setLandmarks(data.facilities.landmarks || []);
+}
+
+    } catch (err) {
+      console.error("Error loading facilities:", err);
+    }
+  };
+
+  loadFacilities();
+}, [hospitalId]);
+
+//save room facilities
+const saveFacilities = async () => {
+  try {
+    await fetch(`/api/hospital/${hospitalId}/facilities`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomFacilities: selectedFacilities }),
+    });
+
+    setOpenFacilityDialog(false); // close dialog
+  } catch (error) {
+    console.error("Error saving facilities:", error);
+  }
+};
+
+// SAVE NEARBY INFO
+const saveNearbyInfo = async () => {
+  try {
+    await fetch(`/api/hospital/${hospitalId}/facilities`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        roomFacilities: selectedFacilities,
+        transportation,
+        landmarks
+      }),
+    });
+
+    setOpenNearbyDialog(false);
+  } catch (error) {
+    console.error("Error saving nearby info:", error);
+  }
+};
+
+
 
   
   // Sort by date (most recent first) and limit to 5
@@ -320,6 +482,7 @@ const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
   console.log("Hospital Data:", hospitaldata);
   console.log("Stats Data:", stats);
   console.log("Recent Activities Data:", recentActivities);
+
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans relative">
@@ -553,7 +716,7 @@ const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
               <div className="bg-gray-50 px-2 sm:px-4 py-6">
-                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 bg-transparent h-auto p-0 gap-1">
+                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 bg-transparent h-auto p-0 gap-1">
                   <TabsTrigger 
                     value="overview" 
                     className="flex flex-col items-center gap-1 px-1 sm:px-2 py-3 data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 rounded-lg text-xs font-medium transition-all duration-200 min-h-[60px] justify-center"
@@ -589,6 +752,20 @@ const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
                     <Hospital className="w-4 h-4 flex-shrink-0" />
                     <span className="text-xs leading-tight text-center">Services</span>
                   </TabsTrigger>
+
+<TabsTrigger 
+  value="facilities" 
+  className="flex flex-col items-center gap-1 px-1 sm:px-2 py-3 
+  data-[state=active]:bg-teal-500 data-[state=active]:text-white 
+  data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 
+  rounded-lg text-xs font-medium transition-all duration-200 min-h-[60px] justify-center"
+>
+  <Building className="w-4 h-4 flex-shrink-0" />
+  <span className="text-xs leading-tight text-center">Facilities</span>
+</TabsTrigger>
+
+                
+
                   <TabsTrigger 
                     value="settings" 
                     className="flex flex-col items-center gap-1 px-1 sm:px-2 py-3 data-[state=active]:bg-gray-500 data-[state=active]:text-white data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 rounded-lg text-xs font-medium transition-all duration-200 min-h-[60px] justify-center"
@@ -596,6 +773,7 @@ const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
                     <Settings className="w-4 h-4 flex-shrink-0" />
                     <span className="text-xs leading-tight text-center">Settings</span>
                   </TabsTrigger>
+                  
                 </TabsList>
               </div>
 
@@ -963,6 +1141,377 @@ const [openDiagnosticForm, setOpenDiagnosticForm] = useState(false);
                   </div>
                 </div>
               </TabsContent>
+
+              {/*Facilites content*/}
+<TabsContent value="facilities" id="facilities" className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+
+  <div className="text-center py-12">
+    <Building className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+    <h3 className="text-xl font-semibold text-gray-600 mb-2">Hospital Facilities</h3>
+    <p className="text-gray-500 mb-6">Add and manage hospital facilities</p>
+
+    <div className="flex gap-3 justify-center">
+
+      {/* OPEN DIALOG BUTTON */}
+<Button 
+  className="rounded-xl bg-orange-600 hover:bg-orange-700 text-white"
+  onClick={() => setOpenFacilityDialog(true)}
+>
+  <Plus className="w-4 h-4 mr-2" />
+  Add Room Facility
+</Button>
+
+
+<Button
+  variant="outline"
+  className="rounded-xl"
+  onClick={() => setOpenViewFacilityDialog(true)}
+>
+  <Eye className="w-4 h-4 mr-2" />
+  View Facilities
+</Button>
+
+{/*Add nearby info*/}
+<Button 
+  className="rounded-xl bg-orange-600 text-white"
+  onClick={() => setOpenNearbyDialog(true)}
+>
+  <Plus className="w-4 h-4 mr-2" />
+  Add Nearby Info
+</Button>
+
+
+    </div>
+  </div>
+
+  {/* DIALOG START */}
+<Dialog open={openFacilityDialog} onOpenChange={setOpenFacilityDialog}>
+  <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto rounded-xl">
+    <DialogHeader>
+      <DialogTitle className="text-xl font-semibold">Select Room Facilities</DialogTitle>
+      <DialogDescription>Select all the available facilities for your hospital rooms.</DialogDescription>
+    </DialogHeader>
+
+    {/* SELECT ALL OPTION */}
+    <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg mt-2 mb-3 border border-blue-200">
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={selectedFacilities.length === FACILITIES.length}
+          onCheckedChange={(checked) => {
+            if (checked) {
+              setSelectedFacilities(FACILITIES); // SELECT ALL
+            } else {
+              setSelectedFacilities([]); // UNSELECT ALL
+            }
+          }}
+          className="data-[state=checked]:bg-blue-600 border-blue-400"
+        />
+        <span className="text-sm font-medium text-blue-700">Select All</span>
+      </div>
+
+      {selectedFacilities.length > 0 && (
+        <button
+          onClick={() => setSelectedFacilities([])}
+          className="text-xs text-red-500 underline"
+        >
+          Clear All
+        </button>
+      )}
+    </div>
+
+    {/* FACILITIES GRID */}
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 py-4">
+      {FACILITIES.map((item, index) => (
+        <div key={index} className="flex items-center gap-2">
+          <Checkbox
+            checked={selectedFacilities.includes(item)}
+            onCheckedChange={() => toggleFacility(item)}
+            className="data-[state=checked]:bg-blue-600 border-blue-400"
+          />
+          <span className="text-sm">{item}</span>
+        </div>
+      ))}
+    </div>
+
+    
+
+    {/* SAVE BUTTON */}
+    <div className="flex justify-end mt-4">
+<Button
+  className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+  onClick={saveFacilities}
+>
+  Save Facilities
+</Button>
+
+    </div>
+  </DialogContent>
+</Dialog>
+
+  {/* DIALOG END */}
+
+{/* VIEW FACILITIES DIALOG */}
+<Dialog open={openViewFacilityDialog} onOpenChange={setOpenViewFacilityDialog}>
+  <DialogContent className="max-w-2xl max-h-[70vh] overflow-y-auto rounded-xl">
+    <DialogHeader>
+      <DialogTitle className="text-xl font-semibold">Selected Room Facilities</DialogTitle>
+      <DialogDescription>
+        All the room facilities your hospital currently provides.
+      </DialogDescription>
+    </DialogHeader>
+
+    {selectedFacilities.length > 0 ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+        {selectedFacilities.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-2 p-2 bg-gray-50 border rounded-lg"
+          >
+            <CheckCircle className="w-4 h-4 text-green-600" />
+            <span className="text-sm">{item}</span>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="text-center text-gray-500 py-6">
+        <AlertTriangle className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+        No facilities added yet.
+      </div>
+    )}
+
+    <div className="flex justify-end mt-6">
+      <Button
+        variant="outline"
+        className="rounded-xl"
+        onClick={() => setOpenViewFacilityDialog(false)}
+      >
+        Close
+      </Button>
+    </div>
+  </DialogContent>
+</Dialog>
+
+{/* NEARBY INFO DIALOG */}
+<Dialog open={openNearbyDialog} onOpenChange={setOpenNearbyDialog}>
+  <DialogContent className="max-w-3xl rounded-xl max-h-[80vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle className="text-xl font-semibold">Nearby Transportation & Landmarks</DialogTitle>
+      <DialogDescription>Add nearby locations around your hospital.</DialogDescription>
+    </DialogHeader>
+
+    <div className="space-y-6">
+
+      {/* TRANSPORTATION */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2 text-blue-600">Nearby Transportation</h3>
+
+{transportation.map((t, index) => (
+  <div key={index} className="flex gap-3 bg-gray-50 p-2 rounded-lg mb-2 border">
+
+    {/* Editable Name */}
+    <input 
+      type="text"
+      className="border p-2 rounded-lg w-full"
+      value={t.name}
+      onChange={(e) => {
+        const updated = [...transportation];
+        updated[index].name = e.target.value;
+        setTransportation(updated);
+      }}
+    />
+
+    {/* Editable Distance */}
+    <input 
+      type="text"
+      className="border p-2 rounded-lg w-32"
+      value={t.distance}
+      onChange={(e) => {
+        const updated = [...transportation];
+        updated[index].distance = e.target.value;
+        setTransportation(updated);
+      }}
+    />
+
+    {/* Delete Button */}
+    <Button
+      size="sm"
+      variant="destructive"
+      onClick={() => {
+        const updated = [...transportation];
+        updated.splice(index, 1);
+        setTransportation(updated);
+      }}
+    >
+      Delete
+    </Button>
+
+  </div>
+))}
+
+
+
+        {/* Add Input */}
+        <div className="flex gap-2 mt-3">
+          <input
+            type="text"
+            placeholder="Location Name"
+            className="border p-2 rounded-lg w-full"
+            value={newTransport.name}
+            onChange={(e) => setNewTransport({ ...newTransport, name: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Distance (KM)"
+            className="border p-2 rounded-lg w-32"
+            value={newTransport.distance}
+            onChange={(e) => setNewTransport({ ...newTransport, distance: e.target.value })}
+          />
+<Button
+  onClick={() => {
+    if (!newTransport.name || !newTransport.distance) return;
+
+    const updated = [...transportation];
+
+    // EDIT MODE: if index exists → update item
+    if (newTransport.index !== undefined) {
+      updated[newTransport.index] = {
+        name: newTransport.name,
+        distance: newTransport.distance
+      };
+    } 
+    // ADD MODE: normal push
+    else {
+      updated.push({
+        name: newTransport.name,
+        distance: newTransport.distance
+      });
+    }
+
+    setTransportation(updated);
+    setNewTransport({ name: "", distance: "" }); // reset
+  }}
+>
+  {newTransport.index !== undefined ? "Update" : "Add"}
+</Button>
+
+        </div>
+      </div>
+
+      {/* LANDMARKS */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2 text-green-600">Nearby Landmarks</h3>
+
+{landmarks.map((l, index) => (
+  <div key={index} className="flex gap-3 bg-gray-50 p-2 rounded-lg mb-2 border">
+
+    {/* Editable Name */}
+    <input 
+      type="text"
+      className="border p-2 rounded-lg w-full"
+      value={l.name}
+      onChange={(e) => {
+        const updated = [...landmarks];
+        updated[index].name = e.target.value;
+        setLandmarks(updated);
+      }}
+    />
+
+    {/* Editable Distance */}
+    <input 
+      type="text"
+      className="border p-2 rounded-lg w-32"
+      value={l.distance}
+      onChange={(e) => {
+        const updated = [...landmarks];
+        updated[index].distance = e.target.value;
+        setLandmarks(updated);
+      }}
+    />
+
+    {/* Delete Button */}
+    <Button
+      size="sm"
+      variant="destructive"
+      onClick={() => {
+        const updated = [...landmarks];
+        updated.splice(index, 1);
+        setLandmarks(updated);
+      }}
+    >
+      Delete
+    </Button>
+
+  </div>
+))}
+
+
+
+        {/* Add Input */}
+        <div className="flex gap-2 mt-3">
+          <input
+            type="text"
+            placeholder="Landmark Name"
+            className="border p-2 rounded-lg w-full"
+            value={newLandmark.name}
+            onChange={(e) => setNewLandmark({ ...newLandmark, name: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Distance (KM)"
+            className="border p-2 rounded-lg w-32"
+            value={newLandmark.distance}
+            onChange={(e) => setNewLandmark({ ...newLandmark, distance: e.target.value })}
+          />
+<Button
+  onClick={() => {
+    if (!newLandmark.name || !newLandmark.distance) return;
+
+    const updated = [...landmarks];
+
+    if (newLandmark.index !== undefined) {
+      updated[newLandmark.index] = {
+        name: newLandmark.name,
+        distance: newLandmark.distance
+      };
+    } else {
+      updated.push({
+        name: newLandmark.name,
+        distance: newLandmark.distance
+      });
+    }
+
+    setLandmarks(updated);
+    setNewLandmark({ name: "", distance: "" });
+  }}
+>
+  {newLandmark.index !== undefined ? "Update" : "Add"}
+</Button>
+
+        </div>
+      </div>
+
+    </div>
+
+    {/* SAVE BUTTON */}
+    <div className="flex justify-end mt-6">
+<Button 
+  className="rounded-xl bg-blue-600 text-white"
+  onClick={saveNearbyInfo}
+>
+  Save Nearby Info
+</Button>
+
+    </div>
+
+  </DialogContent>
+</Dialog>
+
+
+</TabsContent>
+
+
+
+
 
               <TabsContent value="settings" id="settings" className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                 <div className="text-center py-12">

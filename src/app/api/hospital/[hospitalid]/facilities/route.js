@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-// 🏥 GET Hospital Facilities
-export async function GET(req, context) {
+// -----------------------------------------------------
+// 🟦 GET — Fetch Hospital Facilities JSON (All Data)
+// -----------------------------------------------------
+export async function GET(req, { params }) {
   try {
-    // ✅ Fix #1 — Await params properly
-    const { hospitalid } = await context.params;
+    const { hospitalid } = params;
 
-    // ⚠️ Validate hospital ID
     if (!hospitalid) {
       return NextResponse.json(
         { success: false, message: "Hospital ID is required." },
@@ -15,12 +15,11 @@ export async function GET(req, context) {
       );
     }
 
-    // ✅ Fix #2 — Only works if Prisma client was regenerated
     const hospital = await db.hospital.findUnique({
       where: { id: hospitalid },
       select: {
         id: true,
-        facilitiesJson: true, // works after prisma generate
+        facilitiesJson: true, 
       },
     });
 
@@ -31,26 +30,66 @@ export async function GET(req, context) {
       );
     }
 
-    if (!hospital.facilitiesJson || hospital.facilitiesJson.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: "No facilities data available for this hospital.",
-        facilities: [],
-        count: 0,
-      });
-    }
-
+    // Return entire JSON (roomFacilities + transportation + landmarks)
     return NextResponse.json({
       success: true,
-      count: hospital.facilitiesJson.length,
-      facilities: hospital.facilitiesJson,
+      facilities: {
+        roomFacilities: hospital.facilitiesJson?.roomFacilities || [],
+        transportation: hospital.facilitiesJson?.transportation || [],
+        landmarks: hospital.facilitiesJson?.landmarks || [],
+      },
     });
   } catch (error) {
     console.error("🔥 Error fetching hospital facilities:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to fetch hospital facilities.",
+        message: "Failed to fetch facilities.",
+        error: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// -----------------------------------------------------
+// 🟩 PUT — Save/Update All Hospital Facilities
+// -----------------------------------------------------
+export async function PUT(req, { params }) {
+  try {
+    const { hospitalid } = params;
+    const body = await req.json();
+
+    const { roomFacilities, transportation, landmarks } = body;
+
+    if (!hospitalid) {
+      return NextResponse.json(
+        { success: false, message: "Hospital ID is required." },
+        { status: 400 }
+      );
+    }
+
+    await db.hospital.update({
+      where: { id: hospitalid },
+      data: {
+        facilitiesJson: {
+          roomFacilities: roomFacilities || [],
+          transportation: transportation || [],
+          landmarks: landmarks || [],
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Facilities updated successfully.",
+    });
+  } catch (error) {
+    console.error("🔥 Error saving hospital facilities:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to save facilities.",
         error: error.message,
       },
       { status: 500 }

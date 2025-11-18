@@ -174,7 +174,7 @@ useEffect(() => {
   // Calculate average rating from actual reviews
   const avgRating = reviews.length > 0 
     ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) 
-    : "4.5";
+    : "0.0";
   const totalReviews = reviews.length || 127;
 
   const hospitalImages = [
