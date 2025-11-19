@@ -1,11 +1,10 @@
 // src/app/api/hospital/[hospitalid]/beds/route.js
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db"; // your Prisma client
+import { db } from "@/lib/db"; 
 
 function safeNumber(v) {
   if (v === null || v === undefined) return null;
-  // v might be a number-like string (e.g. "1000" or "1,000")
-  // Remove commas and whitespace then try parseFloat
+
   const cleaned = String(v).replace(/,/g, "").trim();
   const n = parseFloat(cleaned);
   return Number.isFinite(n) ? n : null;
@@ -22,13 +21,12 @@ export async function GET(req, { params }) {
     const hospitalBeds = await db.Bed.findMany({
       where: { hospitalId: hospitalid },
       include: {
-        category: true, // BedCategory relation
+        category: true, 
       },
       orderBy: { createdAt: "desc" },
     });
 
-    // fetch hospital top-level relations (hspInfo, hspcontact)
-    // Use findUnique if id is unique, else findFirst. Here id is primary so findUnique is fine.
+
     const hospitalRecord = await db.Hospital.findUnique({
       where: { id: hospitalid },
       include: {
@@ -103,6 +101,9 @@ export async function GET(req, { params }) {
             maxPrice: b.category.maxPrice ?? null,
             discount: b.category.discount ?? null,
             image: b.category.image ?? null,
+            image1: b.category.image1 ?? null,
+            image2: b.category.image2 ?? null,
+            image3: b.category.image3 ?? null,
           }
         : null,
     }));
