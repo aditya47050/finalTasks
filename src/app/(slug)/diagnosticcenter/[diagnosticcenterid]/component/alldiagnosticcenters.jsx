@@ -372,7 +372,7 @@ const DiagnosticMainClient = ({
           <div className="relative">
             
             {/* Diagnostic Center Image and Basic Info */}
-            <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-6 rounded-t-2xl">
+            <div className="bg-gradient-to-br from-[#E68B67]/10 to-[#C47C52]/10 p-6 rounded-t-2xl">
               <div className="flex items-center gap-4">
                 {service.hospital?.hspdetails?.hsplogo ? (
                   <div className="relative">
@@ -388,7 +388,7 @@ const DiagnosticMainClient = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="w-20 h-20 bg-gradient-to-br from-[#1E3B90]/20 to-[#3D85EF]/30 border-4 border-white rounded-full flex items-center justify-center text-white shadow-lg">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#E68B67]/20 to-[#C47C52]/30 border-4 border-white rounded-full flex items-center justify-center text-white shadow-lg">
                     <Briefcase className="w-8 h-8" />
                   </div>
                 )}
@@ -397,7 +397,7 @@ const DiagnosticMainClient = ({
                   <h3 className="text-xl font-bold text-gray-800 mb-1 truncate">
                     {service.subCategory || service.category || service.facility || "Diagnostic Service"}
                   </h3>
-                  <p className="text-[#3D85EF] text-base font-semibold mb-2">
+                  <p className="text-[#C47C52] text-base font-semibold mb-2">
                     {service.hospital?.hspInfo?.regname || "Diagnostic Center"}
                   </p>
                   
@@ -423,17 +423,17 @@ const DiagnosticMainClient = ({
           <div className="p-6 space-y-3">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2 text-gray-700">
-                <Briefcase className="h-4 w-4 text-[#3D85EF]" />
+                <Briefcase className="h-4 w-4 text-[#C47C52]" />
                 <span>Bookings: {service.bookingCount || 0}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-700">
-                <Star className="h-4 w-4 text-[#3D85EF]" />
+                <Star className="h-4 w-4 text-[#C47C52]" />
                 <span className="truncate">Exp: {service.experience || "N/A"} years</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-gray-700">
-              <MapPin className="h-4 w-4 text-[#3D85EF] flex-shrink-0" />
+              <MapPin className="h-4 w-4 text-[#C47C52] flex-shrink-0" />
               <span className="text-sm line-clamp-2">
                 {service.hospital?.hspcontact?.city ? 
                   `${service.hospital.hspcontact.city}${service.hospital?.hspcontact?.state ? `, ${service.hospital.hspcontact.state}` : ''}` : 
@@ -444,7 +444,7 @@ const DiagnosticMainClient = ({
             {/* Fee Range */}
             {(service.minPrice || service.maxPrice) && (
               <div className="flex items-center gap-2 text-gray-700">
-                <span className="text-sm font-semibold text-[#3D85EF]">
+                <span className="text-sm font-semibold text-[#C47C52]">
                   ₹{service.minPrice || "?"} - ₹{service.maxPrice || "?"}
                 </span>
               </div>
@@ -477,7 +477,7 @@ const DiagnosticMainClient = ({
       <div className="mb-12">
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-gradient-to-br from-[#1E3B90] to-[#3D85EF] rounded-xl">
+            <div className="p-2 bg-gradient-to-br from-[#E68B67] to-[#C47C52] rounded-xl">
               {Icon && <Icon className="h-5 w-5 text-white" />}
             </div>
             <div>
@@ -488,7 +488,7 @@ const DiagnosticMainClient = ({
           {services.length > 3 && (
             <button
               onClick={() => toggleRowExpansion(rowKey)}
-              className="flex items-center gap-2 text-[#3D85EF] font-semibold hover:text-[#1E3B90] transition-colors px-4 py-2 rounded-lg hover:bg-[#3D85EF]/5"
+              className="flex items-center gap-2 text-[#C47C52] font-semibold hover:text-[#E68B67] transition-colors px-4 py-2 rounded-lg hover:bg-[#C47C52]/5"
             >
               {expandedRows[rowKey] ? "Show Less" : `View All (${services.length})`}
               <ChevronRight className={`h-4 w-4 transition-transform ${expandedRows[rowKey] ? 'rotate-90' : ''}`} />
@@ -497,10 +497,10 @@ const DiagnosticMainClient = ({
         </div>
 
         {services.length === 0 ? (
-          <div className="flex justify-center items-center rounded-2xl bg-gradient-to-br from-[#1E3B90]/5 to-[#3D85EF]/5 border border-[#3D85EF]/20 p-8">
+          <div className="flex justify-center items-center rounded-2xl bg-gradient-to-br from-[#E68B67]/5 to-[#C47C52]/5 border border-[#C47C52]/20 p-8">
             <div className="text-center">
-              <Briefcase className="h-12 w-12 text-[#3D85EF] mx-auto mb-3" />
-              <p className="text-[#1E3B90] font-medium text-lg">
+              <Briefcase className="h-12 w-12 text-[#C47C52] mx-auto mb-3" />
+              <p className="text-[#E68B67] font-medium text-lg">
                 No diagnostic centers found in {activeCity || "your area"}
               </p>
               <p className="text-gray-600 mt-1">Please try changing your location or filters</p>
@@ -518,9 +518,9 @@ const DiagnosticMainClient = ({
   };
 
   return (
-    <div className="min-h-screen px-0 md:px-8 bg-gradient-to-br from-[#1E3B90]/5 via-white to-[#3D85EF]/5">
+    <div className="min-h-screen px-0 md:px-8 bg-gradient-to-br from-[#E68B67]/5 via-white to-[#C47C52]/5">
       {/* Enhanced Header Section */}
-      <div className="bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] text-white shadow-lg">
+      <div className="bg-gradient-to-r from-[#E68B67] to-[#C47C52] text-white shadow-lg">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             {/* Title Section */}
@@ -556,11 +556,11 @@ const DiagnosticMainClient = ({
             <div className="flex justify-center lg:justify-end">
               <Button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-3 bg-white text-[#1E3B90] hover:bg-white/90 font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
+                className="flex items-center gap-3 bg-white text-[#E68B67] hover:bg-white/90 font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
               >
                 <Filter size={20} />
                 {showFilters ? "Hide Filters" : "Show Filters"}
-                <Badge className="bg-[#3D85EF] text-white ml-1 min-w-[24px] h-6 flex items-center justify-center">
+                <Badge className="bg-[#C47C52] text-white ml-1 min-w-[24px] h-6 flex items-center justify-center">
                   {Object.values(member).filter(val => val !== "" && val !== patientCity).length}
                 </Badge>
               </Button>
@@ -633,7 +633,7 @@ const DiagnosticMainClient = ({
                       name="centerName"
                       value={member.centerName}
                       onChange={handleChange}
-                      className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent transition-all"
+                      className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent transition-all"
                       placeholder="Enter center name..."
                     />
                   </div>
@@ -644,7 +644,7 @@ const DiagnosticMainClient = ({
                       name="hospitalName"
                       value={member.hospitalName}
                       onChange={handleChange}
-                      className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent transition-all"
+                      className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent transition-all"
                       placeholder="Enter hospital name..."
                     />
                   </div>
@@ -657,7 +657,7 @@ const DiagnosticMainClient = ({
                     name="hospitalType"
                     value={member.hospitalType}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent appearance-none bg-white"
                   >
                     <option value="" className="bg-gray-50 text-[#453565]">Hospital Type</option>
                     {hospitalCategories.map((category) => (
@@ -679,7 +679,7 @@ const DiagnosticMainClient = ({
                     name="centerExperience"
                     value={member.centerExperience}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent appearance-none bg-white"
                   >
                     <option value="" className="bg-gray-50 text-[#453565]">Center Experience</option>
                     <option value="any" className="bg-gray-50 text-[#453565]">Any Experience</option>
@@ -696,7 +696,7 @@ const DiagnosticMainClient = ({
                     name="feeRange"
                     value={member.feeRange}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent appearance-none bg-white"
                   >
                     <option value="" className="bg-gray-50 text-[#453565]">Fee Range</option>
                     <option value="any" className="bg-gray-50 text-[#453565]">Any Fee</option>
@@ -713,7 +713,7 @@ const DiagnosticMainClient = ({
                     name="state"
                     value={member.state}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent appearance-none bg-white"
                   >
                     <option value="" className="bg-gray-50 text-[#453565]">Select State</option>
                     {stateList.map((s) => (
@@ -732,7 +732,7 @@ const DiagnosticMainClient = ({
                     value={member.district}
                     onChange={handleChange}
                     disabled={!filteredDistricts.length}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white disabled:opacity-50"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent appearance-none bg-white disabled:opacity-50"
                   >
                     <option value="" className="bg-gray-50 text-[#453565]">Select District</option>
                     {filteredDistricts.map((d) => (
@@ -751,7 +751,7 @@ const DiagnosticMainClient = ({
                     value={member.taluka}
                     onChange={handleChange}
                     disabled={!filteredSubDistricts.length}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white disabled:opacity-50"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent appearance-none bg-white disabled:opacity-50"
                   >
                     <option value="" className="bg-gray-50 text-[#453565]">Select Taluka</option>
                     {filteredSubDistricts.map((sd) => (
@@ -770,7 +770,7 @@ const DiagnosticMainClient = ({
                     name="city"
                     value={member.city}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent transition-all"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent transition-all"
                     placeholder="Enter City Name"
                   />
                 </div>
@@ -783,7 +783,7 @@ const DiagnosticMainClient = ({
                     name="pinCode"
                     value={member.pinCode}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent transition-all"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#C47C52] focus:border-transparent transition-all"
                     placeholder="Enter Pin Code"
                   />
                 </div>
@@ -792,7 +792,7 @@ const DiagnosticMainClient = ({
               {/* Search Button */}
               <Button
                 onClick={handleSearchClick}
-                className="w-full bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] hover:from-[#3D85EF] hover:to-[#1E3B90] text-white font-semibold py-3 rounded-xl shadow-lg transition-all transform hover:scale-105 mt-6"
+                className="w-full bg-gradient-to-r from-[#E68B67] to-[#C47C52] hover:from-[#C47C52] hover:to-[#E68B67] text-white font-semibold py-3 rounded-xl shadow-lg transition-all transform hover:scale-105 mt-6"
               >
                 Apply Filters
               </Button>
@@ -804,8 +804,8 @@ const DiagnosticMainClient = ({
             {row1Services.length === 0 && row2Services.length === 0 && row3Services.length === 0 && row4Services.length === 0 ? (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Briefcase className="h-8 w-8 text-[#3D85EF]" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#E68B67]/10 to-[#C47C52]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="h-8 w-8 text-[#C47C52]" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">No diagnostic centers found</h3>
                   <p className="text-gray-600 mb-4">
@@ -828,7 +828,7 @@ const DiagnosticMainClient = ({
                       setFilteredDistricts([]);
                       setFilteredSubDistricts([]);
                     }}
-                    className="bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] hover:from-[#3D85EF] hover:to-[#1E3B90] text-white"
+                    className="bg-gradient-to-r from-[#E68B67] to-[#C47C52] hover:from-[#C47C52] hover:to-[#E68B67] text-white"
                   >
                     Clear Filters
                   </Button>

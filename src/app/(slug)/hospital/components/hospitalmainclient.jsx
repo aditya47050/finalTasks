@@ -349,7 +349,7 @@ useEffect(() => {
           <div className="relative">
             
             {/* Hospital Image and Basic Info */}
-            <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-6 rounded-t-2xl">
+            <div className="bg-gradient-to-br from-[#E68B67]/10 to-[#C47C52]/10 p-6 rounded-t-2xl">
               <div className="flex items-center gap-4">
                 {item.hspdetails?.hsplogo ? (
                   <div className="relative">
@@ -365,7 +365,7 @@ useEffect(() => {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-20 h-20 bg-gradient-to-br from-[#1E3B90]/20 to-[#3D85EF]/30 border-4 border-white rounded-full flex items-center justify-center text-white shadow-lg">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#E68B67]/30 to-[#C47C52]/30 border-4 border-white rounded-full flex items-center justify-center text-white shadow-lg">
                     <Briefcase className="w-8 h-8" />
                   </div>
                 )}
@@ -374,7 +374,7 @@ useEffect(() => {
                   <h3 className="text-xl font-bold text-gray-800 mb-1 truncate">
                     {item.hspInfo?.regname || "Hospital Name"}
                   </h3>
-                  <p className="text-[#1E3B90] text-base font-semibold mb-2">
+                  <p className="text-[#E68B67] text-base font-semibold mb-2">
                     {hspcategoryname?.title || "Hospital"}
                   </p>
                   
@@ -406,7 +406,7 @@ useEffect(() => {
           <div className="p-6 space-y-3">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2 text-gray-700">
-                <Briefcase className="h-4 w-4 text-[#1E3B90]" />
+                <Briefcase className="h-4 w-4 text-[#E68B67]" />
                 <span>
   {hospitalCounts[item.id]?.doctors !== undefined
     ? `${hospitalCounts[item.id].doctors}`
@@ -416,7 +416,7 @@ useEffect(() => {
 
               </div>
               <div className="flex items-center gap-2 text-gray-700">
-                <Star className="h-4 w-4 text-[#1E3B90]" />
+                <Star className="h-4 w-4 text-[#E68B67]" />
                 <span className="truncate">
   {hospitalCounts[item.id]?.beds !== undefined
     ? `${hospitalCounts[item.id].beds}`
@@ -428,7 +428,7 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center gap-2 text-gray-700">
-              <MapPin className="h-4 w-4 text-[#1E3B90] flex-shrink-0" />
+              <MapPin className="h-4 w-4 text-[#E68B67] flex-shrink-0" />
               <span className="text-sm line-clamp-2">
                 {item.hspcontact?.city ? `${item.hspcontact.city}${item.hspcontact?.state ? `, ${item.hspcontact.state}` : ''}` : 
                  item.hspcontact?.address || "Address not available"}
@@ -437,7 +437,7 @@ useEffect(() => {
 
             {item.hspInfo?.hspcategory && (
               <div className="flex items-center gap-2 text-gray-700">
-                <Shield className="h-4 w-4 text-[#1E3B90] flex-shrink-0" />
+                <Shield className="h-4 w-4 text-[#E68B67] flex-shrink-0" />
                 <span className="text-sm truncate">{item.hspInfo.hspcategory}</span>
               </div>
             )}
@@ -446,11 +446,10 @@ useEffect(() => {
           {/* Footer with Actions - Fixed size */}
           <div className="px-6 pb-6 pt-2">
             <div className="flex gap-3">
-              <button className="flex-1 bg-gradient-to-r from-[#1e40af] to-[#3b82f6] hover:from-[#3b82f6] hover:to-[#1e40af] text-white font-medium py-2.5 px-3 rounded-xl shadow-md transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-sm">
-                <Star className="h-3 w-3" />
+ <button className="flex-1 bg-[#E68B67] hover:bg-[#d17a5b] text-white font-medium py-2.5 px-3 rounded-xl shadow-md transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-sm">
                 Book Now
               </button>
-              <button className="flex-1 bg-gradient-to-r from-[#059669] to-[#10b981] hover:from-[#10b981] hover:to-[#059669] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-sm">
+<button className="flex-1 bg-[#243460] hover:bg-[#1a2850] text-white font-medium py-2.5 px-3 rounded-xl shadow-sm transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-sm">
                 <Briefcase className="h-3 w-3" />
                 View More
               </button>
@@ -469,7 +468,7 @@ useEffect(() => {
       <div className="mb-12">
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-gradient-to-br from-[#1E3B90] to-[#3D85EF] rounded-xl">
+            <div className="p-2 bg-gradient-to-br from-[#E68B67] to-[#3D85EF] rounded-xl">
               {Icon && <Icon className="h-5 w-5 text-white" />}
             </div>
             <div>
@@ -480,7 +479,7 @@ useEffect(() => {
           {hospitals.length > 3 && (
             <button
               onClick={() => toggleRowExpansion(rowKey)}
-              className="flex items-center gap-2 text-[#3D85EF] font-semibold hover:text-[#1E3B90] transition-colors px-4 py-2 rounded-lg hover:bg-[#3D85EF]/5"
+              className="flex items-center gap-2 text-[#3D85EF] font-semibold hover:text-[#E68B67] transition-colors px-4 py-2 rounded-lg hover:bg-[#3D85EF]/5"
             >
               {expandedRows[rowKey] ? "Show Less" : `View All (${hospitals.length})`}
               <ChevronRight className={`h-4 w-4 transition-transform ${expandedRows[rowKey] ? 'rotate-90' : ''}`} />
@@ -489,10 +488,10 @@ useEffect(() => {
         </div>
 
         {hospitals.length === 0 ? (
-          <div className="flex justify-center items-center rounded-2xl bg-gradient-to-br from-[#1E3B90]/5 to-[#3D85EF]/5 border border-[#3D85EF]/20 p-8">
+          <div className="flex justify-center items-center rounded-2xl bg-gradient-to-br from-[#E68B67]/5 to-[#3D85EF]/5 border border-[#3D85EF]/20 p-8">
             <div className="text-center">
-              <Briefcase className="h-12 w-12 text-[#1E3B90] mx-auto mb-3" />
-              <p className="text-[#1E3B90] font-medium text-lg">
+              <Briefcase className="h-12 w-12 text-[#E68B67] mx-auto mb-3" />
+              <p className="text-[#E68B67] font-medium text-lg">
                 No hospitals found in {activeCity || "your area"}
               </p>
               <p className="text-gray-600 mt-1">Please try changing your location or filters</p>
@@ -531,9 +530,9 @@ useEffect(() => {
   ];
 
   return (
-    <div className="min-h-screen md:px-8 bg-gradient-to-br from-[#1E3B90]/5 via-white to-[#3D85EF]/5">
+    <div className="min-h-screen md:px-8 bg-gradient-to-br from-[#FAF5E0]/30 via-white to-[#FAF5E0]/20">
       {/* Enhanced Header Section */}
-      <div className="bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] text-white shadow-lg">
+      <div className="bg-[#E68B67] hover:bg-[#d17a5b] text-white shadow-lg">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             {/* Title Section */}
@@ -569,7 +568,7 @@ useEffect(() => {
             <div className="flex justify-center lg:justify-end">
               <Button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-3 bg-white text-[#1E3B90] hover:bg-white/90 font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
+                className="flex items-center gap-3 bg-white text-[#E68B67] hover:bg-white/90 font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
               >
                 <Filter size={20} />
                 {showFilters ? "Hide Filters" : "Show Filters"}
@@ -632,7 +631,7 @@ useEffect(() => {
                       name="hospitalName"
                       value={member.hospitalName}
                       onChange={handleChange}
-                      className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent transition-all"
+                      className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#E68B67] focus:border-transparent transition-all"
                       placeholder="Enter hospital name..."
                     />
                   </div>
@@ -645,7 +644,7 @@ useEffect(() => {
                     name="surgeryCategory"
                     value={member.surgeryCategory}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#3D85EF] focus:border-transparent appearance-none bg-white"
+                    className="w-full h-12 px-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#E68B67] focus:border-transparent appearance-none bg-white"
                   >
                       <option value="" className="bg-gray-50 text-[#453565]">Surgery Category</option>
                       <option value="Bone / Orthopedics" className="bg-gray-50 text-[#453565]">
@@ -951,7 +950,7 @@ useEffect(() => {
 
                 <Button
                   onClick={handleSearchClick}
-                  className="w-full bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] hover:from-[#3D85EF] hover:to-[#1E3B90] text-white font-semibold py-3 rounded-xl shadow-lg transition-all transform hover:scale-105"
+                  className="w-full bg-[#E68B67] hover:bg-[#d17a5b] hover:from-[#3D85EF] hover:to-[#E68B67] text-white font-semibold py-3 rounded-xl shadow-lg transition-all transform hover:scale-105"
                 >
                   Apply Filters
                 </Button>
@@ -985,8 +984,8 @@ useEffect(() => {
   {row1Hospitals.length === 0 && row2Hospitals.length === 0 && row3Hospitals.length === 0 && row4Hospitals.length === 0 && row5Hospitals.length === 0 ? (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
       <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Briefcase className="h-8 w-8 text-[#1E3B90]" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#E68B67]/10 to-[#C47C52]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="h-8 w-8 text-[#E68B67]" />
         </div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">No hospitals found</h3>
         <p className="text-gray-600 mb-4">
@@ -1009,7 +1008,7 @@ useEffect(() => {
             setFilteredDistricts([]);
             setFilteredSubDistricts([]);
           }}
-                    className="bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] hover:from-[#3D85EF] hover:to-[#1E3B90] text-white"
+                    className="bg-[#E68B67] hover:bg-[#d17a5b] hover:from-[#3D85EF] hover:to-[#E68B67] text-white"
         >
           Clear Filters
         </Button>
@@ -1070,7 +1069,7 @@ useEffect(() => {
     <div className="flex justify-center mt-8">
       <button
         onClick={handleViewMore}
-        className="bg-gradient-to-r from-[#1E3B90] to-[#3D85EF] hover:from-[#3D85EF] hover:to-[#1E3B90] text-white py-3 px-8 rounded-xl font-semibold shadow-lg transition-all transform hover:scale-105"
+        className="bg-[#E68B67] hover:bg-[#d17a5b] hover:from-[#3D85EF] hover:to-[#E68B67] text-white py-3 px-8 rounded-xl font-semibold shadow-lg transition-all transform hover:scale-105"
       >
         View More Hospitals
       </button>

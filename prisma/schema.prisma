@@ -286,7 +286,9 @@ model Patient {
   VideoConsultation      VideoConsultation[]
   healthInsurances       UserHealthInsurance[]
   sentConnectionRequests ConnectionRequest[] @relation("PatientToConnectionRequests")
+  pharmacyReviews PharmacyReview[]
 }
+
 model ConnectionRequest {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   senderEmail   String   // Parent (logged-in user)
@@ -2356,6 +2358,18 @@ model Pharmacy {
   Product               Product[]
   PharmacyCertificate   PharmacyCertificate[]
   PharmacyOrder         PharmacyOrder[]
+  reviews PharmacyReview[]
+}
+
+model PharmacyReview {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  pharmacy   Pharmacy  @relation(fields: [pharmacyId], references: [id])
+  pharmacyId String    @db.ObjectId
+  patient    Patient   @relation(fields: [patientId], references: [id])
+  patientId  String    @db.ObjectId
+  rating     Int
+  comment    String
+  createdAt  DateTime  @default(now())
 }
 
 model PharmacyCertificate {

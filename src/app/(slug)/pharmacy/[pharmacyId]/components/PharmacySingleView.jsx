@@ -51,7 +51,7 @@ const PharmacySingleView = ({ pharmacyData, customerId }) => {
   // Calculate average rating from actual reviews
   const avgRating = reviews.length > 0 
     ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1) 
-    : "4.8";
+    : null;
   const totalReviews = reviews.length || 1200;
 
   const pharmacyImages = [
@@ -329,7 +329,7 @@ const PharmacySingleView = ({ pharmacyData, customerId }) => {
 
       {[
         {
-          icon: <Pill className="w-12 h-12 text-[#243460]" />,
+          icon: <Image src="/icons/pill.png" width={60} height={60} alt="doctor" />,
           title: "Products",
           value: pharmacyData?.Product?.length || "500+",
           rows: [
@@ -338,7 +338,7 @@ const PharmacySingleView = ({ pharmacyData, customerId }) => {
           ]
         },
         {
-          icon: <Users className="w-12 h-12 text-[#243460]" />,
+          icon: <Image src="/icons/doctor.png" width={60} height={60} alt="doctor" />,
           title: "Pharmacists",
           value: pharmacyData?.TotalregPharmacist || "N/A",
           rows: [
@@ -347,7 +347,7 @@ const PharmacySingleView = ({ pharmacyData, customerId }) => {
           ]
         },
         {
-          icon: <Truck className="w-12 h-12 text-[#243460]" />,
+          icon: <Image src="/icons/ambulance.png" width={60} height={60} alt="doctor" />,
           title: "Home Delivery",
           value: pharmacyData?.homedelivery ? "Yes" : "No",
           rows: [
