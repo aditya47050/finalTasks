@@ -10,12 +10,20 @@ import {
   Heart,
   Shield,
   Filter,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 
 const PharmacyClient = ({ pharmacyList }) => {
   console.log("🔥 REAL PHARMACY DATA FROM SERVER:", pharmacyList);
+
+  // UNIQUE PHARMACY TYPES FROM REAL DB
+  const uniqueTypes = [
+    ...new Set(
+      pharmacyList
+        .map((p) => p.pharmacytype)
+        .filter((t) => t && t.trim() !== "")
+    ),
+  ];
 
   // MAP REAL DB DATA
   const pharmacies = pharmacyList.map((p) => {
@@ -40,7 +48,7 @@ const PharmacyClient = ({ pharmacyList }) => {
       name: p.regname || "Unnamed Pharmacy",
       logo: p.pharmacylogo,
 
-      type: p.pharmacytype || "Retail Pharmacy",
+      type: p.pharmacytype || "",
       address: p.fulladdress || "",
       city: p.city || "",
       state: p.state || "",
@@ -51,9 +59,9 @@ const PharmacyClient = ({ pharmacyList }) => {
 
       reviews: reviewCount,
       rating: avgRating,
-      deliverySpeed: p.homedelivery ? 20 : 45,
       is24x7,
       homedelivery: p.homedelivery,
+      onlineOrder: p.onlineplotformservice, // 🔥 added
     };
   });
 
@@ -87,6 +95,7 @@ const PharmacyClient = ({ pharmacyList }) => {
     });
   };
 
+  // APPLY FILTERS
   const filteredPharmacies = useMemo(() => {
     return pharmacies.filter((p) => {
       const nameMatch = p.name.toLowerCase().includes(filters.name.toLowerCase());
@@ -113,9 +122,9 @@ const PharmacyClient = ({ pharmacyList }) => {
   const row1 = [...filteredPharmacies].sort((a, b) => b.ordersCount - a.ordersCount);
   const row2 = [...filteredPharmacies].sort((a, b) => b.rating - a.rating);
   const row3 = [...filteredPharmacies].sort((a, b) => b.productsCount - a.productsCount);
-  const row4 = [...filteredPharmacies].sort((a, b) => a.deliverySpeed - b.deliverySpeed);
+  const row4 = [...filteredPharmacies].sort((a, b) => b.homedelivery - a.homedelivery); // fast delivery removed
 
-  // CARD
+  // PHARMACY CARD
   const PharmacyCard = ({ item }) => (
     <Link href={`/pharmacy/${item.id}`}>
       <Card className="h-full min-h-[280px] shadow-md hover:shadow-xl rounded-2xl transition-all bg-white hover:-translate-y-1">
@@ -123,7 +132,7 @@ const PharmacyClient = ({ pharmacyList }) => {
           <div className="bg-gradient-to-br from-[#1E3B90]/10 to-[#3D85EF]/10 p-5 rounded-t-2xl">
             <div className="flex items-center gap-4">
               <img
-                src={item.logo}
+                src={item.logo && item.logo.trim() !== "" ? item.logo : null}
                 width={70}
                 height={70}
                 alt="logo"
@@ -143,7 +152,9 @@ const PharmacyClient = ({ pharmacyList }) => {
             </div>
           </div>
 
+          {/* 🔥 UPDATED CARD CONTENT */}
           <div className="p-5 space-y-3 text-sm">
+
             <div className="flex items-center gap-2 text-gray-700">
               <MapPin className="w-4 h-4 text-[#1E3B90]" />
               <span className="line-clamp-2">{item.address}</span>
@@ -154,9 +165,38 @@ const PharmacyClient = ({ pharmacyList }) => {
               <span>{item.productsCount} medicines</span>
             </div>
 
+            {/* 🔥 Home Delivery */}
             <div className="flex items-center gap-3 text-gray-700">
               <Clock className="w-4 h-4 text-[#1E3B90]" />
-              <span>Delivery in {item.deliverySpeed} mins</span>
+              <span>
+                Home Delivery:{" "}
+                <span
+                  className={
+                    item.homedelivery
+                      ? "text-green-600 font-semibold"
+                      : "text-red-600 font-semibold"
+                  }
+                >
+                  {item.homedelivery ? "Yes" : "No"}
+                </span>
+              </span>
+            </div>
+
+            {/* 🔥 Online Order */}
+            <div className="flex items-center gap-3 text-gray-700">
+              <Clock className="w-4 h-4 text-[#1E3B90]" />
+              <span>
+                Online Order:{" "}
+                <span
+                  className={
+                    item.onlineOrder
+                      ? "text-green-600 font-semibold"
+                      : "text-red-600 font-semibold"
+                  }
+                >
+                  {item.onlineOrder ? "Yes" : "No"}
+                </span>
+              </span>
             </div>
           </div>
 
@@ -173,6 +213,7 @@ const PharmacyClient = ({ pharmacyList }) => {
     </Link>
   );
 
+  // ROW SECTION
   const RowSection = ({ title, data, icon: Icon }) => {
     const [expanded, setExpanded] = useState(false);
     const items = expanded ? data : data.slice(0, 3);
@@ -276,6 +317,7 @@ const PharmacyClient = ({ pharmacyList }) => {
                 />
               </div>
 
+              {/* 🔥 DYNAMIC PHARMACY TYPES FROM DB */}
               <div>
                 <label className="text-gray-700 text-sm">Pharmacy Type</label>
                 <select
@@ -285,13 +327,15 @@ const PharmacyClient = ({ pharmacyList }) => {
                   className="w-full mt-1 p-2 border rounded-xl"
                 >
                   <option value="">All</option>
-                  <option value="Retail Pharmacy">Retail Pharmacy</option>
-                  <option value="Wholesale">Wholesale</option>
-                  <option value="Chemist">Chemist</option>
-                  <option value="Medical Store">Medical Store</option>
+
+                  {uniqueTypes.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
                 </select>
               </div>
-
+{/* 
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -300,7 +344,7 @@ const PharmacyClient = ({ pharmacyList }) => {
                   onChange={handleFilterChange}
                 />
                 <label>Open 24x7</label>
-              </div>
+              </div> */}
 
               <div className="flex items-center gap-2">
                 <input
@@ -321,7 +365,7 @@ const PharmacyClient = ({ pharmacyList }) => {
           <RowSection title="Top Pharmacies" data={row1} icon={Heart} />
           <RowSection title="Top Rated Pharmacies" data={row2} icon={Star} />
           <RowSection title="Most Medicines Available" data={row3} icon={Briefcase} />
-          <RowSection title="Fastest Delivery Pharmacies" data={row4} icon={Clock} />
+          <RowSection title="Home Delivery Pharmacies" data={row4} icon={Clock} />
         </div>
 
       </div>

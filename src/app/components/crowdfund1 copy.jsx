@@ -197,7 +197,7 @@ const CrowdFund1 = () => {
                                     src={item.src}
                                     width={100}
                                     height={100}
-                                    alt={item.alt}
+                                    alt=""
                                     className="object-cover bg-[#5271FF] rounded-[15px] max-[1200px]:h-12 max-[1200px]:w-12 min-[1200px]:h-28 min-[1200px]:w-28"
                                   />
                                   <p className="text-[#242460] xl:text-[14px] text-center min-[1200px]:text-[13px] max-[1200px]:text-[12px] font-poppins font-extrabold mt-2">
