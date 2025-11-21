@@ -25,7 +25,13 @@ import {
   Home,
   Activity,
   IndianRupee,
-  Stethoscope
+  Stethoscope,
+  ArrowRight,
+  BusFront,
+  Plane,
+  Train,
+  Landmark,
+  Route
 } from "lucide-react";
 import { FaAmbulance } from "react-icons/fa";
 import BookHomeHealthcareDialog from "./bookhomehealthcare";
@@ -106,82 +112,77 @@ const [showVerified, setShowVerified] = useState(false);
     <div key={homeHealthcareService?.id || 'no-service'} className="w-full bg-gray-50 relative min-h-screen">
       {/* Desktop View - Show on large screens only */}
       <div className="hidden lg:block">
-        {/* Clean Simple Header */}
-        <div className="shadow-lg" style={{ background: '#3D85EF' }}>
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="flex items-center justify-between gap-8">
-              {/* Left Section - Logo & Basic Info */}
-              <div className="flex items-center gap-5 flex-1">
-                {homeHealthcareService?.hospital?.hspdetails?.hsplogo && (
-                  <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/40 shadow-lg bg-white flex-shrink-0">
-                    <Image
-                      src={homeHealthcareService.hospital.hspdetails.hsplogo}
-                      width={80}
-                      height={80}
-                      alt="Service Provider Logo"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-white mb-2">
-                    {serviceName || "Home Healthcare Service"}
-                  </h1>
-                  <div className="flex items-center gap-2 text-white/90 text-sm">
-                    <MapPin className="w-4 h-4" />
-                    <span>
-                      {homeHealthcareService?.hospital?.hspcontact?.city}, {homeHealthcareService?.hospital?.hspcontact?.state}
-                    </span>
-                  </div>
-                </div>
-              </div>
+{/* =================== HOME HEALTHCARE HEADER (Exact Screenshot + Exact Layout) =================== */}
+<div
+  className="bg-transparent rounded-[12px] mx-auto mt-5"
+  style={{
+    width: "1270px",
+    height: "88px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0px 24px",
+  }}
+>
 
-              {/* Right Section - Rating & Actions */}
-              <div className="flex items-center gap-6">
-                {/* Rating */}
-                <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3 border border-white/30">
-                  <div className="flex items-center gap-2 mb-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(avgRating)
-                            ? "text-yellow-300 fill-yellow-300"
-                            : "text-white/30"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-white text-center">
-                    <span className="text-xl font-bold">{avgRating}</span>
-                    <span className="text-sm ml-1">({totalReviews})</span>
-                  </div>
-                </div>
+  {/* LEFT SECTION */}
+  <div className="flex flex-col justify-center gap-[2px]">
+    <h1 className="text-[28px] font-bold text-[#243460] leading-none mb-2">
+      {serviceName || "Home Healthcare Service"}
+    </h1>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      const phone = homeHealthcareService?.hospital?.mobile;
-                      if (phone) window.open(`tel:${phone}`, '_self');
-                    }}
-                    className="px-5 py-2.5 bg-white hover:bg-gray-100 text-blue-600 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg transition-all"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Call Now
-                  </button>
-                  <button
-                    onClick={() => setDialogOpen(true)}
-                    className="px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold text-sm flex items-center gap-2 border border-white/40 transition-all"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="flex items-center gap-2 text-[#243460] text-[15px] leading-none">
+      <Building2 className="w-4 h-4" />
+      {homeHealthcareService?.hospital?.hspdetails?.category || "Home Healthcare"}
+    </div>
+  </div>
+
+{/* RIGHT SECTION */}
+<div className="flex flex-col items-end gap-2">
+
+  {/* BUTTONS */}
+  <div className="flex items-center gap-3">
+    <button
+      onClick={() => {
+        const phone = homeHealthcareService?.hospital?.mobile;
+        if (phone) window.open(`tel:${phone}`, "_self");
+      }}
+      className="px-6 py-2 rounded-[12px] text-white text-[15px] font-semibold"
+      style={{ background: "#5868F2" }}
+    >
+      Call Now
+    </button>
+
+    <button
+      onClick={() => setDialogOpen(true)}
+      className="px-6 py-2 rounded-[12px] text-white text-[15px] font-semibold"
+      style={{ background: "#4CAF50" }}
+    >
+      Book Now
+    </button>
+  </div>
+
+  {/* RATING BELOW BUTTONS */}
+  <div className="flex items-center gap-2 mt-[2px]">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < Math.floor(avgRating)
+            ? "text-[#243460] fill-[#243460]"
+            : "text-[#243460]"
+        }`}
+      />
+    ))}
+
+    <span className="text-[#243460] text-[15px] font-semibold leading-none">
+      {avgRating} ({totalReviews})
+    </span>
+  </div>
+
+</div>
+
+</div>
 
         {/* Main Content Layout */}
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -192,7 +193,7 @@ const [showVerified, setShowVerified] = useState(false);
                 <div className="grid grid-cols-4 gap-2 h-[400px] bg-gray-50">
                   <div className="col-span-2 row-span-2 relative group cursor-pointer overflow-hidden rounded-lg">
                     <Image
-                      src={mainImage}
+                      src={mainImage && mainImage.trim() !== "" ? mainImage : "/no-image.png"}
                       fill
                       priority
                       quality={90}
@@ -224,7 +225,7 @@ const [showVerified, setShowVerified] = useState(false);
                   {images.length === 0 && (
                     <div className="col-span-4 row-span-2 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
                       <div className="text-center p-6">
-                        <Heart className="w-20 h-20 text-gray-400 mx-auto mb-4" />
+                        <Home className="w-20 h-20 text-gray-400 mx-auto mb-4" />
                         <p className="text-gray-500 font-medium text-lg">No images available</p>
                       </div>
                     </div>
@@ -234,42 +235,49 @@ const [showVerified, setShowVerified] = useState(false);
             </Card>
           </div>
 
-          {/* FULL WIDTH TABS */}
-          <div className="w-full mb-6">
-            <div className="bg-white border-b border-gray-200 shadow-sm rounded-t-xl">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-4 lg:px-6">
-                <nav className="flex space-x-4 lg:space-x-6 overflow-x-auto scrollbar-hide">
-                  {[
-                    { id: 'overview', label: 'Overview' },
-                    { id: 'services', label: 'Services' },
-                    { id: 'pricing', label: 'Pricing' },
-                    { id: 'reviews', label: 'Reviews' },
-                    { id: 'contact', label: 'Contact' },
-                    { id: 'info', label: 'Provider Info' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`py-3 lg:py-4 px-3 lg:px-4 border-b-2 font-medium text-sm lg:text-base whitespace-nowrap transition-all duration-300 ${
-                        activeTab === tab.id
-                          ? 'border-blue-500 text-blue-600 bg-blue-50 rounded-t-md'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </nav>
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  className="w-full lg:w-auto mt-3 lg:mt-0 lg:ml-4 mb-3 lg:mb-0 lg:my-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 px-6 lg:px-8 rounded-lg transition-all transform hover:scale-110 shadow-xl border-2 border-orange-400 flex items-center justify-center gap-2 whitespace-nowrap text-base lg:text-lg animate-pulse"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Book Service Now
-                </button>
-              </div>
-            </div>
-          </div>
+{/* FULL WIDTH TABS */}
+<div className="flex justify-center mt-6">
+  <div className="w-[1270px] h-[75px] bg-white border border-[#00000033] rounded-[12px] shadow-sm flex items-center px-4">
+    <div className="flex w-full justify-between items-center">
+      
+      {/* Tabs */}
+      <nav className="flex space-x-6 overflow-x-auto scrollbar-hide">
+        {[
+          { id: 'overview', label: 'Overview' },
+          { id: 'services', label: 'Services' },
+          { id: 'pricing', label: 'Pricing' },
+          { id: 'reviews', label: 'Reviews' },
+          { id: 'contact', label: 'Contact' },
+          { id: 'info', label: 'Provider Info' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`py-3 px-4 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-300 ${
+              activeTab === tab.id
+                ? 'border-blue-500 text-blue-600 bg-blue-50 rounded-t-md'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+<button
+  onClick={() => setDialogOpen(true)}
+  className="w-[236px] h-[44px] bg-[#E68B67] text-white font-semibold 
+  rounded-[12px] flex items-center justify-center gap-[10px]
+  px-[20px] py-[10px] text-sm shadow-md"
+>
+  <Calendar className="w-5 h-5" />
+  Book Appointment Now
+</button>
+
+
+    </div>
+  </div>
+</div>
 
           {/* Content Grid with Sidebar - Responsive */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -277,54 +285,169 @@ const [showVerified, setShowVerified] = useState(false);
             <div className="lg:col-span-2 space-y-4 order-2 lg:order-1">
 
               {/* OVERVIEW TAB */}
-              {activeTab === 'overview' && (
-                <Card className="border border-gray-200 shadow-md rounded-xl">
-                  <CardContent className="p-4 md:p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">
-                      About {serviceName}
-                    </h3>
-                    <p className="text-base text-gray-700 leading-relaxed mb-6">
-                      {serviceName} provided by {homeHealthcareService?.hospital?.hspInfo?.regname || "our healthcare provider"} offers professional healthcare services in the comfort of your home.
-                      With {homeHealthcareService?.hospital?.hspInfo?.experience || "5+"} years of experience in providing quality medical care,
-                      we are committed to excellence in home healthcare delivery with experienced medical professionals.
-                    </p>
-                    <div className="mb-6 p-3 md:p-4 bg-blue-50 rounded-xl border border-blue-200">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                          <Shield className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-blue-900 text-base">Service Status</h4>
-                          <p className="text-blue-700 text-sm break-words">
-                            Provider: {homeHealthcareService?.hospital?.hspInfo?.regname} | 
-                            Location: {homeHealthcareService?.hospital?.hspcontact?.city}, {homeHealthcareService?.hospital?.hspcontact?.state}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 md:gap-4">
-                      {[
-                        { icon: <Home className="w-4 h-4 md:w-5 md:h-5" />, label: "At Home", value: "Service", color: "blue" },
-                      { icon: <Clock className="w-4 h-4 md:w-5 md:h-5" />, label: "Available", value: "24/7", color: "green" },
-                      { icon: <Award className="w-4 h-4 md:w-5 md:h-5" />, label: "Experience", value: homeHealthcareService?.hospital?.hspInfo?.experience ? `${homeHealthcareService.hospital.hspInfo.experience}+ yrs` : "5+ yrs", color: "purple" },
-                      { icon: <Users className="w-4 h-4 md:w-5 md:h-5" />, label: "Patients", value: totalPatients > 0 ? `${totalPatients}+` : "Available", color: "orange" },
-                      ].map((stat, index) => (
-                        <div key={index} className="bg-white p-3 md:p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 md:gap-3">
-                            <div className="p-1.5 md:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                              <div className="text-blue-600">{stat.icon}</div>
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-lg font-bold text-gray-900">{stat.value}</p>
-                              <p className="text-sm text-gray-600">{stat.label}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+{activeTab === 'overview' && (
+  <div className="space-y-6">
+
+{/* --- CARD 1: ABOUT HOME HEALTHCARE --- */}
+<Card
+  className="w-[806px] h-[187px] border border-[#00000033] rounded-[12px] shadow-sm mt-5"
+>
+  <CardContent className="p-5">
+    <h3 className="text-xl md:text-2xl font-bold mb-3"
+      style={{ color: "#243460" }}
+    >
+      About {serviceName}
+    </h3>
+
+    <p
+      className="text-sm md:text-base leading-relaxed"
+      style={{ color: "#666666" }}
+    >
+      {serviceName} provided by {homeHealthcareService?.hospital?.hspInfo?.regname || "our healthcare provider"} offers professional healthcare services in the comfort of your home.
+      With {homeHealthcareService?.hospital?.hspInfo?.experience || "5+"} years of experience in providing quality medical care,
+      we are committed to excellence in home healthcare delivery with experienced medical professionals.
+    </p>
+  </CardContent>
+</Card>
+
+
+{/* --- CARD 2: SERVICE STATUS (Exact Figma Design) --- */}
+<Card
+  className="w-[806px] h-[121px] border border-[#00000033] rounded-[12px] shadow-sm"
+>
+  <CardContent className="p-5">
+
+    {/* Title */}
+    <h3
+      className="text-xl font-bold mb-3"
+      style={{ color: "#243460" }}
+    >
+      Service Status
+    </h3>
+
+    {/* Provider / Location / Status Row */}
+    <div className="text-sm flex flex-wrap gap-2">
+      <span style={{ color: "#407BFF" }}>Provider:</span>
+      <span style={{ color: "#E68B67" }}>
+        {homeHealthcareService?.hospital?.hspInfo?.regname || "N/A"}
+      </span>
+
+      <span style={{ color: "#407BFF" }}>| Location:</span>
+      <span style={{ color: "#E68B67" }}>
+        {homeHealthcareService?.hospital?.hspcontact?.city}, {homeHealthcareService?.hospital?.hspcontact?.state}
+      </span>
+
+      <span style={{ color: "#407BFF" }}>| Availability:</span>
+      <span
+        style={{
+          color: "#28A745"
+        }}
+      >
+        24/7
+      </span>
+    </div>
+  </CardContent>
+</Card>
+
+
+{/* --- CARD 3: INFO GRID (Premium Figma Style) --- */}
+<Card className="w-[806px] border border-[#00000033] rounded-[12px] shadow-md">
+  <CardContent className="p-5">
+
+    <div className="grid grid-cols-2 gap-6">
+
+      {[
+        {
+          icon: <Home className="w-12 h-12 text-[#243460]" />,
+          title: "At Home",
+          value: "Service",
+          rows: [
+            { color: "bg-green-500", text: "Home Visit" },
+            { color: "bg-blue-500", text: "Comfort Care" },
+          ]
+        },
+        {
+          icon: <Clock className="w-12 h-12 text-[#243460]" />,
+          title: "Available",
+          value: "24/7",
+          rows: [
+            { color: "bg-green-500", text: "Round Clock" },
+            { color: "bg-blue-500", text: "Always Ready" },
+          ]
+        },
+        {
+          icon: <Award className="w-12 h-12 text-[#243460]" />,
+          title: "Experience",
+          value: homeHealthcareService?.hospital?.hspInfo?.experience ? `${homeHealthcareService.hospital.hspInfo.experience}+ Years` : "5+ Years",
+          rows: [
+            { color: "bg-green-500", text: "Expert Team" },
+            { color: "bg-blue-500", text: "Reliable Service" },
+          ]
+        },
+        {
+          icon: <Users className="w-12 h-12 text-[#243460]" />,
+          title: "Patients",
+          value: totalPatients > 0 ? `${totalPatients}+` : "Available",
+          rows: [
+            { color: "bg-green-500", text: "Served Patients" },
+            { color: "bg-blue-500", text: "Trusted Care" },
+          ]
+        }
+      ].map((item, i) => (
+        
+        <div
+          key={i}
+          className="bg-[#FAF5E05C] p-5 rounded-[14px] border border-[#00000033] shadow-lg flex flex-col justify-between"
+        >
+
+          {/* TOP PART */}
+          <div className="flex gap-4 items-center">
+
+            {/* ICON */}
+            <div className="w-15 h-15 flex items-center justify-center">
+              {item.icon}
+            </div>
+
+            {/* TEXT LIST */}
+            <div className="space-y-1 text-sm">
+              {item.rows.map((row, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${row.color}`}></span>
+                  {row.text}
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+          {/* BOTTOM WITH BUTTON RIGHT */}
+          <div className="mt-6 flex items-center justify-between">
+
+            {/* TEXT SIDE */}
+            <div>
+              <p className="text-[#C47C52] font-semibold text-sm">{item.title}</p>
+              <p className="text-[#091B47] font-bold text-2xl mt-1 text-center">{item.value}</p>
+            </div>
+
+            {/* BUTTON */}
+            <button className="bg-[#E68B67] text-white rounded-[10px] px-5 py-2 text-sm font-semibold flex items-center gap-2">
+              View More <ArrowRight className="w-4 h-4" />
+            </button>
+
+          </div>
+
+        </div>
+
+      ))}
+
+    </div>
+  </CardContent>
+</Card>
+
+
+
+  </div>
+)}
 
               {/* SERVICES TAB */}
               {activeTab === 'services' && (
@@ -533,157 +656,247 @@ const [showVerified, setShowVerified] = useState(false);
               )}
             </div>
 
-            {/* Right Column - Essential Cards */}
+            {/* Right Column - Only 2 Essential Cards */}
             <div className="space-y-4 order-1 lg:order-2">
-              {/* Provider Information Card */}
-              <Card className="border border-gray-200 shadow-md rounded-xl">
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Provider Information</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600 text-sm">Provider:</span>
-                      <p className="font-semibold text-gray-900 text-base">{homeHealthcareService?.hospital?.hspInfo?.regname || "N/A"}</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600 text-sm">Service:</span>
-                      <p className="font-semibold text-gray-900 text-base">{serviceName}</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600 text-sm">Experience:</span>
-                      <p className="font-semibold text-gray-900 text-base">{homeHealthcareService?.hospital?.hspInfo?.experience || "5+"} years</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600 text-sm">Availability:</span>
-                      <p className="font-semibold text-green-600 text-base">24/7</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Quick Contact Card */}
-              <Card className="border border-gray-200 shadow-md rounded-xl">
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Quick Contact</h3>
-                    <div className="space-y-2">
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                      <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-base truncate">{homeHealthcareService?.hospital?.mobile || "N/A"}</p>
-                        <p className="text-sm text-gray-600">Phone</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-                      <Mail className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-base truncate">{homeHealthcareService?.hospital?.email || "N/A"}</p>
-                        <p className="text-sm text-gray-600">Email</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2 p-2 bg-purple-50 rounded-lg">
-                      <MapPin className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-base line-clamp-2">
-                          {homeHealthcareService?.hospital?.hspcontact?.address || "Address not available"}
-                        </p>
-                        <p className="text-sm text-gray-600 truncate">{homeHealthcareService?.hospital?.hspcontact?.city}, {homeHealthcareService?.hospital?.hspcontact?.state}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+{/* ================= QUICK CONTACT ================= */}
+<Card className="border border-[#00000033] rounded-xl shadow-sm mt-5">
+  <CardContent className="p-5">
+
+    {/* Title */}
+    <h3 className="text-[20px] font-semibold text-[#243460] mb-4">
+      Quick Contact
+    </h3>
+
+    <div className="space-y-4">
+
+      {/* Phone */}
+      <div>
+        <div className="flex items-center gap-2 text-[#243460]">
+          <Phone className="w-4 h-4 text-[#666666]" />
+          <span className="text-[14px] text-[#666666]">Phone</span>
+        </div>
+        <p className="text-[15px] font-semibold text-[#243460] mt-1">
+          {homeHealthcareService?.hospital?.mobile || homeHealthcareService?.hospital?.hspcontact?.receptioncontact1 || "N/A"}
+        </p>
+      </div>
+
+      {/* Email */}
+      <div>
+        <div className="flex items-center gap-2 text-[#243460]">
+          <Mail className="w-4 h-4 text-[#666666]" />
+          <span className="text-[14px] text-[#666666]">Email</span>
+        </div>
+        <p className="text-[15px] font-semibold text-[#243460] mt-1 truncate">
+          {homeHealthcareService?.hospital?.email || homeHealthcareService?.hospital?.hspcontact?.receptionemail || "N/A"}
+        </p>
+      </div>
+
+      {/* Rating */}
+      <div>
+        <p className="text-[22px] font-bold text-[#243460]">
+          {avgRating || "N/A"} <span className="font-semibold">Excellent</span>
+        </p>
+
+        <div className="flex items-center gap-2 text-[#666666] mt-1">
+          <Star className="w-4 h-4 text-[#243460]" />
+          <span className="text-[14px]">
+            {totalReviews || 0} Reviews & Comments
+          </span>
+        </div>
+
+        {/* Read All Reviews Button */}
+        <button
+          onClick={() => setShowRating(true)}
+          className="mt-3 bg-[#5868F2] text-white px-4 py-1 text-sm rounded-lg hover:bg-[#4352d9] transition rounded-xl"
+        >
+          Read All Reviews
+        </button>
+      </div>
+
+    </div>
+  </CardContent>
+</Card>
+
+{/* ================= ADDRESS CARD (Exact Screenshot Style) ================= */}
+<div className="bg-white border border-[#00000033] rounded-2xl p-5 shadow-sm">
+
+  {/* TOP ROW */}
+  <div className="flex gap-4">
+
+        {/* Left – LIVE GOOGLE MAP */}
+    <div className="w-32 h-32 rounded-xl overflow-hidden shadow">
+      <iframe
+        width="100%"
+        height="100%"
+        loading="lazy"
+        className="rounded-xl"
+        src={`https://www.google.com/maps?q=${encodeURIComponent(
+          homeHealthcareService?.hospital?.hspcontact?.address || ""
+        )}&output=embed`}
+      />
+    </div>
+
+
+
+    {/* Right – Address Info */}
+    <div className="flex-1">
+      <div className="flex items-center gap-2">
+        <MapPin className="w-5 h-5 text-[#243460]" />
+        <h2 className="text-xl font-bold text-[#243460]">Address</h2>
+      </div>
+
+      <p className="text-sm text-gray-600 mt-1">
+        {homeHealthcareService?.hospital?.hspcontact?.city}, {homeHealthcareService?.hospital?.hspcontact?.state} {homeHealthcareService?.hospital?.hspcontact?.pincode ? `- ${homeHealthcareService.hospital.hspcontact.pincode}` : ""}
+      </p>
+
+      <p className="text-[15px] text-[#243460] font-medium mt-1 leading-5">
+        {homeHealthcareService?.hospital?.hspcontact?.address || "Address not available"}
+      </p>
+    </div>
+
+  </div>
+
+  {/* ---------------------- NEARBY TRANSPORT ---------------------- */}
+  {homeHealthcareService?.hospital?.facilitiesJson?.transportation?.length > 0 && (
+    <div className="mt-5">
+      <h3 className="text-[16px] font-semibold text-[#C47C52] mb-2">
+        Nearby Transportation
+      </h3>
+
+      <div className="space-y-3">
+        {homeHealthcareService.hospital.facilitiesJson.transportation.map((item, i) => (
+          <div key={i} className="flex justify-between items-center">
+
+            <div className="flex items-center gap-2">
+              {/* ICONS EXACT STYLE */}
+              {i === 0 && <BusFront className="w-4 h-4 text-[#243460]" />}
+              {i === 1 && <Plane className="w-4 h-4 text-[#243460]" />}
+              {i === 2 && <Train className="w-4 h-4 text-[#243460]" />}
+
+              <span className="text-[15px] text-[#243460]">{item.name}</span>
+            </div>
+
+            <span className="text-[14px] font-semibold text-[#243460]">
+              {item.distance}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* ---------------------- NEARBY LANDMARKS ---------------------- */}
+  {homeHealthcareService?.hospital?.facilitiesJson?.landmarks?.length > 0 && (
+    <div className="mt-6">
+      <h3 className="text-[16px] font-semibold text-[#C47C52] mb-2">
+        Nearby Landmarks
+      </h3>
+
+      <div className="space-y-3">
+        {homeHealthcareService.hospital.facilitiesJson.landmarks.map((place, i) => (
+          <div key={i} className="flex justify-between items-center">
+
+            <div className="flex items-center gap-2">
+              {/* Landmark Icons */}
+              {i === 0 && <Landmark className="w-4 h-4 text-[#243460]" />}
+              {i === 1 && <Route className="w-4 h-4 text-[#243460]" />}
+              {i === 2 && <Building2 className="w-4 h-4 text-[#243460]" />}
+
+              <span className="text-[15px] text-[#243460]">{place.name}</span>
+            </div>
+
+            <span className="text-[14px] font-semibold text-[#243460]">
+              {place.distance}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+</div>
+
+
+
             </div>
           </div>
 
-          {/* Our Services Section */}
-          <div className="max-w-6xl mx-auto my-6">
-            <Card className="border border-gray-100 shadow-xl rounded-2xl overflow-hidden transition-all hover:shadow-2xl">
-              <CardContent className="p-0">
-                <div className="bg-gradient-to-r from-blue-700 to-indigo-700 py-4 px-4 text-center">
-                  <h2 className="text-xl font-bold text-white tracking-tight">
-                    Our Services
-                  </h2>
-                  <p className="text-blue-100 mt-1 text-sm">
-                    Comprehensive home healthcare solutions for all your needs
-                  </p>
-                </div>
+{/* --- OUR SERVICES (Figma Exact Style + Full Functionality) --- */}
+<div className="mx-auto my-6" style={{ width: "1270px" }}>
 
-                <div className="p-4 sm:p-6 bg-gray-50">
-                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-                    {[
-                      { icon: <Home className="w-5 h-5 text-blue-600" />, label: "Home Service", value: "Available", clickable: true, action: "home" },
-                      { icon: <Clock className="w-5 h-5 text-green-600" />, label: "24/7 Care", value: "Always", clickable: true, action: "24x7" },
-                      { icon: <Award className="w-5 h-5 text-purple-600" />, label: "Experience", value: homeHealthcareService?.hospital?.hspInfo?.experience ? `${homeHealthcareService.hospital.hspInfo.experience}+ yrs` : "5+ yrs", clickable:true, action:"experience" },
-                      { icon: <Users className="w-5 h-5 text-blue-600" />, label: "Patients", value: totalPatients > 0 ? `${totalPatients}+` : "Available", clickable: true, action: "patients" },
-                      { icon: <Activity className="w-5 h-5 text-red-600" />, label: "Monitoring", value: "Live", action:"monitoring", clickable:true },
-                      { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Insurance", value: "Accepted", clickable: true, action: "insurance" },
-                      { icon: <Phone className="w-5 h-5 text-orange-600" />, label: "Emergency", value: "24/7", action:"emergency", clickable:true },
-                      { icon: <Stethoscope className="w-5 h-5 text-cyan-600" />, label: "Professionals", value: "Qualified", clickable: true, action: "professionals" },
-                      { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Care", value: "Personal", clickable: true, action: "care" },
-                      { icon: <IndianRupee className="w-5 h-5 text-green-600" />, label: "Starting", value: `₹${homeHealthcareService?.minPrice || homeHealthcareService?.startingPrice || "999"}`, clickable: true, action: "pricing" },
-                      { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Rating", value: `${avgRating} ★`, action:"rating", clickable:true },
-                      { icon: <CheckCircle className="w-5 h-5 text-green-600" />, label: "Verified", value: "Provider", action:"verified", clickable:true },
-                    ].map((item, idx) => (
-                      <div
-                        key={idx}
-                        onClick={() => {
-                          if (item.clickable) {
-                            if (item.action === "home") {
-                              setShowHomeServices(true);
-                            } else if (item.action === "24x7") {
-                              setShow24x7Care(true);
-                            } else if (item.action === "patients") {
-                              setShowPatientServices(true);
-                            } else if (item.action === "insurance") {
-                              setShowInsuranceServices(true);
-                            } else if (item.action === "professionals") {
-                              setShowProfessionalsServices(true);
-                            } else if (item.action === "care") {
-                              setShowCareServices(true);
-                            } else if (item.action === "pricing") {
-                              setShowPricingServices(true);
-                            }
-                            else if (item.action === "experience") {
-  setShowExperience(true);
-}
-else if (item.action === "monitoring") {
-  setShowMonitoring(true);
-}
-else if (item.action === "emergency") {
-  setShowEmergency(true);
-}
-else if (item.action === "rating") {
-  setShowRating(true);
-}
-else if (item.action === "verified") {
-  setShowVerified(true);
-}
+  <Card className="border border-[#00000033] shadow-md rounded-[12px] overflow-hidden">
+    <CardContent className="p-0">
 
+      {/* Header */}
+      <div className="bg-[#E68B67] py-5 px-6">
+        <h2 className="text-xl font-semibold text-white tracking-tight">
+          Our Services
+        </h2>
+      </div>
 
+      {/* Grid */}
+      <div className="p-6 bg-white">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
 
+          {[
+            { icon: <Home className="w-5 h-5 text-[#243460]" />, label: "Home Service", value: "Available", clickable: true, action: "home" },
+            { icon: <Clock className="w-5 h-5 text-[#243460]" />, label: "24/7 Care", value: "Always", clickable: true, action: "24x7" },
+            { icon: <Award className="w-5 h-5 text-[#243460]" />, label: "Experience", value: homeHealthcareService?.hospital?.hspInfo?.experience ? `${homeHealthcareService.hospital.hspInfo.experience}+ yrs` : "5+ yrs", clickable: true, action: "experience" },
+            { icon: <Users className="w-5 h-5 text-[#243460]" />, label: "Patients", value: totalPatients > 0 ? `${totalPatients}+` : "Available", clickable: true, action: "patients" },
+            { icon: <Activity className="w-5 h-5 text-[#243460]" />, label: "Monitoring", value: "Live", clickable: true, action: "monitoring" },
+            { icon: <Shield className="w-5 h-5 text-[#243460]" />, label: "Insurance", value: "Accepted", clickable: true, action: "insurance" },
+            { icon: <Phone className="w-5 h-5 text-[#243460]" />, label: "Emergency", value: "24/7", clickable: true, action: "emergency" },
+            { icon: <Stethoscope className="w-5 h-5 text-[#243460]" />, label: "Professionals", value: "Qualified", clickable: true, action: "professionals" },
+            { icon: <Heart className="w-5 h-5 text-[#243460]" />, label: "Care", value: "Personal", clickable: true, action: "care" },
+            { icon: <IndianRupee className="w-5 h-5 text-[#243460]" />, label: "Starting", value: `₹${homeHealthcareService?.minPrice || homeHealthcareService?.startingPrice || "999"}`, clickable: true, action: "pricing" },
+            { icon: <Star className="w-5 h-5 text-[#243460]" />, label: "Rating", value: `${avgRating} ★`, clickable: true, action: "rating" },
+            { icon: <CheckCircle className="w-5 h-5 text-[#243460]" />, label: "Verified", value: "Provider", clickable: true, action: "verified" },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              onClick={
+                item.clickable
+                  ? () => {
+                      if (item.action === "home") setShowHomeServices(true);
+                      else if (item.action === "24x7") setShow24x7Care(true);
+                      else if (item.action === "patients") setShowPatientServices(true);
+                      else if (item.action === "insurance") setShowInsuranceServices(true);
+                      else if (item.action === "professionals") setShowProfessionalsServices(true);
+                      else if (item.action === "care") setShowCareServices(true);
+                      else if (item.action === "pricing") setShowPricingServices(true);
+                      else if (item.action === "experience") setShowExperience(true);
+                      else if (item.action === "monitoring") setShowMonitoring(true);
+                      else if (item.action === "emergency") setShowEmergency(true);
+                      else if (item.action === "rating") setShowRating(true);
+                      else if (item.action === "verified") setShowVerified(true);
+                    }
+                  : undefined
+              }
+              className={`bg-[#FAF5E05C] p-4 rounded-xl border border-[#F1E9E2] shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center ${
+                item.clickable ? "cursor-pointer hover:scale-105" : ""
+              }`}
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#EFE9E1] mb-2">
+                {item.icon}
+              </div>
 
+              <h3 className="font-semibold text-[#243460] text-sm">
+                {item.label}
+              </h3>
 
-                          }
-                        }}
-                        className={`bg-white p-2 sm:p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center min-h-[85px] sm:min-h-[95px] ${
-                          item.clickable ? 'cursor-pointer hover:border-blue-400 hover:bg-blue-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 mb-1.5 sm:mb-2">
-                          {item.icon}
-                        </div>
-                        <h3 className="font-semibold text-gray-900 text-xs sm:text-sm mb-0.5 leading-tight line-clamp-2">
-                          {item.label}
-                        </h3>
-                        <p className="font-bold text-blue-700 text-xs sm:text-sm">
-                          {item.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              <p className="font-bold text-[#E68B67] text-sm mt-1">
+                {item.value}
+              </p>
+            </div>
+          ))}
+
+        </div>
+      </div>
+
+    </CardContent>
+  </Card>
+</div>
 
         </div>
       </div>

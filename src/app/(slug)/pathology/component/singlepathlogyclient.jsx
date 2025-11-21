@@ -23,7 +23,13 @@ import {
   CheckCircle,
   Camera,
   Heart,
-  IndianRupee
+  IndianRupee,
+  ArrowRight,
+  BusFront,
+  Plane,
+  Train,
+  Landmark,
+  Route
 } from "lucide-react";
 import { FaHospitalAlt } from "react-icons/fa";
 import BookLabTestDialog from './BookLabTestDialog';
@@ -172,82 +178,79 @@ const serviceHours =
     <div key={hospital?.id || 'no-lab'} className="w-full bg-gray-50 relative min-h-screen">
       {/* Desktop View - Show on large screens only */}
       <div className="hidden lg:block">
-        {/* Clean Simple Header */}
-        <div className="shadow-lg" style={{ background: '#3D85EF' }}>
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="flex items-center justify-between gap-8">
-              {/* Left Section - Logo & Basic Info */}
-              <div className="flex items-center gap-5 flex-1">
-                {hospital?.hspdetails?.hsplogo && (
-                  <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/40 shadow-lg bg-white flex-shrink-0">
-                    <Image
-                      src={hospital.hspdetails.hsplogo}
-                      width={80}
-                      height={80}
-                      alt="Lab Logo"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-white mb-2">
-                    {hospital?.hspInfo?.regname || "Pathology Lab"}
-                  </h1>
-                  <div className="flex items-center gap-2 text-white/90 text-sm">
-                    <MapPin className="w-4 h-4" />
-                    <span>
-                      {safeDisplay(hospital?.hspcontact?.city, "City")}, {safeDisplay(hospital?.hspcontact?.state, "State")}
-                    </span>
-                  </div>
-                </div>
-              </div>
+{/* =================== PATHOLOGY LAB HEADER (Exact Screenshot + Exact Layout) =================== */}
+<div
+  className="bg-transparent rounded-[12px] mx-auto mt-5"
+  style={{
+    width: "1270px",
+    height: "88px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0px 24px",
+  }}
+>
 
-              {/* Right Section - Rating & Actions */}
-              <div className="flex items-center gap-6">
-                {/* Rating */}
-                <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3 border border-white/30">
-                  <div className="flex items-center gap-2 mb-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(avgRating)
-                            ? "text-yellow-300 fill-yellow-300"
-                            : "text-white/30"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-white text-center">
-                    <span className="text-xl font-bold">{avgRating}</span>
-                    <span className="text-sm ml-1">({totalReviews})</span>
-                  </div>
-                </div>
+  {/* LEFT SECTION */}
+  <div className="flex flex-col justify-center gap-[2px]">
+    <h1 className="text-[28px] font-bold text-[#243460] leading-none mb-2">
+      {hospital?.hspInfo?.regname || "Pathology Lab"}
+    </h1>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      const phone = hospital?.hspcontact?.receptioncontact1 || hospital?.mobile;
-                      if (phone) window.open(`tel:${phone}`, '_self');
-                    }}
-                    className="px-5 py-2.5 bg-white hover:bg-gray-100 text-blue-600 rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg transition-all"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Call Now
-                  </button>
-                  <button
-                    onClick={() => setDialogOpen(true)}
-                    className="px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold text-sm flex items-center gap-2 border border-white/40 transition-all"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Book Test
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="flex items-center gap-2 text-[#243460] text-[15px] leading-none">
+      <Building2 className="w-4 h-4" />
+      {hospital?.hspdetails?.category || "Pathology Lab"}
+    </div>
+  </div>
+
+{/* RIGHT SECTION */}
+<div className="flex flex-col items-end gap-2">
+
+  {/* BUTTONS */}
+  <div className="flex items-center gap-3">
+    <button
+      onClick={() => {
+        const phone =
+          hospital?.hspcontact?.receptioncontact1 ||
+          hospital?.mobile;
+        if (phone) window.open(`tel:${phone}`, "_self");
+      }}
+      className="px-6 py-2 rounded-[12px] text-white text-[15px] font-semibold"
+      style={{ background: "#5868F2" }}
+    >
+      Call Now
+    </button>
+
+    <button
+      onClick={() => setDialogOpen(true)}
+      className="px-6 py-2 rounded-[12px] text-white text-[15px] font-semibold"
+      style={{ background: "#4CAF50" }}
+    >
+      Book Now
+    </button>
+  </div>
+
+  {/* RATING BELOW BUTTONS */}
+  <div className="flex items-center gap-2 mt-[2px]">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < Math.floor(avgRating)
+            ? "text-[#243460] fill-[#243460]"
+            : "text-[#243460]"
+        }`}
+      />
+    ))}
+
+    <span className="text-[#243460] text-[15px] font-semibold leading-none">
+      {avgRating} ({totalReviews})
+    </span>
+  </div>
+
+</div>
+
+</div>
 
         {/* Main Content Layout */}
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -255,152 +258,278 @@ const serviceHours =
           <div className="w-full mb-6">
             <Card className="overflow-hidden border border-gray-200 shadow-lg rounded-xl">
               <CardContent className="p-0">
-                {images.length > 0 ? (
-                  <div className="grid grid-cols-4 gap-2 h-[400px] bg-gray-50">
-                    <div className="col-span-2 row-span-2 relative group cursor-pointer overflow-hidden rounded-lg">
-                      <Image
-                        src={mainImage}
-                        fill
-                        priority
-                        quality={90}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        alt="Lab Main View"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                      {images.length > 1 && (
-                        <div className="absolute bottom-4 left-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 font-medium">
-                          <Camera className="w-4 h-4" />
-                          See all photos ({images.length})
-                        </div>
-                      )}
-                    </div>
-                    {images.slice(1, 5).map((image, index) => (
-                      <div key={index} className="relative group cursor-pointer overflow-hidden rounded-lg">
-                        <Image
-                          src={image}
-                          fill
-                          quality={85}
-                          sizes="(max-width: 768px) 25vw, (max-width: 1200px) 12.5vw, 8vw"
-                          className="object-cover transition-transform duration-300 group-hover:scale-110"
-                          alt={`Lab Image ${index + 2}`}
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                <div className="grid grid-cols-4 gap-2 h-[400px] bg-gray-50">
+                  <div className="col-span-2 row-span-2 relative group cursor-pointer overflow-hidden rounded-lg">
+<Image
+  src={mainImage && mainImage.trim() !== "" ? mainImage : "/no-image.png"}
+  fill
+  priority
+  quality={90}
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  className="object-cover transition-transform duration-300 group-hover:scale-105"
+  alt="Lab Main View"
+/>
+
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    {images.length > 1 && (
+                      <div className="absolute bottom-4 left-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 font-medium">
+                        <Camera className="w-4 h-4" />
+                        See all photos ({images.length})
                       </div>
-                    ))}
+                    )}
                   </div>
-                ) : (
-                  <div className="h-[400px] bg-gradient-to-br from-blue-50 via-emerald-50 to-teal-50 flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <TestTube className="w-24 h-24 text-blue-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-gray-700 mb-2">Pathology Lab</h3>
-                      <p className="text-gray-500 font-medium">Images will be available soon</p>
+                  {images.slice(1, 5).map((image, index) => (
+                    <div key={index} className="relative group cursor-pointer overflow-hidden rounded-lg">
+                      <Image
+                        src={image}
+                        fill
+                        quality={85}
+                        sizes="(max-width: 768px) 25vw, (max-width: 1200px) 12.5vw, 8vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                        alt={`Lab Image ${index + 2}`}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                     </div>
-                  </div>
-                )}
+                  ))}
+                  {images.length === 0 && (
+                    <div className="col-span-4 row-span-2 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+                      <div className="text-center p-6">
+                        <FaHospitalAlt className="w-20 h-20 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-500 font-medium text-lg">No images available</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* FULL WIDTH TABS */}
-          <div className="w-full mb-6">
-            <div className="bg-white border-b border-gray-200 shadow-sm rounded-t-xl">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between px-4 lg:px-6">
-                <nav className="flex space-x-4 lg:space-x-6 overflow-x-auto scrollbar-hide">
-                  {[
-                    { id: 'overview', label: 'Overview' },
-                    { id: 'test-details', label: 'Test Details' },
-                    { id: 'facilities', label: 'Facilities' },
-                    { id: 'reviews', label: 'Reviews' },
-                    { id: 'contact', label: 'Contact' },
-                    { id: 'info', label: 'Lab Info' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`py-3 lg:py-4 px-3 lg:px-4 border-b-2 font-medium text-xs lg:text-sm whitespace-nowrap transition-all duration-300 ${
-                        activeTab === tab.id
-                          ? 'border-blue-500 text-blue-600 bg-blue-50 rounded-t-md'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </nav>
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  className="w-full lg:w-auto mt-3 lg:mt-0 lg:ml-4 mb-3 lg:mb-0 lg:my-2 bg-gradient-to-r from-blue-500 blue-500 hover:from-blue-600 hover:blue-600 text-white font-bold py-3 px-6 lg:px-8 rounded-lg transition-all transform hover:scale-110 shadow-xl border-2 border-blue-400 flex items-center justify-center gap-2 whitespace-nowrap text-sm animate-pulse"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Book Test Now
-                </button>
-              </div>
-            </div>
-          </div>
+{/* FULL WIDTH TABS */}
+<div className="flex justify-center mt-6">
+  <div className="w-[1270px] h-[75px] bg-white border border-[#00000033] rounded-[12px] shadow-sm flex items-center px-4">
+    <div className="flex w-full justify-between items-center">
+      
+      {/* Tabs */}
+      <nav className="flex space-x-6 overflow-x-auto scrollbar-hide">
+        {[
+          { id: 'overview', label: 'Overview' },
+          { id: 'test-details', label: 'Test Details' },
+          { id: 'facilities', label: 'Facilities' },
+          { id: 'reviews', label: 'Reviews' },
+          { id: 'contact', label: 'Contact' },
+          { id: 'info', label: 'Lab Info' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`py-3 px-4 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-300 ${
+              activeTab === tab.id
+                ? 'border-blue-500 text-blue-600 bg-blue-50 rounded-t-md'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+<button
+  onClick={() => setDialogOpen(true)}
+  className="w-[236px] h-[44px] bg-[#E68B67] text-white font-semibold 
+  rounded-[12px] flex items-center justify-center gap-[10px]
+  px-[20px] py-[10px] text-sm shadow-md"
+>
+  <Calendar className="w-5 h-5" />
+  Book Appointment Now
+</button>
+
+
+    </div>
+  </div>
+</div>
 
           {/* Content Grid with Sidebar - Responsive */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Tab Content */}
             <div className="lg:col-span-2 space-y-4 order-2 lg:order-1">
               {/* OVERVIEW TAB */}
-              {activeTab === 'overview' && (
-                <Card className="border border-gray-200 shadow-md rounded-xl">
-                  <CardContent className="p-4 md:p-6">
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-                      About {hospital?.hspInfo?.regname}
-                    </h3>
-                    <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-6">
-                      {hospital?.hspInfo?.regname} is a leading pathology lab{hospital?.hspInfo?.experience ? ` with ${hospital.hspInfo.experience} years of experience` : ''} in providing quality diagnostic services.
-                      Located in {safeDisplay(hospital?.hspcontact?.city, "your area")}, {safeDisplay(hospital?.hspcontact?.state, "")}, we are committed to
-                      excellence in healthcare delivery with state-of-the-art equipment and NABL certified facilities.
-                    </p>
-                    <div className="mb-6 p-3 md:p-4 bg-blue-50 rounded-xl border border-blue-200">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                          <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-blue-900 text-sm md:text-base">Lab Status</h4>
-                          <p className="text-blue-700 text-xs md:text-sm break-words">
-                            Registration: {hospital?.hspdetails?.hspregno || "N/A"} | 
-                            Established: {getYear(hospital?.hspdetails?.hspregdate)} | 
-                            Status: <span className={`font-semibold ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
-                              {hospital?.approvalStatus || "APPROVED"}
-                            </span>
-                          </p>
-                          {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                            <p className="text-blue-700 text-xs md:text-sm mt-1">
-                              <Award className="w-3 h-3 md:w-4 md:h-4 inline mr-1" />
-                              NABL Accredited - {hospital?.hspdetails?.nabhnabllevel}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 md:gap-4">
-                      {[
-                        { icon: <TestTube className="w-4 h-4 md:w-5 md:h-5" />, label: "Total Tests",  value: labTestsCount > 0 ? `${labTestsCount}` : "0", color: "blue" },
-                        { icon: <Clock className="w-4 h-4 md:w-5 md:h-5" />, label: "Report Time", value: "24-48 hrs", color: "blue" },
-                        { icon: <Award className="w-4 h-4 md:w-5 md:h-5" />, label: "Certification", value: "NABL", color: "purple" },
-                        { icon: <Users className="w-4 h-4 md:w-5 md:h-5" />, label: "Experience", value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "N/A", color: "orange" },
-                      ].map((stat, index) => (
-                        <div key={index} className="bg-white p-3 md:p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 md:gap-3">
-                            <div className="p-1.5 md:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                              <div className="text-blue-600">{stat.icon}</div>
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-lg md:text-2xl font-bold text-gray-900">{stat.value}</p>
-                              <p className="text-xs md:text-sm text-gray-600">{stat.label}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+{activeTab === 'overview' && (
+  <div className="space-y-6">
+
+{/* --- CARD 1: ABOUT PATHOLOGY LAB --- */}
+<Card
+  className="w-[806px] h-[187px] border border-[#00000033] rounded-[12px] shadow-sm mt-5"
+>
+  <CardContent className="p-5">
+    <h3 className="text-xl md:text-2xl font-bold mb-3"
+      style={{ color: "#243460" }}
+    >
+      About {hospital?.hspInfo?.regname}
+    </h3>
+
+    <p
+      className="text-sm md:text-base leading-relaxed"
+      style={{ color: "#666666" }}
+    >
+      {hospital?.hspInfo?.regname} is a leading pathology lab{hospital?.hspInfo?.experience ? ` with ${hospital.hspInfo.experience} years of experience` : ''} in providing quality diagnostic services.
+      Located in {safeDisplay(hospital?.hspcontact?.city, "your area")}, {safeDisplay(hospital?.hspcontact?.state, "")}, we are committed to
+      excellence in healthcare delivery with state-of-the-art equipment and NABL certified facilities.
+    </p>
+  </CardContent>
+</Card>
+
+
+{/* --- CARD 2: LAB STATUS (Exact Figma Design) --- */}
+<Card
+  className="w-[806px] h-[121px] border border-[#00000033] rounded-[12px] shadow-sm"
+>
+  <CardContent className="p-5">
+
+    {/* Title */}
+    <h3
+      className="text-xl font-bold mb-3"
+      style={{ color: "#243460" }}
+    >
+      Lab Status
+    </h3>
+
+    {/* Registration / Established / Status Row */}
+    <div className="text-sm flex flex-wrap gap-2">
+      <span style={{ color: "#407BFF" }}>Registration:</span>
+      <span style={{ color: "#E68B67" }}>
+        {hospital?.hspdetails?.hspregno || "N/A"}
+      </span>
+
+      <span style={{ color: "#407BFF" }}>| Established:</span>
+      <span style={{ color: "#E68B67" }}>
+        {getYear(hospital?.hspdetails?.hspregdate)}
+      </span>
+
+      <span style={{ color: "#407BFF" }}>| Status:</span>
+      <span
+        style={{
+          color:
+            hospital?.approvalStatus === "APPROVED"
+              ? "#28A745"
+              : "#E68B67",
+        }}
+      >
+        {hospital?.approvalStatus || "APPROVED"}
+      </span>
+    </div>
+
+    {/* NABL */}
+    {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
+      <p className="mt-2 text-sm flex items-center gap-1" style={{ color: "#407BFF" }}>
+        <Award className="w-4 h-4" style={{ color: "#407BFF" }} />
+        NABL Accredited –{" "}
+        <span style={{ color: "#E68B67" }}>
+          {hospital?.hspdetails?.nabhnabllevel}
+        </span>
+      </p>
+    )}
+  </CardContent>
+</Card>
+
+
+{/* --- CARD 3: INFO GRID (Premium Figma Style) --- */}
+<Card className="w-[806px] border border-[#00000033] rounded-[12px] shadow-md">
+  <CardContent className="p-5">
+
+    <div className="grid grid-cols-2 gap-6">
+
+      {[
+        {
+          icon: <TestTube className="w-12 h-12 text-[#243460]" />,
+          title: "Total Tests",
+          value: labTestsCount > 0 ? `${labTestsCount}` : "0",
+          rows: [
+            { color: "bg-green-500", text: "Available Tests" },
+            { color: "bg-blue-500", text: "Quick Results" },
+          ]
+        },
+        {
+          icon: <Clock className="w-12 h-12 text-[#243460]" />,
+          title: "Report Time",
+          value: "24-48 hrs",
+          rows: [
+            { color: "bg-green-500", text: "Fast Delivery" },
+            { color: "bg-blue-500", text: "Online Reports" },
+          ]
+        },
+        {
+          icon: <Award className="w-12 h-12 text-[#243460]" />,
+          title: "Certification",
+          value: "NABL",
+          rows: [
+            { color: "bg-green-500", text: "NABL Certified" },
+            { color: "bg-blue-500", text: "Quality Assured" },
+          ]
+        },
+        {
+          icon: <Users className="w-12 h-12 text-[#243460]" />,
+          title: "Experience",
+          value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "N/A",
+          rows: [
+            { color: "bg-green-500", text: "Expert Team" },
+            { color: "bg-blue-500", text: "Reliable Service" },
+          ]
+        }
+      ].map((item, i) => (
+        
+        <div
+          key={i}
+          className="bg-[#FAF5E05C] p-5 rounded-[14px] border border-[#00000033] shadow-lg flex flex-col justify-between"
+        >
+
+          {/* TOP PART */}
+          <div className="flex gap-4 items-center">
+
+            {/* ICON */}
+            <div className="w-15 h-15 flex items-center justify-center">
+              {item.icon}
+            </div>
+
+            {/* TEXT LIST */}
+            <div className="space-y-1 text-sm">
+              {item.rows.map((row, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${row.color}`}></span>
+                  {row.text}
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+          {/* BOTTOM WITH BUTTON RIGHT */}
+          <div className="mt-6 flex items-center justify-between">
+
+            {/* TEXT SIDE */}
+            <div>
+              <p className="text-[#C47C52] font-semibold text-sm">{item.title}</p>
+              <p className="text-[#091B47] font-bold text-2xl mt-1 text-center">{item.value}</p>
+            </div>
+
+            {/* BUTTON */}
+            <button className="bg-[#E68B67] text-white rounded-[10px] px-5 py-2 text-sm font-semibold flex items-center gap-2">
+              View More <ArrowRight className="w-4 h-4" />
+            </button>
+
+          </div>
+
+        </div>
+
+      ))}
+
+    </div>
+  </CardContent>
+</Card>
+
+
+
+  </div>
+)}
 
               {/* TEST DETAILS TAB */}
               {activeTab === 'test-details' && (
@@ -715,203 +844,253 @@ const serviceHours =
 
             {/* Right Column - Only 2 Essential Cards */}
             <div className="space-y-4 order-1 lg:order-2">
-              {/* Lab Information Card */}
-              <Card className="border border-gray-200 shadow-md rounded-xl">
-                <CardContent className="p-4">
-                  <h3 className="text-base font-bold text-gray-900 mb-3">Lab Information</h3>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600">Registration No:</span>
-                      <p className="font-semibold text-gray-900 text-xs">{hospital?.hspdetails?.hspregno || "N/A"}</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600">Established:</span>
-                      <p className="font-semibold text-gray-900 text-xs">{getYear(hospital?.hspdetails?.hspregdate)}</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600">Experience:</span>
-                      <p className="font-semibold text-gray-900 text-xs">{hospital?.hspInfo?.experience || "N/A"} years</p>
-                    </div>
-                    <div className="bg-gray-50 p-2 rounded">
-                      <span className="text-gray-600">Status:</span>
-                      <p className={`font-semibold text-xs ${hospital?.approvalStatus === 'APPROVED' ? 'text-blue-600' : 'text-yellow-600'}`}>
-                        {hospital?.approvalStatus || "APPROVED"}
-                      </p>
-                    </div>
-                  </div>
-                  {hospital?.hspdetails?.nabhnablapproved === "Yes" && (
-                    <div className="mt-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-4 h-4 text-blue-600" />
-                        <span className="font-semibold text-blue-900 text-sm">NABL Accredited</span>
-                      </div>
-                      <p className="text-blue-700 text-xs mt-1">{hospital.hspdetails.nabhnabllevel}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
 
-              {/* Quick Contact Card */}
-              <Card className="border border-gray-200 shadow-md rounded-xl">
-                <CardContent className="p-4">
-                  <h3 className="text-base font-bold text-gray-900 mb-3">Quick Contact</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                      <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm truncate">{safeDisplay(hospital?.hspcontact?.receptioncontact1 || hospital?.mobile)}</p>
-                        <p className="text-xs text-gray-600">Reception</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                      <Mail className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-xs truncate">{safeDisplay(hospital?.hspcontact?.receptionemail || hospital?.email)}</p>
-                        <p className="text-xs text-gray-600">Email</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2 p-2 bg-purple-50 rounded-lg">
-                      <MapPin className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-xs line-clamp-2">
-                          {safeDisplay(hospital?.hspcontact?.address)}
-                        </p>
-                        <p className="text-xs text-gray-600 truncate">{safeDisplay(hospital?.hspcontact?.city, "City")}, {safeDisplay(hospital?.hspcontact?.state, "State")}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+{/* ================= QUICK CONTACT ================= */}
+<Card className="border border-[#00000033] rounded-xl shadow-sm mt-5">
+  <CardContent className="p-5">
 
-              {/* Test Booking Card */}
-              <Card className="border border-blue-200 shadow-md rounded-xl bg-gradient-to-br from-blue-50 blue-50">
-                <CardContent className="p-4">
-                  <h3 className="text-base font-bold text-gray-900 mb-3 text-center">Book Your Test</h3>
-                  
-                  <div className="bg-white rounded-lg p-4 mb-3 text-center">
-                    <p className="text-xs text-gray-600 mb-1">Test Price</p>
-                    {discountPercentage > 0 && (
-                      <p className="text-sm text-gray-400 line-through">₹{originalPrice}</p>
-                    )}
-                    <p className="text-2xl font-bold text-blue-600">₹{finalPrice}</p>
-                    {discountPercentage > 0 && (
-                      <Badge className="bg-red-500 text-white mt-2">
-                        {discountPercentage}% OFF
-                      </Badge>
-                    )}
-                  </div>
+    {/* Title */}
+    <h3 className="text-[20px] font-semibold text-[#243460] mb-4">
+      Quick Contact
+    </h3>
 
-                  <button
-                    onClick={() => setDialogOpen(true)}
-                    className="w-full bg-gradient-to-r from-blue-500 blue-500 hover:from-blue-600 hover:blue-600 text-white font-bold py-3 rounded-lg transition-all shadow-md text-sm flex items-center justify-center gap-2"
-                  >
-                    <TestTube className="w-4 h-4" />
-                    Book Now
-                  </button>
-                </CardContent>
-              </Card>
+    <div className="space-y-4">
+
+      {/* Phone */}
+      <div>
+        <div className="flex items-center gap-2 text-[#243460]">
+          <Phone className="w-4 h-4 text-[#666666]" />
+          <span className="text-[14px] text-[#666666]">Reception</span>
+        </div>
+        <p className="text-[15px] font-semibold text-[#243460] mt-1">
+          {safeDisplay(hospital?.hspcontact?.receptioncontact1 || hospital?.mobile, "N/A")}
+        </p>
+      </div>
+
+      {/* Email */}
+      <div>
+        <div className="flex items-center gap-2 text-[#243460]">
+          <Mail className="w-4 h-4 text-[#666666]" />
+          <span className="text-[14px] text-[#666666]">Email</span>
+        </div>
+        <p className="text-[15px] font-semibold text-[#243460] mt-1 truncate">
+          {safeDisplay(hospital?.hspcontact?.receptionemail || hospital?.email, "N/A")}
+        </p>
+      </div>
+
+      {/* Rating */}
+      <div>
+        <p className="text-[22px] font-bold text-[#243460]">
+          {avgRating || "N/A"} <span className="font-semibold">Excellent</span>
+        </p>
+
+        <div className="flex items-center gap-2 text-[#666666] mt-1">
+          <Star className="w-4 h-4 text-[#243460]" />
+          <span className="text-[14px]">
+            {totalReviews || 0} Reviews & Comments
+          </span>
+        </div>
+
+        {/* Read All Reviews Button */}
+        <button
+          onClick={() => setShowRatingList(true)}
+          className="mt-3 bg-[#5868F2] text-white px-4 py-1 text-sm rounded-lg hover:bg-[#4352d9] transition rounded-xl"
+        >
+          Read All Reviews
+        </button>
+      </div>
+
+    </div>
+  </CardContent>
+</Card>
+
+{/* ================= ADDRESS CARD (Exact Screenshot Style) ================= */}
+<div className="bg-white border border-[#00000033] rounded-2xl p-5 shadow-sm">
+
+  {/* TOP ROW */}
+  <div className="flex gap-4">
+
+        {/* Left – LIVE GOOGLE MAP */}
+    <div className="w-32 h-32 rounded-xl overflow-hidden shadow">
+      <iframe
+        width="100%"
+        height="100%"
+        loading="lazy"
+        className="rounded-xl"
+        src={`https://www.google.com/maps?q=${encodeURIComponent(
+          safeDisplay(hospital?.hspcontact?.address, "")
+        )}&output=embed`}
+      />
+    </div>
+
+
+
+    {/* Right – Address Info */}
+    <div className="flex-1">
+      <div className="flex items-center gap-2">
+        <MapPin className="w-5 h-5 text-[#243460]" />
+        <h2 className="text-xl font-bold text-[#243460]">Address</h2>
+      </div>
+
+      <p className="text-sm text-gray-600 mt-1">
+        {safeDisplay(hospital?.hspcontact?.city, "City")}, {safeDisplay(hospital?.hspcontact?.state, "State")} {hospital?.hspcontact?.pincode || hospital?.pincode ? `- ${hospital.hspcontact.pincode || hospital.pincode}` : ""}
+      </p>
+
+      <p className="text-[15px] text-[#243460] font-medium mt-1 leading-5">
+        {safeDisplay(hospital?.hspcontact?.address, "Address not available")}
+      </p>
+    </div>
+
+  </div>
+
+  {/* ---------------------- NEARBY TRANSPORT ---------------------- */}
+  {hospital?.facilitiesJson?.transportation?.length > 0 && (
+    <div className="mt-5">
+      <h3 className="text-[16px] font-semibold text-[#C47C52] mb-2">
+        Nearby Transportation
+      </h3>
+
+      <div className="space-y-3">
+        {hospital.facilitiesJson.transportation.map((item, i) => (
+          <div key={i} className="flex justify-between items-center">
+
+            <div className="flex items-center gap-2">
+              {/* ICONS EXACT STYLE */}
+              {i === 0 && <BusFront className="w-4 h-4 text-[#243460]" />}
+              {i === 1 && <Plane className="w-4 h-4 text-[#243460]" />}
+              {i === 2 && <Train className="w-4 h-4 text-[#243460]" />}
+
+              <span className="text-[15px] text-[#243460]">{item.name}</span>
+            </div>
+
+            <span className="text-[14px] font-semibold text-[#243460]">
+              {item.distance}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* ---------------------- NEARBY LANDMARKS ---------------------- */}
+  {hospital?.facilitiesJson?.landmarks?.length > 0 && (
+    <div className="mt-6">
+      <h3 className="text-[16px] font-semibold text-[#C47C52] mb-2">
+        Nearby Landmarks
+      </h3>
+
+      <div className="space-y-3">
+        {hospital.facilitiesJson.landmarks.map((place, i) => (
+          <div key={i} className="flex justify-between items-center">
+
+            <div className="flex items-center gap-2">
+              {/* Landmark Icons */}
+              {i === 0 && <Landmark className="w-4 h-4 text-[#243460]" />}
+              {i === 1 && <Route className="w-4 h-4 text-[#243460]" />}
+              {i === 2 && <Building2 className="w-4 h-4 text-[#243460]" />}
+
+              <span className="text-[15px] text-[#243460]">{place.name}</span>
+            </div>
+
+            <span className="text-[14px] font-semibold text-[#243460]">
+              {place.distance}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+</div>
+
+
+
             </div>
           </div>
 
-           {/* Our Services Section - Professional & Enhanced */}
-           <div className="max-w-6xl mx-auto my-6">
-            <Card className="border border-gray-100 shadow-xl rounded-2xl overflow-hidden transition-all hover:shadow-2xl">
-              <CardContent className="p-0">
-                 <div className="bg-gradient-to-r from-blue-600 to-blue-600 py-4 px-4 text-center">
+{/* --- OUR SERVICES (Figma Exact Style + Full Functionality) --- */}
+<div className="mx-auto my-6" style={{ width: "1270px" }}>
 
-                   <h2 className="text-2xl font-bold text-white tracking-tight">
-                     Our Services
-                   </h2>
-                   <p className="text-blue-100 mt-1 text-xs sm:text-sm">
-                     Comprehensive pathology services for all your needs
-                   </p>
-                 </div>
+  <Card className="border border-[#00000033] shadow-md rounded-[12px] overflow-hidden">
+    <CardContent className="p-0">
 
-                 <div className="p-4 sm:p-6 bg-gray-50">
-                   <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-                     {[
-                       { icon: <TestTube className="w-5 h-5 text-blue-600" />, label: "Lab Tests", value: labTestsCount > 0 ? `${labTestsCount}` : "0",  action: "labTests", clickable:true },
-                       { icon: <Award className="w-5 h-5 text-purple-600" />, label: "NABL Certified", value: "Certified", action: "nablCertified", clickable:true },
-                       { icon: <Clock className="w-5 h-5 text-orange-600" />, label: "Service Hours", value: "24/7", action: "serviceHours", clickable:true },
-                       { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: "Quality Assured", value: "100%", action: "qualityAssured", clickable:true },
-                       { icon: <Users className="w-5 h-5 text-cyan-600" />, label: "Experience", value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "0", action: "experience", clickable:true },
-                       { icon: <Heart className="w-5 h-5 text-red-600" />, label: "Home Collection", value: "Available",  action: "homeCollection", clickable:true },
-                       { icon: <Video className="w-5 h-5 text-blue-600" />, label: "Online Reports", value: "Available",  action: "onlineReports", clickable:true },
-                       { icon: <CreditCard className="w-5 h-5 text-orange-600" />, label: "Cashless", value: "Available",  action: "cashless", clickable:true },
-                       { icon: <FileText className="w-5 h-5 text-blue-600" />, label: "Govt Schemes", value: "Available",  action: "govtSchemes", clickable:true },
-                       ...(hospital?.hspdetails?.nabhnablapproved === "Yes"
-  ? [{
-      icon: <Award className="w-5 h-5 text-blue-600" />,
-      label: "NABL Level",
-      value: hospital.hspdetails.nabhnabllevel || "Level 8",
-      action: "nablLevel",
-      clickable: true,
-    }]
-  : []),
+      {/* Header */}
+      <div className="bg-[#E68B67] py-5 px-6">
+        <h2 className="text-xl font-semibold text-white tracking-tight">
+          Our Services
+        </h2>
+      </div>
 
-                       { icon: <Star className="w-5 h-5 text-yellow-600" />, label: "Rating", value: `${avgRating} ★`, action: "rating", clickable: true },
+      {/* Grid */}
+      <div className="p-6 bg-white">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
 
-                       { icon: <Building2 className="w-5 h-5 text-purple-600" />, label: "Branches",  value: branchData?.length > 0 ? branchData.length : "0",   action: "branches", clickable:true },
-                     ].map((item, idx) => (
-                       <div
-                         key={idx}
-                         onClick={() => {
-                           if (item.clickable) {
-                             if (item.action === "labTests") {
-                               setShowLabTests(true);
-                             } else if (item.action === "homeCollection") {
-                               setShowHomeCollection(true);
-                             } else if (item.action === "branches") {
-                               setShowBranches(true);
-                             } else if (item.action === "govtSchemes") {
-                               setShowGovtSchemes(true);
-                             } else if (item.action === "cashless") {
-                               setShowCashless(true);
-                             } else if (item.action === "onlineReports") {
-                               setShowOnlineReports(true);
-                             }
-                             else if (item.action === "nablCertified") {
-  setShowNablCertified(true);}
-                             else if (item.action === "rating") {
-  setShowRatingList(true);
-}else if (item.action === "serviceHours") {
-  setShowServiceHours(true);
-}
-else if (item.action === "qualityAssured") {
-  setShowQualityAssured(true);
-}else if (item.action === "experience") {
-  setShowExperience(true);
-}
-else if (item.action === "nablLevel") {
-  setShowNablLevel(true);
-}
+          {[
+            { icon: <TestTube className="w-5 h-5 text-[#243460]" />, label: "Lab Tests", value: labTestsCount > 0 ? `${labTestsCount}` : "—", clickable: true, action: "labTests" },
+            { icon: <Award className="w-5 h-5 text-[#243460]" />, label: "NABL Certified", value: "Certified", clickable: true, action: "nablCertified" },
+            { icon: <Clock className="w-5 h-5 text-[#243460]" />, label: "Service Hours", value: "24/7", clickable: true, action: "serviceHours" },
+            { icon: <Shield className="w-5 h-5 text-[#243460]" />, label: "Quality Assured", value: "100%", clickable: true, action: "qualityAssured" },
+            { icon: <Users className="w-5 h-5 text-[#243460]" />, label: "Experience", value: hospital?.hspInfo?.experience ? `${hospital.hspInfo.experience}+ Years` : "—", clickable: true, action: "experience" },
+            { icon: <Heart className="w-5 h-5 text-[#243460]" />, label: "Home Collection", value: "Available", clickable: true, action: "homeCollection" },
+            { icon: <Video className="w-5 h-5 text-[#243460]" />, label: "Online Reports", value: "Available", clickable: true, action: "onlineReports" },
+            { icon: <CreditCard className="w-5 h-5 text-[#243460]" />, label: "Cashless", value: "Available", clickable: true, action: "cashless" },
+            { icon: <FileText className="w-5 h-5 text-[#243460]" />, label: "Govt Schemes", value: "Available", clickable: true, action: "govtSchemes" },
+            ...(hospital?.hspdetails?.nabhnablapproved === "Yes"
+              ? [{
+                  icon: <Award className="w-5 h-5 text-[#243460]" />,
+                  label: "NABL Level",
+                  value: hospital.hspdetails.nabhnabllevel || "Level 8",
+                  clickable: true,
+                  action: "nablLevel",
+                }]
+              : []),
+            { icon: <Star className="w-5 h-5 text-[#243460]" />, label: "Rating", value: `${avgRating} ★`, clickable: true, action: "rating" },
+            { icon: <Building2 className="w-5 h-5 text-[#243460]" />, label: "Branches", value: branchData?.length > 0 ? branchData.length : "0", clickable: true, action: "branches" },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              onClick={
+                item.clickable
+                  ? () => {
+                      if (item.action === "labTests") setShowLabTests(true);
+                      else if (item.action === "homeCollection") setShowHomeCollection(true);
+                      else if (item.action === "branches") setShowBranches(true);
+                      else if (item.action === "govtSchemes") setShowGovtSchemes(true);
+                      else if (item.action === "cashless") setShowCashless(true);
+                      else if (item.action === "onlineReports") setShowOnlineReports(true);
+                      else if (item.action === "nablCertified") setShowNablCertified(true);
+                      else if (item.action === "rating") setShowRatingList(true);
+                      else if (item.action === "serviceHours") setShowServiceHours(true);
+                      else if (item.action === "qualityAssured") setShowQualityAssured(true);
+                      else if (item.action === "experience") setShowExperience(true);
+                      else if (item.action === "nablLevel") setShowNablLevel(true);
+                    }
+                  : undefined
+              }
+              className={`bg-[#FAF5E05C] p-4 rounded-xl border border-[#F1E9E2] shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center ${
+                item.clickable ? "cursor-pointer hover:scale-105" : ""
+              }`}
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#EFE9E1] mb-2">
+                {item.icon}
+              </div>
 
+              <h3 className="font-semibold text-[#243460] text-sm">
+                {item.label}
+              </h3>
 
+              <p className="font-bold text-[#E68B67] text-sm mt-1">
+                {item.value}
+              </p>
+            </div>
+          ))}
 
+        </div>
+      </div>
 
-
-                           }
-                         }}
-                         className={`bg-white p-2 sm:p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all text-center flex flex-col items-center justify-center min-h-[85px] sm:min-h-[95px] ${
-                           item.clickable ? 'cursor-pointer hover:border-blue-400 hover:bg-blue-50' : ''
-                         }`}
-                       >
-                         <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-50 mb-1.5 sm:mb-2">
-                           {item.icon}
-                         </div>
-                         <h3 className="font-semibold text-gray-900 text-[10px] sm:text-xs mb-0.5 leading-tight line-clamp-2">
-                           {item.label}
-                         </h3>
-                         <p className="font-bold text-blue-700 text-[10px] sm:text-xs">
-                           {item.value}
-                         </p>
-                       </div>
-                     ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+    </CardContent>
+  </Card>
+</div>
 
         </div>
       </div>
