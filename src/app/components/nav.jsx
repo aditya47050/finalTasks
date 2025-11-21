@@ -95,6 +95,7 @@ const NavBar = ({
   doctorcategory,
   diagnosticCategory,
   userData,
+  pharmacies,
 }) => {
   console.log(userData)
   const [showAlert, setShowAlert] = useState(false);
@@ -425,11 +426,13 @@ const NavBar = ({
           {/* Enhanced Facilities Section */}
           <div className="md:container md:pl-[20px] lg:px-auto xl:pl-12 xl:pr-[60px] xlg:container pt-2 mx-auto">
             <div className="relative">
-              <Facilities
-                hspcategory={hspcategory}
-                doctorcategory={doctorcategory}
-                diagnosticCategory={diagnosticCategory}
-              />
+<Facilities
+  hspcategory={hspcategory}
+  doctorcategory={doctorcategory}
+  diagnosticCategory={diagnosticCategory}
+  pharmacies={pharmacies}
+/>
+
             </div>
           </div>
         </div>

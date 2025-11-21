@@ -59,9 +59,13 @@ import AccreditationList from "./AccreditationList";
 import InhouseCanteenList from "./InhouseCanteenList";
 
 
-const HospitalSingleView = ({ hospitalData, patientId, allHospitals }) => {
+const HospitalSingleView = ({ hospitalData, patientId, allHospitals, categoryName }) => {
   console.log("🚀 ~ Hospital Data:", hospitalData)
   console.log("🚀 ~ Hospital Specialities:", JSON.stringify(hospitalData.HospitalSpeciality, null, 2))
+
+    console.log("HSP DETAILS RAW:", hospitalData?.hspdetails);
+  console.log("Logo:", hospitalData?.hspdetails?.hsplogo);
+  console.log("Reg Cert:", hospitalData?.hspdetails?.hspregcertificate);
   
   const [activeTab, setActiveTab] = useState('overview');
   const [showDoctorsList, setShowDoctorsList] = useState(false);
@@ -82,6 +86,9 @@ const [showNablPathology, setShowNablPathology] = useState(false);
 const [showPharmacy, setShowPharmacy] = useState(false);
 const [showAccreditation, setShowAccreditation] = useState(false);
 const [showCanteen, setShowCanteen] = useState(false);
+const category = categoryName || "N/A";
+
+
 // added these states
 const [doctorCount, setDoctorCount] = useState(null);
 const [bedCount, setBedCount] = useState(null);
@@ -257,10 +264,11 @@ const bedCategoryMapping = {
       {hospitalData?.hspInfo?.regname || "Hospital Name"}
     </h1>
 
-    <div className="flex items-center gap-2 text-[#243460] text-[15px] leading-none">
-      <Building2 className="w-4 h-4" />
-      {hospitalData?.hspdetails?.category || "Gynac Hospital"}
-    </div>
+<div className="flex items-center gap-2 text-[#243460] text-[15px]">
+  <Building2 className="w-4 h-4" />
+  {category}
+</div>
+
   </div>
 
 {/* RIGHT SECTION */}

@@ -14,6 +14,7 @@ const HospitalPage = async ({ params }) => {
 
     if (!session?.email) return <AccessErrorDisplay />;
 
+    // Fetch patient
     const patient = await db.patient.findUnique({
       where: { email: session.email },
     });
@@ -25,7 +26,13 @@ const HospitalPage = async ({ params }) => {
     // ⭐ Fetch ALL hospitals (for Top Bed Booking Section)
     const allHospitals = await db.Hospital.findMany({
       include: {
-        hspInfo: true,
+        hspInfo: {
+          include: {
+            hspcategory: {
+              include: { hspcategory: true }, // 👈 HospitalsCategory include
+            },
+          },
+        },
         hspcontact: true,
         hspdetails: true,
         _count: {
@@ -37,11 +44,17 @@ const HospitalPage = async ({ params }) => {
       },
     });
 
-    // ⭐ Fetch Single Hospital Data
+    // ⭐ Fetch Single Hospital Data (WITH CATEGORY)
     const hospitalData = await db.Hospital.findUnique({
       where: { id: hospitalid },
       include: {
-        hspInfo: true,
+        hspInfo: {
+          include: {
+            hspcategory: {
+              include: { hspcategory: true }, // 👈 include category master
+            },
+          },
+        },
         hspcontact: true,
         hspdetails: true,
         hspbranches: true,
@@ -63,13 +76,19 @@ const HospitalPage = async ({ params }) => {
       },
     });
 
+    // ⭐ FIX: hspcategory is ARRAY → take first item
+    const categoryName =
+      hospitalData?.hspInfo?.hspcategory?.[0]?.hspcategory?.title || null;
+
     return (
-      <HospitalSingleView 
+      <HospitalSingleView
         hospitalData={hospitalData}
         patientId={patientId}
-        allHospitals={allHospitals}   // ⬅️ ADD HERE
+        allHospitals={allHospitals}
+        categoryName={categoryName} // <-- PASS CATEGORY
       />
     );
+
   } catch (error) {
     console.error("Error loading hospital page:", error);
     return <div>Something went wrong. Please try again later.</div>;

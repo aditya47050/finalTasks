@@ -13,6 +13,7 @@ import { ChevronDown } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 
 const Facilities = ({ hspcategory, doctorcategory, diagnosticCategory }) => {
+
   const router = useRouter()
   const pathname = usePathname()
 
@@ -21,6 +22,9 @@ const Facilities = ({ hspcategory, doctorcategory, diagnosticCategory }) => {
     router.push(link)
   }
 
+  // -------------------------------------------------------
+  // ⭐ NAVIGATION LINKS (Pharmacy now DIRECT CLICK, NO DROPDOWN)
+  // -------------------------------------------------------
   const navlinks = [
     {
       title: "Expert Doctors",
@@ -69,10 +73,7 @@ const Facilities = ({ hspcategory, doctorcategory, diagnosticCategory }) => {
       submenu: [
         { title: "ICU at Home", link: "/home-healthcare/ICU%20at%20Home" },
         { title: "General Nursing", link: "/home-healthcare/General%20Nursing" },
-       { 
-  title: "Neurological Care & Rehabilitation", 
-  link: "/home-healthcare/Neurological%20Care%20%26%20Rehabilitation" 
-},
+        { title: "Neurological Care & Rehabilitation", link: "/home-healthcare/Neurological%20Care%20%26%20Rehabilitation" },
         { title: "Cancer Care on Bed", link: "/home-healthcare/Cancer%20Care%20on%20Bed" },
         { title: "Transplant & Post-Op Care", link: "/home-healthcare/Transplant%20%26%20Post-Op%20Care" },
         { title: "Pregnancy Care", link: "/home-healthcare/Pregnancy%20Care" },
@@ -100,13 +101,12 @@ const Facilities = ({ hspcategory, doctorcategory, diagnosticCategory }) => {
     {
       title: "Health Insurance",
       link: "/health-insurance",
-     submenu: [
-      { title: "Government Health Insurance", link: "/health-insurance/category?name=government" },
-      { title: "Private Health Insurance", link: "/health-insurance/category?name=private" },
-      { title: "TPA Health Insurance", link: "/health-insurance/category?name=tpa" },
-      { title: "TPA Administration Services", link: "/health-insurance/category?name=tpa_admin" },
-    ],
-
+      submenu: [
+        { title: "Government Health Insurance", link: "/health-insurance/category?name=government" },
+        { title: "Private Health Insurance", link: "/health-insurance/category?name=private" },
+        { title: "TPA Health Insurance", link: "/health-insurance/category?name=tpa" },
+        { title: "TPA Administration Services", link: "/health-insurance/category?name=tpa_admin" },
+      ],
     },
     {
       title: "Corporate Health",
@@ -122,54 +122,73 @@ const Facilities = ({ hspcategory, doctorcategory, diagnosticCategory }) => {
         { title: "Equipped Mobile Medical Unit", link: "#" },
       ],
     },
+
+    // ⭐ PHARMACY — NO DROPDOWN
     {
       title: "Pharmacy",
-      link: "/mobilenav/8",
-      submenu: [
-        { title: "TATA 1mg", link: "#" },
-        { title: "Apollo 24/7", link: "#" },
-        { title: "Pharm Easy", link: "#" },
-        { title: "Netmeds", link: "#" }, { title: "Flipkart Health", link: "#" }, { title: "Indian Chemist", link: "#" }, { title: "HEALTH KART", link: "#" }, { title: "MeD LIFe", link: "#" }, { title: "India pharm", link: "#" }, { title: "MedPlus Mart", link: "#" },
-      ],
+      link: "/pharmacy", // DIRECT PAGE
+      submenu: [],       // NO DROPDOWN
     },
   ]
 
+  // -------------------------------------------------------
+  // ⭐ RENDER
+  // -------------------------------------------------------
   return (
     <div className="container mx-auto px-4 min-[1000px]:px-[14px] min-[1100px]:px-[8px] xl:px-[2px] my-2">
-      <div className="flex justify-center lg:justify-between  min-[1000px]:gap-x-[1px] xl:gap-x-[2px]  w-full">
+      <div className="flex justify-center lg:justify-between min-[1000px]:gap-x-[1px] xl:gap-x-[2px] w-full">
+
         {navlinks.map((nav) => {
+          const isActive =
+            pathname === nav.link ||
+            nav.submenu.some((item) => pathname.startsWith(item.link))
+
+          // ⭐ If NO submenu → DIRECT BUTTON
+          if (nav.submenu.length === 0) {
+            return (
+              <Button
+                key={nav.title}
+                className={cn(
+                  "flex items-center gap-1 min-[1000px]:px-[2px] min-[1100px]:px-[6px] min-[1200px]:px-[6px] xl:px-1 xlg:px-3.5 py-2 rounded-xl min-[1000px]:text-[10px] min-[1100px]:text-xs font-semibold transition-colors",
+                  isActive ? "bg-[#FF5E00] text-white" : "bg-gray-100 text-[#453565]"
+                )}
+                size="sm"
+                onClick={(e) => handleClick(e, nav.link)}
+              >
+                <span>{nav.title}</span>
+              </Button>
+            )
+          }
+
+          // ⭐ OTHERWISE use dropdown
           const totalItems = nav.submenu.length
           let columns = 1
-          if (totalItems > 10 && totalItems <= 20) {
-            columns = 2
-          } else if (totalItems > 20 && totalItems <= 30) {
-            columns = 3
-          } else if (totalItems > 30) {
-            columns = 4
-          }
-          columns = Math.max(1, columns)
-          const itemsPerColumn = Math.ceil(totalItems / columns)
-          const columnsArray = Array.from({ length: columns }, (_, colIndex) => {
-            return nav.submenu.slice(colIndex * itemsPerColumn, (colIndex + 1) * itemsPerColumn)
-          })
 
-          const isActive = pathname === nav.link ||nav.submenu.some((item) => pathname.startsWith(item.link))
+          if (totalItems > 10 && totalItems <= 20) columns = 2
+          else if (totalItems > 20 && totalItems <= 30) columns = 3
+          else if (totalItems > 30) columns = 4
+
+          const itemsPerColumn = Math.ceil(totalItems / columns)
+          const columnsArray = Array.from({ length: columns }, (_, colIndex) =>
+            nav.submenu.slice(colIndex * itemsPerColumn, (colIndex + 1) * itemsPerColumn)
+          )
 
           return (
             <DropdownMenu key={nav.title}>
               <DropdownMenuTrigger asChild>
                 <Button
                   className={cn(
-                    "flex items-center gap-1 min-[1000px]:px-[2px] min-[1100px]:px-[6px] min-[1200px]:px-[6px] xl:px-1 xlg:px-3.5 py-2 rounded-xl min-[1000px]:text-[10px] min-[1100px]:text-xs font-semibold transition-colors ",
-                    isActive ? "bg-[#FF5E00] text-white hover:bg-gray-100 hover:text-[#453565]" : "bg-gray-100  text-[#453565] hover:bg-gray-100 hover:text-[#453565]",
+                    "flex items-center gap-1 min-[1000px]:px-[2px] min-[1100px]:px-[6px] min-[1200px]:px-[6px] xl:px-1 xlg:px-3.5 py-2 rounded-xl min-[1000px]:text-[10px] min-[1100px]:text-xs font-semibold transition-colors",
+                    isActive ? "bg-[#FF5E00] text-white" : "bg-gray-100 text-[#453565]"
                   )}
                   size="sm"
                   onClick={(e) => handleClick(e, nav.link)}
                 >
-                  <span className="select-none">{nav.title}</span>
-                  <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  <span>{nav.title}</span>
+                  <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200" />
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent
                 className="text-xs min-w-[100px] max-w-[90vw] md:max-w-[800px] bg-white p-4 shadow-lg rounded-xl"
                 align="start"
@@ -178,26 +197,31 @@ const Facilities = ({ hspcategory, doctorcategory, diagnosticCategory }) => {
                   <Button
                     size="sm"
                     onClick={(e) => handleClick(e, nav.link)}
-                    className="w-full justify-center rounded-xl font-bold px-3 py-1 text-xs bg-[#5271FF] hover:bg-[#5271FF]/90 text-white"
+                    className="w-full justify-center rounded-xl font-bold px-3 py-1 text-xs bg-[#5271FF] text-white"
                   >
                     View More {nav.title}
                   </Button>
                 </DropdownMenuItem>
+
                 <DropdownMenuSeparator className="my-2" />
 
-                <div className="text-sm bg-white grid grid-flow-col auto-cols-max  gap-y-1">
+                <div className="text-sm bg-white grid grid-flow-col auto-cols-max gap-y-1">
                   {columnsArray.map((columnItems, colIndex) => (
                     <div key={colIndex} className="flex">
                       <div className="min-w-[120px] max-w-[180px]">
                         {columnItems.map((item) => (
-                          <DropdownMenuItem key={item.link} className="p-0 !text-[10px]">
-                            <Link href={item.link} className="block w-full py-0 px-2">
-                              <span className="text-[#453565] font-medium hover:underline">{item.title}</span>
+                          <DropdownMenuItem key={item.link} className="p-0">
+                            <Link href={item.link} className="block w-full py-0 px-2 text-[10px]">
+                              <span className="text-[#453565] font-medium hover:underline">
+                                {item.title}
+                              </span>
                             </Link>
                           </DropdownMenuItem>
                         ))}
                       </div>
-                      {colIndex < columnsArray.length - 1 && <div className="border-l border-gray-200 mx-4"></div>}
+                      {colIndex < columnsArray.length - 1 && (
+                        <div className="border-l border-gray-200 mx-4"></div>
+                      )}
                     </div>
                   ))}
                 </div>
