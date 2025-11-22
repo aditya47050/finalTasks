@@ -39,6 +39,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
   const [cart, setCart] = useState([])
   const [favorites, setFavorites] = useState([])
   const [isOrderProcessing, setIsOrderProcessing] = useState(false)
+  const [editingQuantity, setEditingQuantity] = useState(null)
 
   const [selectedCategory, setSelectedCategory] = useState("")
   const [selectedBrand, setSelectedBrand] = useState("")
@@ -138,9 +139,47 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
     setCart(cart.map((item) => (item.id === productId ? { ...item, quantity: Math.min(quantity, item.stock) } : item)))
   }
 
+  const handleQuantityInputChange = (productId, value) => {
+    // Allow empty input for better UX
+    if (value === "") {
+      setCart(cart.map((item) =>
+        item.id === productId ? { ...item, quantity: "" } : item
+      ))
+      return
+    }
+
+    const quantity = parseInt(value)
+    if (isNaN(quantity) || quantity < 0) return
+
+    updateCartQuantity(productId, quantity)
+  }
+
+  const startEditingQuantity = (productId) => {
+    setEditingQuantity(productId)
+  }
+
+  const finishEditingQuantity = (productId) => {
+    setEditingQuantity(null)
+    const cartItem = cart.find(item => item.id === productId)
+    if (cartItem && (cartItem.quantity === "" || cartItem.quantity <= 0)) {
+      removeFromCart(productId)
+    }
+  }
+
+  const handleQuantityInputBlur = (productId) => {
+    finishEditingQuantity(productId)
+  }
+
+  const handleQuantityInputKeyPress = (productId, e) => {
+    if (e.key === 'Enter') {
+      finishEditingQuantity(productId)
+    }
+  }
+
   const removeFromCart = (productId) => {
     const product = cart.find((item) => item.id === productId)
     setCart(cart.filter((item) => item.id !== productId))
+    setEditingQuantity(null)
     if (product) {
       toast.success(`${product.name} has been removed from your cart.`);
     }
@@ -153,10 +192,10 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
     setFavorites((prev) => (prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]))
 
     if (product) {
-      if(isCurrentlyFavorite){
+      if (isCurrentlyFavorite) {
         toast.success(`${product.name} has been removed from your favorites.`);
       }
-      else{
+      else {
         toast.success(`${product.name} has been added to your favorites.`);
       }
     }
@@ -234,7 +273,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
       }
 
       toast.success("Your order has been placed and will be processed soon.")
-      
+
       setTimeout(() => setCart([]), 500)
     } catch (error) {
       console.error("Error saving order:", error)
@@ -332,7 +371,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                 </div>
 
                 {/* Stock Filter Dropdown */}
-                <div className="mb-2 relative">
+                {/* <div className="mb-2 relative">
                   <select
                     className="w-full md:h-10 h-9 p-2 pr-10 md:text-[14px] text-[12px] rounded-full placeholder:pl-2 placeholder:text-white text-white bg-[#5271FF] border-[#453565] appearance-none"
                     value={selectedStockFilter}
@@ -348,10 +387,10 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                   <span className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
                     <FaArrowCircleDown className="md:h-6 md:w-6 h-4 w-4 text-white rounded-full" />
                   </span>
-                </div>
+                </div> */}
 
                 {/* Prescription Filter Dropdown */}
-                <div className="mb-2 relative">
+                {/* <div className="mb-2 relative">
                   <select
                     className="w-full md:h-10 h-9 p-2 pr-10 md:text-[14px] text-[12px] rounded-full placeholder:pl-2 placeholder:text-white text-white bg-[#5271FF] border-[#453565] appearance-none"
                     value={selectedPrescriptionFilter}
@@ -367,7 +406,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                   <span className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
                     <FaArrowCircleDown className="md:h-6 md:w-6 h-4 w-4 text-white rounded-full" />
                   </span>
-                </div>
+                </div> */}
 
                 {/* Price Range */}
                 <div className="mb-4">
@@ -432,6 +471,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                 const cartItem = cart.find((item) => item.id === product.id)
                 const inCart = !!cartItem
                 const isFavorite = favorites.includes(product.id)
+                const isEditing = editingQuantity === product.id
 
                 return (
                   <Card
@@ -443,17 +483,17 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                       {/* Product Header with Gradient */}
                       <div className="relative w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#5271FF] to-[#8b5cf6] rounded-t-3xl py-6">
                         <div className="w-24 h-24 bg-white border-4 border-[#FF5E00] rounded-full flex items-center justify-center text-[#5271FF] font-bold text-lg">
-                        {product.productImage ? (
-    <img
-      src={product.productImage}
-      alt={product.name}
-      className="h-8 w-8 object-cover rounded-md border"
-    />
-  ) : (
-    <div className="h-8 w-8 bg-gray-200 rounded-md border flex items-center justify-center text-gray-400">
-      📦
-    </div>
-  )}
+                          {product.productImage ? (
+                            <img
+                              src={product.productImage}
+                              alt={product.name}
+                              className="h-8 w-8 object-cover rounded-md border"
+                            />
+                          ) : (
+                            <div className="h-8 w-8 bg-gray-200 rounded-md border flex items-center justify-center text-gray-400">
+                              📦
+                            </div>
+                          )}
                         </div>
 
                         {/* Rating */}
@@ -505,17 +545,25 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                           </p>
                         )}
 
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className="text-2xl font-bold text-[#5271FF]">
-                            ₹{(product.discountedPrice || product.price).toFixed(2)}
-                          </span>
-                          {product.discountedPrice && product.discountedPrice < product.price && (
-                            <>
-                              <span className="text-sm text-[#243460] line-through">₹{product.price.toFixed(2)}</span>
-                              <Badge variant="destructive" className="text-xs bg-[#FF5E00] text-white">
-                                {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
-                              </Badge>
-                            </>
+                        {/* Price Display - Clear per unit pricing */}
+                        <div className="flex flex-col items-center gap-2 mb-4 w-full">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-[#5271FF]">
+                              ₹{(product.discountedPrice || product.price).toFixed(2)}
+                            </span>
+                            {product.discountedPrice && product.discountedPrice < product.price && (
+                              <>
+                                <span className="text-sm text-[#243460] line-through">₹{product.price.toFixed(2)}</span>
+                                <Badge variant="destructive" className="text-xs bg-[#FF5E00] text-white">
+                                  {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
+                                </Badge>
+                              </>
+                            )}
+                          </div>
+                          {(product.category === "Tablets" || product.category === "Capsule") && (
+                            <div className="text-xs text-[#243460] bg-blue-50 px-2 py-1 rounded-full border border-blue-200">
+                               {product.unit || 'unit'} Units
+                            </div>
                           )}
                         </div>
 
@@ -541,6 +589,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                           )}
                         </div>
 
+                        {/* Cart Controls with Editable Quantity */}
                         {inCart ? (
                           <div className="flex items-center justify-between animate-scale-in w-full">
                             <div className="flex items-center gap-2">
@@ -552,9 +601,29 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
-                              <span className="font-semibold px-3 py-1 bg-[#5271FF]/10 rounded text-[#5271FF] min-w-[2rem] text-center">
-                                {cartItem.quantity}
-                              </span>
+
+                              {/* Editable Quantity Input */}
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  min="1"
+                                  max={product.stock}
+                                  value={cartItem.quantity}
+                                  onChange={(e) => handleQuantityInputChange(product.id, e.target.value)}
+                                  onBlur={() => handleQuantityInputBlur(product.id)}
+                                  onKeyPress={(e) => handleQuantityInputKeyPress(product.id, e)}
+                                  className="w-16 h-8 text-center border-2 border-[#5271FF] rounded-lg font-semibold text-[#5271FF] focus:outline-none focus:ring-2 focus:ring-[#5271FF]/20"
+                                  autoFocus
+                                />
+                              ) : (
+                                <div
+                                  className="w-16 h-8 px-3 py-1 bg-[#5271FF]/10 rounded text-[#5271FF] font-semibold text-center cursor-pointer border-2 border-transparent hover:border-[#5271FF] transition-colors"
+                                  onClick={() => startEditingQuantity(product.id)}
+                                >
+                                  {cartItem.quantity}
+                                </div>
+                              )}
+
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -610,6 +679,7 @@ const PharmacyProductsClient = ({ pharmacy, products, customer }) => {
           </div>
         </div>
 
+        {/* Cart Summary */}
         {cart.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-[#5271FF]/20 shadow-lg p-4 z-50 animate-slide-in-up">
             <div className="container mx-auto">

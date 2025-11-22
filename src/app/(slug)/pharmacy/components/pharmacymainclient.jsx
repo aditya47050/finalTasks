@@ -1,22 +1,26 @@
 "use client";
-import React, { useState, useMemo } from "react";
+
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Briefcase,
   ChevronRight,
   Star,
   MapPin,
-  Clock,
   Heart,
-  Shield,
   Filter,
   Truck,
   ShoppingCart,
-  Building2,
 } from "lucide-react";
 import Link from "next/link";
 
-const PharmacyClient = ({ pharmacyList }) => {
+const PharmacyMainClient = ({
+  pharmacyList,
+  stateList,
+  districtList,
+  subdistrictList,
+}) => {
+  // ------------------ FORMAT PHARMACY DATA ------------------
   const pharmacies = pharmacyList.map((p) => {
     const reviewCount = p.PharmacyReview?.length || 0;
     const avgRating =
@@ -37,8 +41,10 @@ const PharmacyClient = ({ pharmacyList }) => {
       logo: p.pharmacylogo || null,
       type: p.pharmacytype || "",
       address: p.fulladdress || "",
-      city: p.city || "",
       state: p.state || "",
+      district: p.district || "",
+      taluka: p.taluka || "",
+      city: p.city || "",
       pincode: p.pincode || "",
       productsCount: p.Product?.length || 0,
       ordersCount: p.PharmacyOrder?.length || 0,
@@ -51,13 +57,19 @@ const PharmacyClient = ({ pharmacyList }) => {
     };
   });
 
+  // ------------------ UNIQUE FILTER VALUES ------------------
   const uniqueCities = [...new Set(pharmacies.map((p) => p.city).filter(Boolean))];
   const uniquePincodes = [...new Set(pharmacies.map((p) => p.pincode).filter(Boolean))];
   const uniqueTypes = [...new Set(pharmacies.map((p) => p.type).filter(Boolean))];
 
+  // ------------------ FILTER STATES ------------------
   const [showFilters, setShowFilters] = useState(false);
+
   const [filters, setFilters] = useState({
     name: "",
+    state: "",
+    district: "",
+    taluka: "",
     city: "",
     pincode: "",
     type: "",
@@ -68,29 +80,84 @@ const PharmacyClient = ({ pharmacyList }) => {
     hasBranches: false,
   });
 
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
+  const [filteredTalukas, setFilteredTalukas] = useState([]);
+
+  // ------------------ STATE → DISTRICT ------------------
+  useEffect(() => {
+    if (!filters.state) {
+      setFilteredDistricts([]);
+      return;
+    }
+
+    const selectedState = stateList.find(
+      (s) => s.stateName.toLowerCase() === filters.state.toLowerCase()
+    );
+
+    if (selectedState) {
+      const districts = districtList.filter((d) => d.stateId === selectedState.id);
+      setFilteredDistricts(districts);
+    }
+
+    setFilters((prev) => ({ ...prev, district: "", taluka: "" }));
+  }, [filters.state]);
+
+  // ------------------ DISTRICT → TALUKA ------------------
+  useEffect(() => {
+    if (!filters.district) {
+      setFilteredTalukas([]);
+      return;
+    }
+
+    const selectedDistrict = filteredDistricts.find(
+      (d) => d.district.toLowerCase() === filters.district.toLowerCase()
+    );
+
+    if (selectedDistrict) {
+      const talukas = subdistrictList.filter(
+        (t) => t.districtId === selectedDistrict.id
+      );
+      setFilteredTalukas(talukas);
+    }
+
+    setFilters((prev) => ({ ...prev, taluka: "" }));
+  }, [filters.district]);
+
+  // ------------------ FILTERED PHARMACY LIST ------------------
   const filteredPharmacies = useMemo(() => {
     return pharmacies.filter((p) => {
-      if (filters.name && !p.name.toLowerCase().includes(filters.name.toLowerCase())) return false;
+      if (filters.name && !p.name.toLowerCase().includes(filters.name.toLowerCase()))
+        return false;
+
+      if (filters.state && p.state !== filters.state) return false;
+      if (filters.district && p.district !== filters.district) return false;
+      if (filters.taluka && p.taluka !== filters.taluka) return false;
+
       if (filters.city && p.city !== filters.city) return false;
       if (filters.pincode && p.pincode !== filters.pincode) return false;
       if (filters.type && p.type !== filters.type) return false;
+
       if (filters.homedelivery && !p.homedelivery) return false;
       if (filters.onlineOrder && !p.onlineOrder) return false;
       if (filters.is24x7 && !p.is24x7) return false;
+
       if (filters.rating && p.rating < Number(filters.rating)) return false;
       if (filters.hasBranches && p.branchCount === 0) return false;
+
       return true;
     });
   }, [filters, pharmacies]);
 
+  // ------------------ ROW LISTS ------------------
   const row1 = [...filteredPharmacies].sort((a, b) => b.ordersCount - a.ordersCount);
   const row2 = [...filteredPharmacies].sort((a, b) => b.rating - a.rating);
   const row3 = [...filteredPharmacies].sort((a, b) => b.productsCount - a.productsCount);
   const row4 = [...filteredPharmacies].filter((p) => p.homedelivery);
 
+  // ------------------ CARD COMPONENT ------------------
   const PharmacyCard = ({ item }) => (
     <Link href={`/pharmacy/${item.id}`}>
-      <Card className="h-full min-h-[280px] shadow hover:shadow-xl rounded-2xl transition-all bg-white hover:-translate-y-1">
+      <Card className="h-full min-h-[280px] rounded-2xl shadow hover:shadow-xl transition-all bg-white hover:-translate-y-1">
         <CardContent className="p-0">
           <div className="bg-gradient-to-br from-[#E68B67]/10 to-[#C47C52]/10 p-5 rounded-t-2xl">
             <div className="flex items-center gap-4">
@@ -100,7 +167,7 @@ const PharmacyClient = ({ pharmacyList }) => {
                   width={70}
                   height={70}
                   alt={item.name}
-                  className="rounded-full object-contain bg-white p-2 shadow"
+                  className="rounded-full bg-white p-2 shadow"
                 />
               ) : (
                 <div className="w-[70px] h-[70px] rounded-full bg-gray-200" />
@@ -125,17 +192,12 @@ const PharmacyClient = ({ pharmacyList }) => {
               <MapPin className="w-4 h-4 text-[#E68B67]" />
               <span className="line-clamp-2">{item.address}</span>
             </div>
-{/* 
-            <div className="flex items-center gap-3 text-gray-700">
-              <Shield className="w-4 h-4 text-[#E68B67]" />
-              <span>{item.productsCount} medicines</span>
-            </div> */}
 
             <div className="flex items-center gap-3 text-gray-700">
               <Truck className="w-4 h-4 text-[#E68B67]" />
               <span>
                 Home Delivery:{" "}
-                <span className={item.homedelivery ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
+                <span className={item.homedelivery ? "text-green-600" : "text-red-600"}>
                   {item.homedelivery ? "Yes" : "No"}
                 </span>
               </span>
@@ -145,7 +207,7 @@ const PharmacyClient = ({ pharmacyList }) => {
               <ShoppingCart className="w-4 h-4 text-[#E68B67]" />
               <span>
                 Online Order:{" "}
-                <span className={item.onlineOrder ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
+                <span className={item.onlineOrder ? "text-green-600" : "text-red-600"}>
                   {item.onlineOrder ? "Yes" : "No"}
                 </span>
               </span>
@@ -153,10 +215,10 @@ const PharmacyClient = ({ pharmacyList }) => {
           </div>
 
           <div className="p-5 pt-1 flex gap-3">
-            <button className="flex-1 py-2 bg-[#E68B67] hover:bg-[#d17a5b] text-white rounded-xl text-sm font-medium transition">
+            <button className="flex-1 py-2 bg-[#E68B67] hover:bg-[#d17a5b] text-white rounded-xl text-sm">
               Order Now
             </button>
-            <button className="flex-1 py-2 bg-[#243460] hover:bg-[#1a2850] text-white rounded-xl text-sm font-medium transition">
+            <button className="flex-1 py-2 bg-[#243460] hover:bg-[#1a2850] text-white rounded-xl text-sm">
               View More
             </button>
           </div>
@@ -165,9 +227,10 @@ const PharmacyClient = ({ pharmacyList }) => {
     </Link>
   );
 
+  // ------------------ ROW SECTION ------------------
   const RowSection = ({ title, data, icon: Icon }) => {
     const [expanded, setExpanded] = useState(false);
-    const items = expanded ? data : data.slice(0, 3);
+    const visible = expanded ? data : data.slice(0, 3);
 
     return (
       <div className="mb-12">
@@ -191,17 +254,19 @@ const PharmacyClient = ({ pharmacyList }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((p) => (
-            <PharmacyCard key={p.id} item={p} />
+          {visible.map((item) => (
+            <PharmacyCard key={item.id} item={item} />
           ))}
         </div>
       </div>
     );
   };
 
+  // ------------------ MAIN RETURN ------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAF5E0]/30 via-white to-[#FAF5E0]/20">
-      <div className="bg-gradient-to-r from-[#E68B67] to-[#C47C52] text-white py-10 shadow">
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-[#E68B67] to-[#C47C52] text-white py-10">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -220,15 +285,21 @@ const PharmacyClient = ({ pharmacyList }) => {
         </div>
       </div>
 
+      {/* PAGE BODY */}
       <div className="container mx-auto px-4 py-10 flex gap-8">
+        {/* FILTER SIDEBAR */}
         {showFilters && (
-          <div className="w-80 bg-white rounded-2xl shadow-xl p-6 h-fit sticky top-20 space-y-6">
+          <div className="w-80 bg-white p-6 rounded-2xl shadow-xl space-y-6 sticky top-20 h-fit">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-semibold text-[#243460]">Filters</h3>
+
               <button
                 onClick={() =>
                   setFilters({
                     name: "",
+                    state: "",
+                    district: "",
+                    taluka: "",
                     city: "",
                     pincode: "",
                     type: "",
@@ -245,34 +316,86 @@ const PharmacyClient = ({ pharmacyList }) => {
               </button>
             </div>
 
-            <div className="space-y-1">
+            {/* Search */}
+            <div>
               <p className="text-sm font-medium text-gray-600">Search</p>
               <input
                 value={filters.name}
                 onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:border-[#E68B67] outline-none"
+                className="w-full p-2 border rounded-xl focus:border-[#E68B67]"
                 placeholder="Pharmacy name..."
               />
             </div>
 
-            <div className="space-y-1">
+            {/* State */}
+            <div>
+              <p className="text-sm font-medium text-gray-600">State</p>
+              <select
+                value={filters.state}
+                onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+                className="w-full p-2 border rounded-xl"
+              >
+                <option value="">All States</option>
+                {stateList.map((s) => (
+                  <option key={s.id}>{s.stateName}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* District */}
+            <div>
+              <p className="text-sm font-medium text-gray-600">District</p>
+              <select
+                value={filters.district}
+                onChange={(e) => setFilters({ ...filters, district: e.target.value })}
+                className="w-full p-2 border rounded-xl"
+                disabled={!filteredDistricts.length}
+              >
+                <option value="">All Districts</option>
+                {filteredDistricts.map((d) => (
+                  <option key={d.id}>{d.district}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Taluka */}
+            <div>
+              <p className="text-sm font-medium text-gray-600">Taluka</p>
+              <select
+                value={filters.taluka}
+                onChange={(e) => setFilters({ ...filters, taluka: e.target.value })}
+                className="w-full p-2 border rounded-xl"
+                disabled={!filteredTalukas.length}
+              >
+                <option value="">All Talukas</option>
+                {filteredTalukas.map((t) => (
+                  <option key={t.id}>{t.subDistrict}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* City */}
+            <div>
               <p className="text-sm font-medium text-gray-600">City</p>
               <select
                 value={filters.city}
                 onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:border-[#E68B67] outline-none"
+                className="w-full p-2 border rounded-xl"
               >
                 <option value="">All Cities</option>
                 {uniqueCities.map((c) => (
                   <option key={c}>{c}</option>
                 ))}
               </select>
+            </div>
 
-              <p className="text-sm font-medium text-gray-600 mt-3">Pincode</p>
+            {/* Pincode */}
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pincode</p>
               <select
                 value={filters.pincode}
                 onChange={(e) => setFilters({ ...filters, pincode: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:border-[#E68B67] outline-none"
+                className="w-full p-2 border rounded-xl"
               >
                 <option value="">All</option>
                 {uniquePincodes.map((p) => (
@@ -281,31 +404,28 @@ const PharmacyClient = ({ pharmacyList }) => {
               </select>
             </div>
 
-            <div className="space-y-1">
+            {/* Pharmacy Type */}
+            <div>
               <p className="text-sm font-medium text-gray-600">Pharmacy Type</p>
               <select
                 value={filters.type}
                 onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:border-[#E68B67] outline-none"
+                className="w-full p-2 border rounded-xl"
               >
                 <option value="">All</option>
                 {uniqueTypes.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
+                  <option key={t}>{t}</option>
                 ))}
               </select>
             </div>
 
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-gray-600">Services</p>
-
+            {/* Checkboxes */}
+            <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
                   checked={filters.homedelivery}
                   onChange={(e) => setFilters({ ...filters, homedelivery: e.target.checked })}
-                  className="w-4 h-4 text-[#E68B67] rounded"
                 />
                 Home Delivery
               </label>
@@ -315,7 +435,6 @@ const PharmacyClient = ({ pharmacyList }) => {
                   type="checkbox"
                   checked={filters.onlineOrder}
                   onChange={(e) => setFilters({ ...filters, onlineOrder: e.target.checked })}
-                  className="w-4 h-4 text-[#E68B67] rounded"
                 />
                 Online Order
               </label>
@@ -325,18 +444,27 @@ const PharmacyClient = ({ pharmacyList }) => {
                   type="checkbox"
                   checked={filters.is24x7}
                   onChange={(e) => setFilters({ ...filters, is24x7: e.target.checked })}
-                  className="w-4 h-4 text-[#E68B67] rounded"
                 />
                 Open 24x7
               </label>
+
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={filters.hasBranches}
+                  onChange={(e) => setFilters({ ...filters, hasBranches: e.target.checked })}
+                />
+                Has Branches
+              </label>
             </div>
 
-            <div className="space-y-1">
+            {/* Rating */}
+            <div>
               <p className="text-sm font-medium text-gray-600">Ratings</p>
               <select
                 value={filters.rating}
                 onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-xl focus:border-[#E68B67] outline-none"
+                className="w-full p-2 border rounded-xl"
               >
                 <option value="">Any Rating</option>
                 <option value="4">4★ & above</option>
@@ -344,22 +472,10 @@ const PharmacyClient = ({ pharmacyList }) => {
                 <option value="2">2★ & above</option>
               </select>
             </div>
-
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-600">Other</p>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={filters.hasBranches}
-                  onChange={(e) => setFilters({ ...filters, hasBranches: e.target.checked })}
-                  className="w-4 h-4 text-[#E68B67] rounded"
-                />
-                Has Branches
-              </label>
-            </div>
           </div>
         )}
 
+        {/* ROWS SECTION */}
         <div className="flex-1">
           <RowSection title="Top Pharmacies" data={row1} icon={Heart} />
           <RowSection title="Top Rated Pharmacies" data={row2} icon={Star} />
@@ -371,4 +487,4 @@ const PharmacyClient = ({ pharmacyList }) => {
   );
 };
 
-export default PharmacyClient;
+export default PharmacyMainClient;

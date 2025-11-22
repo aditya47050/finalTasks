@@ -286,7 +286,7 @@ model Patient {
   VideoConsultation      VideoConsultation[]
   healthInsurances       UserHealthInsurance[]
   sentConnectionRequests ConnectionRequest[] @relation("PatientToConnectionRequests")
-  pharmacyReviews PharmacyReview[]
+    pharmacyReviews PharmacyReview[]
 }
 
 model ConnectionRequest {

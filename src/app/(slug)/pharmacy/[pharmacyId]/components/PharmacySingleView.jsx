@@ -38,10 +38,12 @@ import { FaHospitalAlt } from "react-icons/fa";
 import { MdLocalPharmacy } from "react-icons/md";
 import { useRouter } from "next/navigation";
 
-const PharmacySingleView = ({ pharmacyData, customerId }) => {
+const PharmacySingleView = ({ pharmacyData, customerId, addReview }) => {
   console.log("🚀 ~ Pharmacy Data:", pharmacyData)
   
   const [activeTab, setActiveTab] = useState('overview');
+  const [rating, setRating] = useState(0);
+
   const router = useRouter();
 
   // Get reviews from pharmacy data
@@ -450,6 +452,11 @@ const PharmacySingleView = ({ pharmacyData, customerId }) => {
                                 {product.brand && (
                                   <p className="text-xs text-blue-600 mb-2">{product.brand}</p>
                                 )}
+                                                          {/* {(product.category === "Tablets" || product.category === "Capsule") && (
+                            <div className="text-xs text-[#243460] bg-blue-50 px-2 py-1 rounded-full border border-blue-200">
+                               {product.unit || 'unit'} Units
+                            </div>
+                          )} */}
                                 <div className="flex items-center justify-between">
                                   <div>
                                     <p className="text-lg font-bold text-blue-600">₹{product.discountedPrice || product.price}</p>
@@ -596,6 +603,51 @@ const PharmacySingleView = ({ pharmacyData, customerId }) => {
                 <Card className="border border-gray-200 shadow-md rounded-xl">
                   <CardContent className="p-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
+                    {/* ====== ADD REVIEW BOX ====== */}
+{customerId && (
+  <form action={addReview} className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-5 shadow-sm">
+    <h4 className="text-lg font-semibold text-gray-900 mb-3">Write a Review</h4>
+
+    {/* Rating Stars */}
+    <div className="flex items-center gap-2 mb-4">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => setRating(star)}
+          className="focus:outline-none"
+        >
+          <Star
+            className={`w-7 h-7 cursor-pointer ${
+              star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+            }`}
+          />
+        </button>
+      ))}
+
+      <input type="hidden" name="rating" value={rating} />
+    </div>
+
+    {/* Comment Box */}
+    <textarea
+      name="comment"
+      required
+      placeholder="Share your experience…"
+      className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      rows={4}
+    />
+
+    {/* Submit Button */}
+    <button
+      type="submit"
+      className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md"
+    >
+      Submit Review
+    </button>
+  </form>
+)}
+{/* ====== END REVIEW BOX ====== */}
+
                     {reviews.length > 0 ? (
                       <>
                         <div className="text-center mb-8">
